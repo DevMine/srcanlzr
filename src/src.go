@@ -219,6 +219,7 @@ type Attribute struct {
 	Variable
 	Visibility int
 	Constant   bool
+	Static     bool
 }
 
 type Method struct {
