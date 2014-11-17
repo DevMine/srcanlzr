@@ -67,7 +67,7 @@ func main() {
 	}
 
 	if len(flag.Args()) != 1 {
-		fmt.Fprintln(os.Stderr, "invalid # of arguments\n")
+		fmt.Fprint(os.Stderr, "invalid # of arguments\n\n")
 		flag.Usage()
 	}
 
