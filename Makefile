@@ -12,6 +12,9 @@ build:
 test:
 	go test ${PKG}/...
 
+deps:
+	 go get -u github.com/DevMine/srcanlzr
+
 check:
 	go vet ${PKG}/...
 	golint ${GOPATH}/src/${PKG}
