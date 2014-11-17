@@ -13,7 +13,7 @@ import (
 	"encoding/xml"
 	"net/url"
 
-	"projects.gw-computing.net/devmine-sandbox/srcanlzr/repo"
+	"github.com/DevMine/srcanlzr/repo"
 )
 
 // Source file type

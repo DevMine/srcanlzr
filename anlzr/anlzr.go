@@ -10,7 +10,7 @@ package anlzr
 import (
 	"encoding/xml"
 
-	"projects.gw-computing.net/devmine-sandbox/srcanlzr/src"
+	"github.com/DevMine/srcanlzr/src"
 )
 
 type Analyzer interface {

@@ -16,8 +16,8 @@ import (
 
 	"path/filepath"
 
-	"projects.gw-computing.net/devmine-sandbox/srcanlzr/anlzr"
-	"projects.gw-computing.net/devmine-sandbox/srcanlzr/src"
+	"github.com/DevMine/srcanlzr/anlzr"
+	"github.com/DevMine/srcanlzr/src"
 )
 
 const (

@@ -4,7 +4,7 @@
 
 package anlzr
 
-import "projects.gw-computing.net/devmine-sandbox/srcanlzr/src"
+import "github.com/DevMine/srcanlzr/src"
 
 const (
 	maxInt64 = int64(^uint64(0) >> 1)
