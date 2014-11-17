@@ -80,7 +80,10 @@ func main() {
 		}
 	}
 
-	bs, _ := ioutil.ReadFile(flag.Arg(0))
+	bs, err := ioutil.ReadFile(flag.Arg(0))
+	if err != nil {
+		fatal(err)
+	}
 
 	p := new(src.Project)
 	if err := json.Unmarshal(bs, p); err != nil {
