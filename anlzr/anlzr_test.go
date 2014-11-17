@@ -8,14 +8,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"os"
 	"testing"
 
 	"github.com/DevMine/srcanlzr/anlzr"
 	"github.com/DevMine/srcanlzr/src"
 )
 
-var testdata = os.Getenv("GOPATH") + "/src/github.com/DevMine/srcanlzr/testdata/go.json"
+//var testdata = os.Getenv("GOPATH") + "/src/github.com/DevMine/srcanlzr/testdata/go.json"
+var testdata = "../testdata/go.json"
 
 func TestRunAnalyzers(t *testing.T) {
 	bs, err := ioutil.ReadFile(testdata)
