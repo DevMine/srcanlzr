@@ -1,3 +1,7 @@
+# specific files
 tags
+foo.json
+
+# files by extension
 *.swp
 *.prename
