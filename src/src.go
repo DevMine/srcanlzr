@@ -102,6 +102,7 @@ type SourceFile struct {
 // TODO it would be nice to only have the raw function prototype instead of the
 // whole function.
 // TODO proposal: keep only positions instead of a raw string. This would make
+// FIXME add the possibility to have multiple return statements
 // the parsing faster and the generated JSON smaller.
 type Function struct {
 	Name     string
@@ -121,6 +122,7 @@ type IfStatement struct {
 	Line     int // Line number of the statement relatively to the function.
 }
 
+// TODO rename this type into LoopStatement and the loop stop condition
 type ForStatement struct {
 	Type     string
 	StmtList []Statement
