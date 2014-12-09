@@ -18,25 +18,31 @@ type Analyzer interface {
 }
 
 type Result struct {
-	XMLName           xml.Name       `json:"-" xml:"result"`
-	ProgLangs         []src.Language `json:"programming_languages" xml:"programming-languages"`
-	AverageComplexity int            `json:"average_complexity" xml:"averageComplexity"`
-	AverageFuncLen    float32        `json:"average_function_length" xml:"average-function-length"`
-	MaxFuncLen        int64          `json:"max_function_length" xml:"max-function-length"`
-	MinFuncLen        int64          `json:"min_function_length" xml:"min-function-length"`
-	MedianFuncLen     int64          `json:"median_function_length" xml:"median-function-length"`
-	TotalLoC          int64          `json:"total_loc" xml:"total-loc"`
+	XMLName        xml.Name          `json:"-" xml:"result"`
+	ProgLangs      []src.Language    `json:"programming_languages" xml:"programming-languages"`
+	AverageFuncLen float32           `json:"average_function_length" xml:"average-function-length"`
+	MaxFuncLen     int64             `json:"max_function_length" xml:"max-function-length"`
+	MinFuncLen     int64             `json:"min_function_length" xml:"min-function-length"`
+	MedianFuncLen  int64             `json:"median_function_length" xml:"median-function-length"`
+	TotalLoC       int64             `json:"total_loc" xml:"total-loc"`
+	Complexity     ComplexityMetrics `json:"complexity"`
+}
+
+// Cyclomatic complexity metrics, also known as McCabe metric.
+type ComplexityMetrics struct {
+	AveragePerFunc float32 `json:"average_per_func"` // Average complexity per function.
+	AveragePerFile float32 `json:"average_per_file"` // Average complexity per file.
 }
 
 func RunAnalyzers(p *src.Project, a ...Analyzer) (*Result, error) {
 	r := &Result{
-		ProgLangs:         p.ProgLangs,
-		AverageComplexity: -1,
-		AverageFuncLen:    -1.0,
-		MaxFuncLen:        -1,
-		MinFuncLen:        -1,
-		MedianFuncLen:     -1,
-		TotalLoC:          -1,
+		ProgLangs:      p.ProgLangs,
+		AverageFuncLen: -1.0,
+		MaxFuncLen:     -1,
+		MinFuncLen:     -1,
+		MedianFuncLen:  -1,
+		TotalLoC:       -1,
+		Complexity:     ComplexityMetrics{AveragePerFunc: -1, AveragePerFile: -1},
 	}
 
 	for _, anlzr := range a {
