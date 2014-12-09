@@ -10,7 +10,10 @@
 package src
 
 import (
+	"encoding/json"
 	"encoding/xml"
+	"errors"
+	"fmt"
 	"net/url"
 
 	"github.com/DevMine/srcanlzr/repo"
@@ -58,12 +61,80 @@ const (
 )
 
 type Project struct {
-	Name      string // Name of the project
-	Repo      *repo.Repo
+	Name      string     // Name of the project
+	Repo      *repo.Repo // Repository in which the project is hosted
 	RepoURL   *url.URL   // Repo URL
 	ProgLangs []Language // List of all programming languages used
 	Packages  []*Package // Project's packages
 	LoC       int64      // Lines of Code
+}
+
+// UnmarshalProject unmarshals a JSON representation of a Project into a real
+//  Project structure.
+//
+// It is required to use this function instead of json.Unmarshal because we use
+// an interface to abstract a Statement, thus json.Unmarshal is unable to
+// unmarshal the statements correctly.
+//
+// TODO Find a more elegant way for solving this problem (eg. write a custom
+// JSON parser).
+func UnmarshalProject(bs []byte) (*Project, error) {
+	p := &Project{}
+
+	if err := json.Unmarshal(bs, p); err != nil {
+		return nil, err
+	}
+
+	for _, pkgs := range p.Packages {
+		for _, sfs := range pkgs.SourceFiles {
+			for _, fct := range sfs.Functions {
+				castStmts := make([]Statement, 0)
+
+				for _, stmt := range fct.StmtList {
+					castStmt, err := castToStatement(stmt.(map[string]interface{}))
+					if err != nil {
+						return nil, err
+					}
+
+					castStmts = append(castStmts, castStmt)
+				}
+
+				fct.StmtList = castStmts
+			}
+
+			for _, cls := range sfs.Classes {
+				for _, mds := range cls.Methods {
+					castStmts := make([]Statement, 0)
+
+					for _, stmt := range mds.StmtList {
+						castStmt, err := castToStatement(stmt.(map[string]interface{}))
+						if err != nil {
+							return nil, err
+						}
+
+						castStmts = append(castStmts, castStmt)
+					}
+				}
+			}
+
+			for _, mods := range sfs.Modules {
+				for _, mds := range mods.Methods {
+					castStmts := make([]Statement, 0)
+
+					for _, stmt := range mds.StmtList {
+						castStmt, err := castToStatement(stmt.(map[string]interface{}))
+						if err != nil {
+							return nil, err
+						}
+
+						castStmts = append(castStmts, castStmt)
+					}
+				}
+			}
+		}
+	}
+
+	return p, nil
 }
 
 type Language struct {
@@ -122,6 +193,36 @@ type IfStatement struct {
 	Line     int // Line number of the statement relatively to the function.
 }
 
+// CastToIfStatement "cast" a generic map into a IfStatement.
+func CastToIfStatement(m map[string]interface{}) (*IfStatement, error) {
+	ifstmt := IfStatement{}
+
+	if typ, ok := m["Type"]; !ok || typ != "IF" {
+		return nil, errors.New("the generic map supplied is not a IfStatement")
+	}
+
+	ifstmt.Type = m["Type"].(string)
+
+	if line, ok := m["Line"]; ok {
+		ifstmt.Line = int(line.(float64))
+	}
+
+	if stmts, ok := m["StmtList"]; ok && stmts != nil {
+		ifstmt.StmtList = make([]Statement, 0)
+
+		for _, stmt := range m["StmtList"].([]interface{}) {
+			castStmt, err := castToStatement(stmt.(map[string]interface{}))
+			if err != nil {
+				return nil, err
+			}
+
+			ifstmt.StmtList = append(ifstmt.StmtList, castStmt)
+		}
+	}
+
+	return &ifstmt, nil
+}
+
 // TODO rename this type into LoopStatement and the loop stop condition
 type ForStatement struct {
 	Type     string
@@ -129,11 +230,67 @@ type ForStatement struct {
 	Line     int // Line number of the statement relatively to the function.
 }
 
+// CastToForStatement "cast" a generic map into a ForStatement.
+func CastToForStatement(m map[string]interface{}) (*ForStatement, error) {
+	forstmt := ForStatement{}
+
+	// TODO remove FOR
+	if typ, ok := m["Type"]; !ok || (typ != "FOR" && typ != "LOOP") {
+		return nil, errors.New("the generic map supplied is not a ForStatement")
+	}
+
+	forstmt.Type = m["Type"].(string)
+
+	if line, ok := m["Line"]; ok {
+		forstmt.Line = int(line.(float64))
+	}
+
+	if stmts, ok := m["StmtList"]; ok && stmts != nil {
+		forstmt.StmtList = make([]Statement, 0)
+
+		for _, stmt := range m["StmtList"].([]interface{}) {
+			castStmt, err := castToStatement(stmt.(map[string]interface{}))
+			if err != nil {
+				return nil, err
+			}
+
+			forstmt.StmtList = append(forstmt.StmtList, castStmt)
+		}
+	}
+
+	return &forstmt, nil
+}
+
 type CallStatement struct {
-	Type     string
-	Ref      FuncRef // Reference to the function
-	StmtList []Statement
-	Line     int // Line number of the statement relatively to the function.
+	Type string
+	Ref  FuncRef // Reference to the function
+	Line int     // Line number of the statement relatively to the function.
+}
+
+// CastToCallStatement "cast" a generic map into a CallStatement.
+func CastToCallStatement(m map[string]interface{}) (*CallStatement, error) {
+	callstmt := CallStatement{}
+
+	if typ, ok := m["Type"]; !ok || typ != "CALL" {
+		return nil, errors.New("the generic map supplied is not a CallStatement")
+	}
+
+	callstmt.Type = m["Type"].(string)
+
+	if line, ok := m["Line"]; ok {
+		callstmt.Line = int(line.(float64))
+	}
+
+	if ref, ok := m["Ref"]; ok {
+		ref, err := CastToFuncRef(ref.(map[string]interface{}))
+		if err != nil {
+			return nil, err
+		}
+
+		callstmt.Ref = *ref
+	}
+
+	return &callstmt, nil
 }
 
 type AssignStatement struct {
@@ -143,15 +300,93 @@ type AssignStatement struct {
 	Line     int    // Line number of the statement relatively to the function.
 }
 
+// CastToAssignStatement "cast" a generic map into a AssignStatement.
+func CastToAssignStatement(m map[string]interface{}) (*AssignStatement, error) {
+	assignstmt := AssignStatement{}
+
+	if typ, ok := m["Type"]; !ok || typ != "ASSIGN" {
+		return nil, errors.New("the generic map supplied is not a AssignStatement")
+	}
+
+	assignstmt.Type = m["Type"].(string)
+
+	if line, ok := m["Line"]; ok {
+		// XXX unsafe cast
+		assignstmt.Line = int(line.(float64))
+	}
+
+	if varName, ok := m["VarName"]; ok {
+		assignstmt.VarName = varName.(string)
+	}
+
+	if varValue, ok := m["VarValue"]; ok {
+		assignstmt.VarValue = varValue.(string)
+	}
+
+	return &assignstmt, nil
+}
+
 type OtherStatement struct {
 	Type     string
 	StmtList []Statement
 	Line     int // Line number of the statement relatively to the function.
 }
 
+// CastToOtherStatement "cast" a generic map into a OtherStatement.
+func CastToOtherStatement(m map[string]interface{}) (*OtherStatement, error) {
+	otherstmt := OtherStatement{}
+
+	if typ, ok := m["Type"]; !ok || typ != "OTHER" {
+		return nil, errors.New("the generic map supplied is not a OtherStatement")
+	}
+
+	otherstmt.Type = m["Type"].(string)
+
+	if line, ok := m["Line"]; ok {
+		otherstmt.Line = int(line.(float64))
+	}
+
+	if stmts, ok := m["StmtList"]; ok && stmts != nil {
+		otherstmt.StmtList = make([]Statement, 0)
+
+		for _, stmt := range m["StmtList"].([]interface{}) {
+			castStmt, err := castToStatement(stmt.(map[string]interface{}))
+			if err != nil {
+				return nil, err
+			}
+
+			otherstmt.StmtList = append(otherstmt.StmtList, castStmt)
+		}
+	}
+
+	return &otherstmt, nil
+}
+
 type FuncRef struct {
 	Namespace string
 	FuncName  string
+}
+
+// CastToFuncRef "cast" a generic map into a FuncRef.
+func CastToFuncRef(m map[string]interface{}) (*FuncRef, error) {
+	fctref := FuncRef{}
+
+	var ok bool
+
+	var namespace interface{}
+	if namespace, ok = m["Namespace"]; !ok {
+		return nil, errors.New("malformed FuncRef, no Namespace field")
+	}
+
+	var funcName interface{}
+	if funcName, ok = m["FuncName"]; !ok {
+		return nil, errors.New("malformed FuncRef, no FuncName field")
+	}
+
+	fctref.Namespace = namespace.(string)
+	fctref.FuncName = funcName.(string)
+
+	return &fctref, nil
 }
 
 type Variable struct {
@@ -227,4 +462,29 @@ type Attribute struct {
 type Method struct {
 	Function
 	Visibility int
+}
+
+// castToStatement cast appropriately a given general map into a Statement.
+//func castToStatement(m map[string]interface{}) (Statement, error) {
+func castToStatement(m map[string]interface{}) (Statement, error) {
+	if _, ok := m["Type"]; !ok {
+		return nil, errors.New("statements list contains an element that is not a Statement")
+	}
+
+	switch m["Type"] {
+	case "IF":
+		return CastToIfStatement(m)
+	case "LOOP", "FOR": // TODO remove FOR
+		return CastToForStatement(m)
+	case "ASSIGN":
+		return CastToAssignStatement(m)
+	case "CALL":
+		return CastToCallStatement(m)
+	case "OTHER":
+		return CastToOtherStatement(m)
+	}
+
+	fmt.Println(m["Type"])
+
+	return nil, errors.New("unknown statement")
 }
