@@ -85,12 +85,12 @@ func main() {
 		fatal(err)
 	}
 
-	p := new(src.Project)
-	if err := json.Unmarshal(bs, p); err != nil {
+	p, err := src.UnmarshalProject(bs)
+	if err != nil {
 		fatal(err)
 	}
 
-	res, err := anlzr.RunAnalyzers(p, anlzr.LoC{})
+	res, err := anlzr.RunAnalyzers(p, anlzr.LoC{}, anlzr.Complexity{})
 	if err != nil {
 		fatal(err)
 	}
