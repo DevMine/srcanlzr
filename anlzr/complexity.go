@@ -29,12 +29,31 @@ func (c Complexity) Analyze(p *src.Project, r *Result) error {
 			for _, f := range sf.Functions {
 				numFuncs++
 				fileComplexity += functionCyclomaticComplexity(&f)
+
+				for _, stmt := range f.StmtList {
+					switch stmt.(type) {
+					case src.IfStatement, src.ForStatement:
+						fileComplexity++
+					}
+				}
+
+				fileComplexity += int64(len(f.Return))
 			}
 
 			for _, cls := range sf.Classes {
 				for _, m := range cls.Methods {
 					numFuncs++
 					fileComplexity += methodCyclomaticComplexity(m)
+
+					for _, stmt := range m.StmtList {
+						switch stmt.(type) {
+						case src.IfStatement, src.ForStatement:
+							fileComplexity++
+						}
+					}
+
+					fileComplexity += int64(len(m.Return))
+
 				}
 			}
 
@@ -42,6 +61,16 @@ func (c Complexity) Analyze(p *src.Project, r *Result) error {
 				for _, m := range mod.Methods {
 					numFuncs++
 					fileComplexity += methodCyclomaticComplexity(m)
+
+					for _, stmt := range m.StmtList {
+						switch stmt.(type) {
+						case src.IfStatement, src.ForStatement:
+							fileComplexity++
+						}
+					}
+
+					fileComplexity += int64(len(m.Return))
+
 				}
 			}
 
@@ -53,12 +82,6 @@ func (c Complexity) Analyze(p *src.Project, r *Result) error {
 			}
 		}
 	}
-
-	fmt.Println("totalFuncs:", totalFuncs)
-	fmt.Println("totalFiles:", totalFiles)
-
-	fmt.Println("totalComplexityPerFunc:", totalComplexityPerFunc)
-	fmt.Println("totalComplexityPerFile:", totalComplexityPerFile)
 
 	cm.AveragePerFunc = float32(totalComplexityPerFunc) / float32(totalFuncs)
 	cm.AveragePerFile = totalComplexityPerFile / float32(totalFiles)
