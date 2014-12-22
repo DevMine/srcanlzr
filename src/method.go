@@ -6,5 +6,5 @@ package src
 
 type Method struct {
 	Function
-	Visibility int
+	Visibility string
 }

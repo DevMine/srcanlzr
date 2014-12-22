@@ -6,7 +6,7 @@ package src
 
 type Attribute struct {
 	Variable
-	Visibility int
+	Visibility string
 	Constant   bool
 	Static     bool
 }

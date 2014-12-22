@@ -8,6 +8,6 @@ import "encoding/xml"
 
 type Language struct {
 	XMLName   xml.Name `json:"-" xml:"languages"`
-	Lang      int      `json:"language" xml:"language"`
-	Paradigms []int    `json:"paradigms" xml:"paradigm"`
+	Lang      string   `json:"language" xml:"language"`
+	Paradigms []string `json:"paradigms" xml:"paradigm"`
 }

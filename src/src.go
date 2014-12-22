@@ -14,37 +14,64 @@ import (
 	"fmt"
 )
 
-// Programming languages
+// Supported programming languages
 const (
-	Go = iota
-	Ruby
-	Python
-	C
-	Java
-	Scala
-	// ... and so on
+	Go     = "go"
+	Ruby   = "ruby"
+	Python = "python"
+	C      = "c"
+	Java   = "java"
+	Scala  = "scala"
 )
 
-// Visibilities
+var suppLang = []string{
+	Go,
+	Ruby,
+	Python,
+	C,
+	Java,
+	Scala,
+}
+
+// Supported visiblities
 const (
-	PublicVisibility = iota
-	PackageVisibility
-	ProtectedVisibility
-	PrivateVisibility
+	PublicVisibility    = "public"
+	PackageVisibility   = "package"
+	ProtectedVisibility = "protected"
+	PrivateVisibility   = "private"
 )
 
-// Paradigms
+var suppVisibility = []string{
+	PublicVisibility,
+	PackageVisibility,
+	ProtectedVisibility,
+	PrivateVisibility,
+}
+
+// Supported paradigms
 const (
-	Strucured = iota
-	Imperative
-	Procedural
-	Compiled
-	Concurrent
-	Functional
-	ObjectOriented
-	Generic
-	Reflective
+	Structured     = "structured"
+	Imperative     = "imperative"
+	Procedural     = "procedural"
+	Compiled       = "compiled"
+	Concurrent     = "concurrent"
+	Functional     = "functional"
+	ObjectOriented = "object oriented"
+	Generic        = "generic"
+	Reflective     = "reflective"
 )
+
+var suppParadigms = []string{
+	Structured,
+	Imperative,
+	Procedural,
+	Compiled,
+	Concurrent,
+	Functional,
+	ObjectOriented,
+	Generic,
+	Reflective,
+}
 
 // castToStatement cast appropriately a given general map into a Statement.
 //func castToStatement(m map[string]interface{}) (Statement, error) {

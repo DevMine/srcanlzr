@@ -6,6 +6,6 @@ package src
 
 type Interface struct {
 	Name       string
-	Visibility int
+	Visibility string
 	// TODO
 }
