@@ -14,15 +14,6 @@ import (
 	"fmt"
 )
 
-// Source file type
-// XXX is it really useful? Is it possible to abstract that ? Because this
-// strongly related to C and it does not really fit with generic representation
-// of a source code...
-const (
-	Source = iota
-	Header
-)
-
 // Programming languages
 const (
 	Go = iota

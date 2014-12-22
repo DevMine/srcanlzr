@@ -7,7 +7,6 @@ package src
 // TODO add support of structs and types
 type SourceFile struct {
 	Path       string           // Path is the source file location
-	Type       int              // Type of source file (source, header, ...)
 	ProgLang   *Language        // Programming language
 	Encoding   string           // Encoding of the source file
 	MIME       string           // MIME type as defined in RFC 2046
