@@ -4,8 +4,16 @@
 
 `srcanlzr` is a tool to analyze source code repositories.
 
+
 ## Installation
 
 ```
 go get github.com/DevMine/srcanlzr
 ```
+
+
+## Download
+
+You can also directly download a compiled version:
+
+http://gobuild.io/github.com/DevMine/srcanlzr
