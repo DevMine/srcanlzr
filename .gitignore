@@ -1,6 +1,7 @@
 # specific files
 tags
 foo.json
+srcanlzr
 
 # files by extension
 *.swp
