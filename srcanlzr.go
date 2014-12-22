@@ -13,7 +13,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-
 	"path/filepath"
 
 	"github.com/DevMine/srcanlzr/anlzr"
