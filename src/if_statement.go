@@ -7,9 +7,9 @@ package src
 import "errors"
 
 type IfStatement struct {
-	Type     string
-	StmtList []Statement
-	Line     int // Line number of the statement relatively to the function.
+	Type     string      `json:"type"`
+	StmtList []Statement `json:"statements_list"`
+	Line     int         `json:"line"` // Line number of the statement relatively to the function.
 }
 
 // CastToIfStatement "cast" a generic map into a IfStatement.

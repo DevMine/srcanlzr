@@ -5,9 +5,9 @@
 package src
 
 type Package struct {
-	Name        string        // Package name
-	Path        string        // Package location
-	Doc         string        // Package doc comments
-	SourceFiles []*SourceFile // Source files
-	LoC         int64         // Lines of Code
+	Name        string        `json:"name"`         // Package name
+	Path        string        `json:"path"`         // Package location
+	Doc         string        `json:"doc"`          // Package doc comments
+	SourceFiles []*SourceFile `json:"source_files"` // Source files
+	LoC         int64         `json:"loc"`          // Lines of Code
 }

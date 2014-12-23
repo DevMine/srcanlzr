@@ -10,11 +10,11 @@ package src
 // FIXME add the possibility to have multiple return statements
 // the parsing faster and the generated JSON smaller.
 type Function struct {
-	Name     string
-	Comments string
-	Args     []Variable
-	Return   []Variable
-	StmtList []Statement
-	LoC      int64  // Lines of Code
-	Raw      string // Function raw source code.
+	Name     string      `json:"name"`
+	Comments string      `json:"comments"` // TODO rename into doc?
+	Args     []Variable  `json:"args"`
+	Return   []Variable  `json:"return"`
+	StmtList []Statement `json:"statements_list"`
+	LoC      int64       `json:"loc"` // Lines of Code
+	Raw      string      `json:"raw"` // Function raw source code.
 }

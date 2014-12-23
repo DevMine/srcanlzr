@@ -5,11 +5,11 @@
 package src
 
 type Class struct {
-	Name                  string
-	Visiblity             int
-	ExtendedClasses       []*Class
-	ImplementedInterfaces []*Interface
-	Attributes            []*Attribute
-	Methods               []*Method
-	Modules               []*Module // For languages supporting mixins
+	Name                  string       `json:"name"`
+	Visiblity             int          `json:"visibility"`
+	ExtendedClasses       []*Class     `json:"extended_classes"`
+	ImplementedInterfaces []*Interface `json:"implemented_interfaces"`
+	Attributes            []*Attribute `json:"attributes"`
+	Methods               []*Method    `json:"methods"`
+	Modules               []*Module    `json:"modules"`
 }

@@ -7,9 +7,9 @@ package src
 import "errors"
 
 type FuncRef struct {
-	Namespace string
-	FuncName  string
-	External  bool
+	Namespace string `json:"namespace"`
+	FuncName  string `json:"function_name"`
+	External  bool   `json:"external"`
 }
 
 // CastToFuncRef "cast" a generic map into a FuncRef.

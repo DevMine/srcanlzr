@@ -5,8 +5,8 @@
 package src
 
 type Constant struct {
-	Name  string
-	Type  string
-	Value string
-	Doc   string
+	Name  string `json:"name"`
+	Type  string `json:"type"`
+	Value string `json:"value"`
+	Doc   string `json:"doc"`
 }

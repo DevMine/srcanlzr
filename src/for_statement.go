@@ -8,9 +8,9 @@ import "errors"
 
 // TODO rename this type into LoopStatement and the loop stop condition
 type ForStatement struct {
-	Type     string
-	StmtList []Statement
-	Line     int // Line number of the statement relatively to the function.
+	Type     string      `json:"type"`
+	StmtList []Statement `json:"statements_list"`
+	Line     int         `json:"line"` // Line number of the statement relatively to the function.
 }
 
 // CastToForStatement "cast" a generic map into a ForStatement.

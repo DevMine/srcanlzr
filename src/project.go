@@ -12,12 +12,12 @@ import (
 )
 
 type Project struct {
-	Name      string     // Name of the project
-	Repo      *repo.Repo // Repository in which the project is hosted
-	RepoURL   *url.URL   // Repo URL
-	ProgLangs []Language // List of all programming languages used
-	Packages  []*Package // Project's packages
-	LoC       int64      // Lines of Code
+	Name      string     `json:"name"`           // Name of the project
+	Repo      *repo.Repo `json:"repository"`     // Repository in which the project is hosted
+	RepoURL   *url.URL   `json:"repository_url"` // Repo URL
+	ProgLangs []Language `json:"languages"`      // List of all programming languages used
+	Packages  []*Package `json:"packages"`       // Project's packages
+	LoC       int64      `json:"loc"`            // Lines of Code
 }
 
 // UnmarshalProject unmarshals a JSON representation of a Project into a real

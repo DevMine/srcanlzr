@@ -6,5 +6,5 @@ package src
 
 type Method struct {
 	Function
-	Visibility string
+	Visibility string `json:"visibility"`
 }

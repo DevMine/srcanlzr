@@ -5,7 +5,7 @@
 package src
 
 type Interface struct {
-	Name       string
-	Visibility string
+	Name       string `json:"name"`
+	Visibility string `json:"visibility"`
 	// TODO
 }

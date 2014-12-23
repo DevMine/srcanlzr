@@ -5,8 +5,8 @@
 package src
 
 type Module struct {
-	Name       string
-	Attributes []*Attribute
-	Methods    []*Method
-	Modules    []*Module // For languages supporting mixins
+	Name       string       `json:"name"`
+	Attributes []*Attribute `json:"attributes"`
+	Methods    []*Method    `json:"methods"`
+	Modules    []*Module    `json:"modules"` // For languages supporting mixins
 }

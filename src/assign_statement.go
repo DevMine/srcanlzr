@@ -7,10 +7,10 @@ package src
 import "errors"
 
 type AssignStatement struct {
-	Type     string
-	VarName  string
-	VarValue string // TODO handle case where value is a literal, function call, etc.
-	Line     int    // Line number of the statement relatively to the function.
+	Type     string `json:"type"`
+	VarName  string `json:"var_name"`
+	VarValue string `json:"var_value"` // TODO handle case where value is a literal, function call, etc.
+	Line     int    `json:"line"`      // Line number of the statement relatively to the function.
 }
 
 // CastToAssignStatement "cast" a generic map into a AssignStatement.

@@ -9,17 +9,17 @@ package src
 type ExprType interface{}
 
 type PrimitiveType struct {
-	Name string // int, float, string, etc.
+	Name string `json:"name"` // int, float, string, etc.
 }
 
 type StructuredType struct {
-	Name   string
-	Doc    string
-	Fields []Field
+	Name   string  `json:"name"`
+	Doc    string  `json:"doc"`
+	Fields []Field `json:"fields"`
 }
 
 type Field struct {
-	Name string
-	Type string
-	Doc  string
+	Name string `json:"name"`
+	Type string `json:"type"`
+	Doc  string `json:"doc"`
 }

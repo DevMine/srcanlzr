@@ -6,7 +6,7 @@ package src
 
 type Attribute struct {
 	Variable
-	Visibility string
-	Constant   bool
-	Static     bool
+	Visibility string `json:"visibility"`
+	Constant   bool   `json:"constant"`
+	Static     bool   `json:"static"`
 }

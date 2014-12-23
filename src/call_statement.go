@@ -7,9 +7,9 @@ package src
 import "errors"
 
 type CallStatement struct {
-	Type string
-	Ref  FuncRef // Reference to the function
-	Line int     // Line number of the statement relatively to the function.
+	Type string  `json:"type"`
+	Ref  FuncRef `json:"reference"` // Reference to the function
+	Line int     `json:"line"`      // Line number of the statement relatively to the function.
 }
 
 // CastToCallStatement "cast" a generic map into a CallStatement.

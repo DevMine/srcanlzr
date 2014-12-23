@@ -5,7 +5,7 @@
 package src
 
 type TypeDef struct {
-	Name string
-	Doc  string
-	Type ExprType
+	Name string   `json:"name"`
+	Doc  string   `json:"doc"`
+	Type ExprType `json:"type"`
 }
