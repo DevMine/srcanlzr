@@ -11,7 +11,7 @@ package src
 // the parsing faster and the generated JSON smaller.
 type Function struct {
 	Name     string      `json:"name"`
-	Comments string      `json:"comments"` // TODO rename into doc?
+	Doc      string      `json:"doc"` // TODO rename into doc?
 	Args     []Variable  `json:"args"`
 	Return   []Variable  `json:"return"`
 	StmtList []Statement `json:"statements_list"`
