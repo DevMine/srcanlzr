@@ -79,7 +79,7 @@ func UnmarshalProject(bs []byte) (*Project, error) {
 				}
 			}
 
-			for _, mods := range sfs.Modules {
+			for _, mods := range sfs.Traits {
 				for _, mds := range mods.Methods {
 					castStmts := make([]Statement, 0)
 

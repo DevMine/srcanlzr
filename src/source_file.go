@@ -44,10 +44,9 @@ type SourceFile struct {
 	// List of classes
 	Classes []Class `json:"classes"`
 
-	// List of modules
-	// TODO rename into "traits"
+	// List of traits
 	// See http://en.wikipedia.org/wiki/Trait_%28computer_programming%29
-	Modules []Module `json:"modules"`
+	Traits []Trait `json:"traits"`
 
 	// The total number of lines of code.
 	LoC int64 `json:"loc"`

@@ -4,9 +4,9 @@
 
 package src
 
-type Module struct {
+type Trait struct {
 	Name       string       `json:"name"`
 	Attributes []*Attribute `json:"attributes"`
 	Methods    []*Method    `json:"methods"`
-	Modules    []*Module    `json:"modules"` // For languages supporting mixins
+	Traits     []*Trait     `json:"traits"`
 }

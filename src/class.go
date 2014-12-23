@@ -11,5 +11,5 @@ type Class struct {
 	ImplementedInterfaces []*Interface `json:"implemented_interfaces"`
 	Attributes            []*Attribute `json:"attributes"`
 	Methods               []*Method    `json:"methods"`
-	Modules               []*Module    `json:"modules"`
+	Traits                []*Trait     `json:"traits"`
 }

@@ -59,7 +59,7 @@ func (lca LoC) Analyze(p *src.Project, r *Result) error {
 				}
 			}
 
-			for _, mod := range sf.Modules {
+			for _, mod := range sf.Traits {
 				for _, m := range mod.Methods {
 					totalFuncs++
 					totalLoCFunc += m.LoC
