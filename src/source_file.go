@@ -4,20 +4,51 @@
 
 package src
 
-// TODO add support of structs and types
+// SourceFile holds information about a source file.
 type SourceFile struct {
-	Path       string           `json:"path"`       // Path is the source file location
-	ProgLang   *Language        `json:"language"`   // Programming language
-	Encoding   string           `json:"encoding"`   // Encoding of the source file
-	MIME       string           `json:"mime"`       // MIME type as defined in RFC 2046 / TODO remove?
-	Imports    []string         `json:"imports"`    // Imports
-	TypeDefs   []TypeDef        `json:"type_defs"`  // TypeDefs
-	Structs    []StructuredType `json:"structs"`    // Struct
-	Constants  []Constant       `json:"constants"`  // Constants
-	Variables  []Variable       `json:"variables"`  // Variables
-	Functions  []Function       `json:"functions"`  // Functions
-	Interfaces []Interface      `json:"interfaces"` // Interfaces
-	Classes    []Class          `json:"classes"`    // Classes
-	Modules    []Module         `json:"modules"`    // Modules (sometimes called "trait")
-	LoC        int64            `json:"loc"`        // Lines of Code
+	// The path of the source file, relative to the root of the project.
+	Path string `json:"path"`
+
+	// Programming language used.
+	ProgLang *Language `json:"language"`
+
+	// File encoding.
+	Encoding string `json:"encoding"`
+
+	// TODO remove
+	MIME string `json:"mime"`
+
+	// List of the imports used by the srouce file.
+	Imports []string `json:"imports"`
+
+	// Types definition
+	// TODO rename JSON key into type_definition
+	TypeDefs []TypeDef `json:"type_defs"`
+
+	// Structures definition
+	// TODO rename JSON key into structures
+	Structs []StructuredType `json:"structs"`
+
+	// List of constants defined at the file level (e.g. global constants)
+	Constants []Constant `json:"constants"`
+
+	// List of variables defined at the file level (e.g. global variables)
+	Variables []Variable `json:"variables"`
+
+	// List of functions
+	Functions []Function `json:"functions"`
+
+	// List of interfaces
+	Interfaces []Interface `json:"interfaces"`
+
+	// List of classes
+	Classes []Class `json:"classes"`
+
+	// List of modules
+	// TODO rename into "traits"
+	// See http://en.wikipedia.org/wiki/Trait_%28computer_programming%29
+	Modules []Module `json:"modules"`
+
+	// The total number of lines of code.
+	LoC int64 `json:"loc"`
 }
