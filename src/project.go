@@ -11,13 +11,32 @@ import (
 	"github.com/DevMine/srcanlzr/repo"
 )
 
+// A project is the root of the src API and must be at the root of the JSON
+// generated string.
+//
+// It contains the metadata of a project and the list of all packages (basically
+// folders).
 type Project struct {
-	Name      string     `json:"name"`           // Name of the project
-	Repo      *repo.Repo `json:"repository"`     // Repository in which the project is hosted
-	RepoURL   *url.URL   `json:"repository_url"` // Repo URL
-	ProgLangs []Language `json:"languages"`      // List of all programming languages used
-	Packages  []*Package `json:"packages"`       // Project's packages
-	LoC       int64      `json:"loc"`            // Lines of Code
+	// The name of the project. Since it may be something really difficult to
+	// guess, it should generally be the name of the folder containing the
+	// project.
+	Name string `json:"name"`
+
+	// The repository in which the project is hosted.
+	Repo *repo.Repo `json:"repository"`
+
+	// TODO remove
+	RepoURL *url.URL `json:"repository_url"`
+
+	// Programming languages used in the project.
+	ProgLangs []Language `json:"languages"`
+
+	// List of all packages of the project. A packages is just a folder
+	// containing at least one source file.
+	Packages []*Package `json:"packages"`
+
+	// The total number of lines of code in the whole project.
+	LoC int64 `json:"loc"`
 }
 
 // UnmarshalProject unmarshals a JSON representation of a Project into a real
