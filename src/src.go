@@ -14,6 +14,23 @@ import (
 	"fmt"
 )
 
+// Supported VCS (Version Control System)
+const (
+	Git = "git"
+	Hg  = "mercurial"
+	SVN = "subversion"
+	Bzr = "bazaar"
+	CVS = "cvs"
+)
+
+var suppVCS = []string{
+	Git,
+	Hg,
+	SVN,
+	Bzr,
+	CVS,
+}
+
 // Supported programming languages
 const (
 	Go     = "go"

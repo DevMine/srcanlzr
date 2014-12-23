@@ -4,11 +4,7 @@
 
 package src
 
-import (
-	"encoding/json"
-
-	"github.com/DevMine/srcanlzr/repo"
-)
+import "encoding/json"
 
 // A project is the root of the src API and must be at the root of the JSON
 // generated string.
@@ -22,7 +18,7 @@ type Project struct {
 	Name string `json:"name"`
 
 	// The repository in which the project is hosted.
-	Repo *repo.Repo `json:"repository"`
+	Repo *Repo `json:"repository"`
 
 	// Programming languages used in the project.
 	ProgLangs []Language `json:"languages"`
