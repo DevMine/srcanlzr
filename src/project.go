@@ -6,7 +6,6 @@ package src
 
 import (
 	"encoding/json"
-	"net/url"
 
 	"github.com/DevMine/srcanlzr/repo"
 )
@@ -24,9 +23,6 @@ type Project struct {
 
 	// The repository in which the project is hosted.
 	Repo *repo.Repo `json:"repository"`
-
-	// TODO remove
-	RepoURL *url.URL `json:"repository_url"`
 
 	// Programming languages used in the project.
 	ProgLangs []Language `json:"languages"`
