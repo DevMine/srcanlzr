@@ -32,7 +32,7 @@ func (c Complexity) Analyze(p *src.Project, r *Result) error {
 
 				for _, stmt := range f.StmtList {
 					switch stmt.(type) {
-					case src.IfStatement, src.ForStatement:
+					case src.IfStatement, src.LoopStatement:
 						fileComplexity++
 					}
 				}
@@ -47,7 +47,7 @@ func (c Complexity) Analyze(p *src.Project, r *Result) error {
 
 					for _, stmt := range m.StmtList {
 						switch stmt.(type) {
-						case src.IfStatement, src.ForStatement:
+						case src.IfStatement, src.LoopStatement:
 							fileComplexity++
 						}
 					}
@@ -64,7 +64,7 @@ func (c Complexity) Analyze(p *src.Project, r *Result) error {
 
 					for _, stmt := range m.StmtList {
 						switch stmt.(type) {
-						case src.IfStatement, src.ForStatement:
+						case src.IfStatement, src.LoopStatement:
 							fileComplexity++
 						}
 					}
@@ -124,11 +124,11 @@ func statementComplexity(s src.Statement) int64 {
 		for _, s := range stmt.StmtList {
 			c += statementComplexity(s)
 		}
-	case src.ForStatement:
+	case src.LoopStatement:
 		fmt.Println("bar")
 		c++
 
-		stmt := s.(src.ForStatement)
+		stmt := s.(src.LoopStatement)
 
 		for _, s := range stmt.StmtList {
 			c += statementComplexity(s)

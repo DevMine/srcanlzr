@@ -84,7 +84,7 @@ func castToStatement(m map[string]interface{}) (Statement, error) {
 	case "IF":
 		return CastToIfStatement(m)
 	case "LOOP", "FOR": // TODO remove FOR
-		return CastToForStatement(m)
+		return CastToLoopStatement(m)
 	case "ASSIGN":
 		return CastToAssignStatement(m)
 	case "CALL":
