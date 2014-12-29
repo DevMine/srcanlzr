@@ -99,15 +99,15 @@ func castToStatement(m map[string]interface{}) (Statement, error) {
 
 	switch m["Type"] {
 	case "IF":
-		return CastToIfStatement(m)
+		return NewIfStatement(m)
 	case "LOOP", "FOR": // TODO remove FOR
-		return CastToLoopStatement(m)
+		return NewLoopStatement(m)
 	case "ASSIGN":
-		return CastToAssignStatement(m)
+		return NewAssignStatement(m)
 	case "CALL":
-		return CastToCallStatement(m)
+		return NewCallStatement(m)
 	case "OTHER":
-		return CastToOtherStatement(m)
+		return NewOtherStatement(m)
 	}
 
 	fmt.Println(m["Type"])

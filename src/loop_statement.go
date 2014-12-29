@@ -13,8 +13,8 @@ type LoopStatement struct {
 	Line     int         `json:"line"` // Line number of the statement relatively to the function.
 }
 
-// CastToLoopStatement "cast" a generic map into a LoopStatement.
-func CastToLoopStatement(m map[string]interface{}) (*LoopStatement, error) {
+// NewLoopStatement creates a new LoopStatement from a generic map.
+func NewLoopStatement(m map[string]interface{}) (*LoopStatement, error) {
 	loopstmt := LoopStatement{}
 
 	if typ, ok := m["Type"]; !ok || typ != "LOOP" {

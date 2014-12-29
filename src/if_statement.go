@@ -12,8 +12,8 @@ type IfStatement struct {
 	Line     int         `json:"line"` // Line number of the statement relatively to the function.
 }
 
-// CastToIfStatement "cast" a generic map into a IfStatement.
-func CastToIfStatement(m map[string]interface{}) (*IfStatement, error) {
+// NewIfStatement creates a new IfStatement from a generic map.
+func NewIfStatement(m map[string]interface{}) (*IfStatement, error) {
 	ifstmt := IfStatement{}
 
 	if typ, ok := m["Type"]; !ok || typ != "IF" {

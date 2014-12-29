@@ -13,8 +13,8 @@ type AssignStatement struct {
 	Line     int    `json:"line"`      // Line number of the statement relatively to the function.
 }
 
-// CastToAssignStatement "cast" a generic map into a AssignStatement.
-func CastToAssignStatement(m map[string]interface{}) (*AssignStatement, error) {
+// NewAssignStatement creates a new AssignStatement from a generic map.
+func NewAssignStatement(m map[string]interface{}) (*AssignStatement, error) {
 	assignstmt := AssignStatement{}
 
 	if typ, ok := m["Type"]; !ok || typ != "ASSIGN" {

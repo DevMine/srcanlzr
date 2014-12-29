@@ -12,8 +12,8 @@ type CallStatement struct {
 	Line int     `json:"line"`      // Line number of the statement relatively to the function.
 }
 
-// CastToCallStatement "cast" a generic map into a CallStatement.
-func CastToCallStatement(m map[string]interface{}) (*CallStatement, error) {
+// NewCallStatement creates a new CallStatement from a generic map.
+func NewCallStatement(m map[string]interface{}) (*CallStatement, error) {
 	callstmt := CallStatement{}
 
 	if typ, ok := m["Type"]; !ok || typ != "CALL" {

@@ -12,8 +12,8 @@ type OtherStatement struct {
 	Line     int         `json:"line"` // Line number of the statement relatively to the function.
 }
 
-// CastToOtherStatement "cast" a generic map into a OtherStatement.
-func CastToOtherStatement(m map[string]interface{}) (*OtherStatement, error) {
+// NewOtherStatement creates a new OtherStatement from a generic map.
+func NewOtherStatement(m map[string]interface{}) (*OtherStatement, error) {
 	otherstmt := OtherStatement{}
 
 	if typ, ok := m["Type"]; !ok || typ != "OTHER" {
