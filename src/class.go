@@ -6,7 +6,7 @@ package src
 
 type Class struct {
 	Name                  string       `json:"name"`
-	Visiblity             int          `json:"visibility"`
+	Visiblity             string       `json:"visibility"`
 	ExtendedClasses       []*Class     `json:"extended_classes"`
 	ImplementedInterfaces []*Interface `json:"implemented_interfaces"`
 	Attributes            []*Attribute `json:"attributes"`
