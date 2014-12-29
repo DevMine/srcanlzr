@@ -12,12 +12,6 @@ type SourceFile struct {
 	// Programming language used.
 	ProgLang *Language `json:"language"`
 
-	// File encoding.
-	Encoding string `json:"encoding"`
-
-	// TODO remove
-	MIME string `json:"mime"`
-
 	// List of the imports used by the srouce file.
 	Imports []string `json:"imports"`
 
