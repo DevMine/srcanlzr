@@ -12,8 +12,8 @@ type FuncRef struct {
 	External  bool   `json:"external"`
 }
 
-// CastToFuncRef "cast" a generic map into a FuncRef.
-func CastToFuncRef(m map[string]interface{}) (*FuncRef, error) {
+// NewFuncRef creates a new FuncRef from a generic map.
+func NewFuncRef(m map[string]interface{}) (*FuncRef, error) {
 	fctref := FuncRef{}
 
 	var ok bool

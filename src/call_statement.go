@@ -27,7 +27,7 @@ func NewCallStatement(m map[string]interface{}) (*CallStatement, error) {
 	}
 
 	if ref, ok := m["Ref"]; ok {
-		ref, err := CastToFuncRef(ref.(map[string]interface{}))
+		ref, err := NewFuncRef(ref.(map[string]interface{}))
 		if err != nil {
 			return nil, err
 		}
