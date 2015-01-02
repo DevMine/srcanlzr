@@ -25,7 +25,7 @@ type Result struct {
 	MinFuncLen     int64             `json:"min_function_length" xml:"min-function-length"`
 	MedianFuncLen  int64             `json:"median_function_length" xml:"median-function-length"`
 	TotalLoC       int64             `json:"total_loc" xml:"total-loc"`
-	Complexity     ComplexityMetrics `json:"complexity"`
+	Complexity     ComplexityMetrics `json:"complexity" xml:"complexity"`
 }
 
 // Cyclomatic complexity metrics, also known as McCabe metric.
