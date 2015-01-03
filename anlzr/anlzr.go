@@ -19,7 +19,7 @@ type Analyzer interface {
 
 type Result struct {
 	XMLName        xml.Name          `json:"-" xml:"result"`
-	ProgLangs      []src.Language    `json:"programming_languages" xml:"programming-languages"`
+	ProgLangs      []Language        `json:"programming_languages" xml:"programming-languages"`
 	AverageFuncLen float32           `json:"average_function_length" xml:"average-function-length"`
 	MaxFuncLen     int64             `json:"max_function_length" xml:"max-function-length"`
 	MinFuncLen     int64             `json:"min_function_length" xml:"min-function-length"`
@@ -34,9 +34,14 @@ type ComplexityMetrics struct {
 	AveragePerFile float32 `json:"average_per_file"` // Average complexity per file.
 }
 
+type Language struct {
+	src.Language
+	Lines int64
+}
+
 func RunAnalyzers(p *src.Project, a ...Analyzer) (*Result, error) {
 	r := &Result{
-		ProgLangs:      p.ProgLangs,
+		ProgLangs:      []Language{},
 		AverageFuncLen: -1.0,
 		MaxFuncLen:     -1,
 		MinFuncLen:     -1,
