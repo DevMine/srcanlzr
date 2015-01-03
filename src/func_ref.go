@@ -4,32 +4,29 @@
 
 package src
 
-import "errors"
-
 type FuncRef struct {
 	Namespace string `json:"namespace"`
 	FuncName  string `json:"function_name"`
 	External  bool   `json:"external"`
 }
 
-// NewFuncRef creates a new FuncRef from a generic map.
-func NewFuncRef(m map[string]interface{}) (*FuncRef, error) {
+// newFuncRef creates a new FuncRef from a generic map.
+func newFuncRef(m map[string]interface{}) (*FuncRef, error) {
+	var err error
+	errPrefix := "src/func_ref"
 	fctref := FuncRef{}
 
-	var ok bool
-
-	var namespace interface{}
-	if namespace, ok = m["Namespace"]; !ok {
-		return nil, errors.New("malformed FuncRef, no Namespace field")
+	if fctref.Namespace, err = extractStringValue("namespace", errPrefix, m); err != nil {
+		return nil, err
 	}
 
-	var funcName interface{}
-	if funcName, ok = m["FuncName"]; !ok {
-		return nil, errors.New("malformed FuncRef, no FuncName field")
+	if fctref.FuncName, err = extractStringValue("function_name", errPrefix, m); err != nil {
+		return nil, err
 	}
 
-	fctref.Namespace = namespace.(string)
-	fctref.FuncName = funcName.(string)
+	if fctref.External, err = extractBoolValue("external", errPrefix, m); err != nil {
+		return nil, err
+	}
 
 	return &fctref, nil
 }

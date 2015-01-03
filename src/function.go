@@ -4,6 +4,12 @@
 
 package src
 
+import (
+	"errors"
+	"fmt"
+	"reflect"
+)
+
 // TODO it would be nice to only have the raw function prototype instead of the
 // whole function.
 // TODO proposal: keep only positions instead of a raw string. This would make
@@ -12,9 +18,77 @@ package src
 type Function struct {
 	Name     string      `json:"name"`
 	Doc      string      `json:"doc"` // TODO rename into doc?
-	Args     []Variable  `json:"args"`
-	Return   []Variable  `json:"return"`
+	Args     []*Variable `json:"args"`
+	Return   []*Variable `json:"return"` // TODO put return in statements
 	StmtList []Statement `json:"statements_list"`
 	LoC      int64       `json:"loc"` // Lines of Code
 	Raw      string      `json:"raw"` // Function raw source code.
+}
+
+func newFunction(m map[string]interface{}) (*Function, error) {
+	var err error
+	errPrefix := "src/function"
+	fct := Function{}
+
+	if fct.Name, err = extractStringValue("name", errPrefix, m); err != nil {
+		return nil, err
+	}
+
+	if fct.Doc, err = extractStringValue("doc", errPrefix, m); err != nil {
+		return nil, err
+	}
+
+	if fct.LoC, err = extractInt64Value("loc", errPrefix, m); err != nil {
+		return nil, err
+	}
+
+	if fct.Raw, err = extractStringValue("raw", errPrefix, m); err != nil {
+		return nil, err
+	}
+
+	if fct.Args, err = newVariablesSlice("args", errPrefix, m); err != nil {
+		return nil, err
+	}
+
+	if fct.Return, err = newVariablesSlice("returns", errPrefix, m); err != nil {
+		return nil, err
+	}
+
+	if fct.StmtList, err = newStatementsSlice("statements_list", errPrefix, m); err != nil {
+		return nil, err
+	}
+
+	return &fct, nil
+}
+
+func newFunctionsSlice(key, errPrefix string, m map[string]interface{}) ([]*Function, error) {
+	var err error
+	var s reflect.Value
+
+	fctsMap, ok := m[key]
+	if !ok {
+		return nil, errors.New(fmt.Sprintf("%s: field '%s' does not exist", errPrefix, key))
+	}
+
+	if s = reflect.ValueOf(fctsMap); s.Kind() != reflect.Slice {
+		return nil, errors.New(fmt.Sprintf("%s: field '%s' is supposed to be a slice",
+			errPrefix, key))
+	}
+
+	fcts := make([]*Function, s.Len(), s.Len())
+	for i := 0; i < s.Len(); i++ {
+		fct := s.Index(i).Interface()
+
+		switch fct.(type) {
+		case map[string]interface{}:
+			if fcts[i], err = newFunction(fct.(map[string]interface{})); err != nil {
+				return nil, err
+			}
+		default:
+			return nil, errors.New(fmt.Sprintf("%s: '%s' must be a map[string]interface{}",
+				errPrefix, key))
+		}
+	}
+
+	return fcts, nil
 }

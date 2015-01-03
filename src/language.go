@@ -4,10 +4,66 @@
 
 package src
 
-import "encoding/xml"
+import (
+	"encoding/xml"
+	"errors"
+	"fmt"
+	"reflect"
+)
 
 type Language struct {
-	XMLName   xml.Name `json:"-" xml:"languages"`
-	Lang      string   `json:"language" xml:"language"`
+	XMLName xml.Name `json:"-" xml:"languages"`
+
+	// TODO rename into name
+	Lang string `json:"language" xml:"language"`
+
 	Paradigms []string `json:"paradigms" xml:"paradigm"`
+}
+
+func newLanguage(m map[string]interface{}) (*Language, error) {
+	var err error
+	errPrefix := "src/language"
+	lang := Language{}
+
+	if lang.Lang, err = extractStringValue("language", errPrefix, m); err != nil {
+		return nil, err
+	}
+
+	if lang.Paradigms, err = extractStringSliceValue("paradigms", errPrefix, m); err != nil {
+		return nil, err
+	}
+
+	return &lang, nil
+}
+
+func newLanguagesSlice(key, errPrefix string, m map[string]interface{}) ([]*Language, error) {
+	var err error
+	var s reflect.Value
+
+	langsMap, ok := m[key]
+	if !ok {
+		return nil, errors.New(fmt.Sprintf("%s: field '%s' does not exist", errPrefix, key))
+	}
+
+	if s = reflect.ValueOf(langsMap); s.Kind() != reflect.Slice {
+		return nil, errors.New(fmt.Sprintf("%s: field '%s' is supposed to be a slice",
+			errPrefix, key))
+	}
+
+	langs := make([]*Language, s.Len(), s.Len())
+	for i := 0; i < s.Len(); i++ {
+		lang := s.Index(i).Interface()
+
+		switch lang.(type) {
+		case map[string]interface{}:
+			if langs[i], err = newLanguage(lang.(map[string]interface{})); err != nil {
+				return nil, err
+			}
+		default:
+			return nil, errors.New(fmt.Sprintf("%s: '%s' must be a map[string]interface{}",
+				errPrefix, key))
+		}
+	}
+
+	return langs, nil
 }

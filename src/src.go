@@ -9,10 +9,7 @@
 */
 package src
 
-import (
-	"errors"
-	"fmt"
-)
+import "encoding/json"
 
 // Supported VCS (Version Control System)
 const (
@@ -90,27 +87,22 @@ var suppParadigms = []string{
 	Reflective,
 }
 
-// castToStatement cast appropriately a given general map into a Statement.
-//func castToStatement(m map[string]interface{}) (Statement, error) {
-func castToStatement(m map[string]interface{}) (Statement, error) {
-	if _, ok := m["Type"]; !ok {
-		return nil, errors.New("statements list contains an element that is not a Statement")
+// Unmarshal unmarshals a JSON representation of a Project into a real
+//  Project structure.
+//
+// It is required to use this function instead of json.Unmarshal because we use
+// an interface to abstract a Statement, thus json.Unmarshal is unable to
+// unmarshal the statements correctly.
+func Unmarshal(bs []byte) (*Project, error) {
+	genMap := map[string]interface{}{}
+	if err := json.Unmarshal(bs, &genMap); err != nil {
+		return nil, err
 	}
 
-	switch m["Type"] {
-	case "IF":
-		return NewIfStatement(m)
-	case "LOOP", "FOR": // TODO remove FOR
-		return NewLoopStatement(m)
-	case "ASSIGN":
-		return NewAssignStatement(m)
-	case "CALL":
-		return NewCallStatement(m)
-	case "OTHER":
-		return NewOtherStatement(m)
+	prj, err := newProject(genMap)
+	if err != nil {
+		return nil, err
 	}
 
-	fmt.Println(m["Type"])
-
-	return nil, errors.New("unknown statement")
+	return prj, nil
 }

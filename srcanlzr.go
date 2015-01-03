@@ -84,7 +84,7 @@ func main() {
 		fatal(err)
 	}
 
-	p, err := src.UnmarshalProject(bs)
+	p, err := src.Unmarshal(bs)
 	if err != nil {
 		fatal(err)
 	}

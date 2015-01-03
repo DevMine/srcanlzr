@@ -4,39 +4,39 @@
 
 package src
 
-import "errors"
+import (
+	"errors"
+	"fmt"
+)
 
 type OtherStatement struct {
 	Type     string      `json:"type"`
 	StmtList []Statement `json:"statements_list"`
-	Line     int         `json:"line"` // Line number of the statement relatively to the function.
+	Line     int64       `json:"line"` // Line number of the statement relatively to the function.
 }
 
-// NewOtherStatement creates a new OtherStatement from a generic map.
-func NewOtherStatement(m map[string]interface{}) (*OtherStatement, error) {
+// newOtherStatement creates a new OtherStatement from a generic map.
+func newOtherStatement(m map[string]interface{}) (*OtherStatement, error) {
+	var err error
+	errPrefix := "src/loop_statement"
 	otherstmt := OtherStatement{}
 
-	if typ, ok := m["Type"]; !ok || typ != "OTHER" {
-		return nil, errors.New("the generic map supplied is not a OtherStatement")
+	// should never happen
+	if typ, ok := m["Type"]; !ok || typ != OtherStmtName {
+		return nil, errors.New(fmt.Sprintf("%s: the generic map supplied is not a OtherStatement",
+			errPrefix))
 	}
 
-	otherstmt.Type = m["Type"].(string)
-
-	if line, ok := m["Line"]; ok {
-		otherstmt.Line = int(line.(float64))
+	if otherstmt.Type, err = extractStringValue("type", errPrefix, m); err != nil {
+		return nil, err
 	}
 
-	if stmts, ok := m["StmtList"]; ok && stmts != nil {
-		otherstmt.StmtList = make([]Statement, 0)
+	if otherstmt.Line, err = extractInt64Value("line", errPrefix, m); err != nil {
+		return nil, err
+	}
 
-		for _, stmt := range m["StmtList"].([]interface{}) {
-			castStmt, err := castToStatement(stmt.(map[string]interface{}))
-			if err != nil {
-				return nil, err
-			}
-
-			otherstmt.StmtList = append(otherstmt.StmtList, castStmt)
-		}
+	if otherstmt.StmtList, err = newStatementsSlice("statements_list", errPrefix, m); err != nil {
+		return nil, err
 	}
 
 	return &otherstmt, nil

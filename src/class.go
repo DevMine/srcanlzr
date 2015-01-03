@@ -4,12 +4,82 @@
 
 package src
 
+import (
+	"errors"
+	"fmt"
+	"reflect"
+)
+
 type Class struct {
 	Name                  string       `json:"name"`
-	Visiblity             string       `json:"visibility"`
+	Visibility            string       `json:"visibility"`
 	ExtendedClasses       []*Class     `json:"extended_classes"`
 	ImplementedInterfaces []*Interface `json:"implemented_interfaces"`
 	Attributes            []*Attribute `json:"attributes"`
 	Methods               []*Method    `json:"methods"`
 	Traits                []*Trait     `json:"traits"`
+}
+
+func newClass(m map[string]interface{}) (*Class, error) {
+	var err error
+	errPrefix := "src/class"
+	cls := Class{}
+
+	if cls.Name, err = extractStringValue("name", errPrefix, m); err != nil {
+		return nil, err
+	}
+
+	if cls.Visibility, err = extractStringValue("visibility", errPrefix, m); err != nil {
+		return nil, err
+	}
+
+	if cls.ExtendedClasses, err = newClassesSlice("classes", errPrefix, m); err != nil {
+		return nil, err
+	}
+
+	if cls.ImplementedInterfaces, err = newInterfacesSlice("interfaces", errPrefix, m); err != nil {
+		return nil, err
+	}
+
+	if cls.Attributes, err = newAttributesSlice("attributes", errPrefix, m); err != nil {
+		return nil, err
+	}
+
+	if cls.Methods, err = newMethodsSlice("methods", errPrefix, m); err != nil {
+		return nil, err
+	}
+
+	return &cls, nil
+}
+
+func newClassesSlice(key, errPrefix string, m map[string]interface{}) ([]*Class, error) {
+	var err error
+	var s reflect.Value
+
+	clssMap, ok := m[key]
+	if !ok {
+		return nil, errors.New(fmt.Sprintf("%s: field '%s' does not exist", errPrefix, key))
+	}
+
+	if s = reflect.ValueOf(clssMap); s.Kind() != reflect.Slice {
+		return nil, errors.New(fmt.Sprintf("%s: field '%s' is supposed to be a slice",
+			errPrefix, key))
+	}
+
+	clss := make([]*Class, s.Len(), s.Len())
+	for i := 0; i < s.Len(); i++ {
+		cls := s.Index(i).Interface()
+
+		switch cls.(type) {
+		case map[string]interface{}:
+			if clss[i], err = newClass(cls.(map[string]interface{})); err != nil {
+				return nil, err
+			}
+		default:
+			return nil, errors.New(fmt.Sprintf("%s: '%s' must be a map[string]interface{}",
+				errPrefix, key))
+		}
+	}
+
+	return clss, nil
 }

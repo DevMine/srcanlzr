@@ -28,7 +28,7 @@ func (c Complexity) Analyze(p *src.Project, r *Result) error {
 
 			for _, f := range sf.Functions {
 				numFuncs++
-				fileComplexity += functionCyclomaticComplexity(&f)
+				fileComplexity += functionCyclomaticComplexity(f)
 
 				for _, stmt := range f.StmtList {
 					switch stmt.(type) {

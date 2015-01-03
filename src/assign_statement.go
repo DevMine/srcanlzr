@@ -4,36 +4,44 @@
 
 package src
 
-import "errors"
+import (
+	"errors"
+	"fmt"
+)
 
 type AssignStatement struct {
 	Type     string `json:"type"`
 	VarName  string `json:"var_name"`
 	VarValue string `json:"var_value"` // TODO handle case where value is a literal, function call, etc.
-	Line     int    `json:"line"`      // Line number of the statement relatively to the function.
+	Line     int64  `json:"line"`      // Line number of the statement relatively to the function.
 }
 
-// NewAssignStatement creates a new AssignStatement from a generic map.
-func NewAssignStatement(m map[string]interface{}) (*AssignStatement, error) {
+// newAssignStatement creates a new AssignStatement from a generic map.
+func newAssignStatement(m map[string]interface{}) (*AssignStatement, error) {
+	var err error
+	errPrefix := "src/assign_statement"
 	assignstmt := AssignStatement{}
 
-	if typ, ok := m["Type"]; !ok || typ != "ASSIGN" {
-		return nil, errors.New("the generic map supplied is not a AssignStatement")
+	// should never happen
+	if typ, ok := m["type"]; !ok || typ != IfStmtName {
+		return nil, errors.New(fmt.Sprintf("%s: the generic map supplied is not a AssignStatement",
+			errPrefix))
 	}
 
-	assignstmt.Type = m["Type"].(string)
-
-	if line, ok := m["Line"]; ok {
-		// XXX unsafe cast
-		assignstmt.Line = int(line.(float64))
+	if assignstmt.Type, err = extractStringValue("type", errPrefix, m); err != nil {
+		return nil, err
 	}
 
-	if varName, ok := m["VarName"]; ok {
-		assignstmt.VarName = varName.(string)
+	if assignstmt.VarName, err = extractStringValue("var_name", errPrefix, m); err != nil {
+		return nil, err
 	}
 
-	if varValue, ok := m["VarValue"]; ok {
-		assignstmt.VarValue = varValue.(string)
+	if assignstmt.VarValue, err = extractStringValue("var_value", errPrefix, m); err != nil {
+		return nil, err
+	}
+
+	if assignstmt.Line, err = extractInt64Value("line", errPrefix, m); err != nil {
+		return nil, err
 	}
 
 	return &assignstmt, nil

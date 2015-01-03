@@ -4,8 +4,6 @@
 
 package src
 
-import "encoding/json"
-
 // A project is the root of the src API and must be at the root of the JSON
 // generated string.
 //
@@ -21,7 +19,7 @@ type Project struct {
 	Repo *Repo `json:"repository"`
 
 	// Programming languages used in the project.
-	ProgLangs []Language `json:"languages"`
+	ProgLangs []*Language `json:"languages"`
 
 	// List of all packages of the project. A packages is just a folder
 	// containing at least one source file.
@@ -31,70 +29,31 @@ type Project struct {
 	LoC int64 `json:"loc"`
 }
 
-// UnmarshalProject unmarshals a JSON representation of a Project into a real
-//  Project structure.
-//
-// It is required to use this function instead of json.Unmarshal because we use
-// an interface to abstract a Statement, thus json.Unmarshal is unable to
-// unmarshal the statements correctly.
-//
-// TODO Find a more elegant way for solving this problem (eg. write a custom
-// JSON parser).
-func UnmarshalProject(bs []byte) (*Project, error) {
-	p := &Project{}
+// newProject creates a new Project from a generic map.
+func newProject(m map[string]interface{}) (*Project, error) {
+	var err error
+	errPrefix := "src/project"
+	prj := Project{}
 
-	if err := json.Unmarshal(bs, p); err != nil {
+	if prj.Name, err = extractStringValue("name", errPrefix, m); err != nil {
 		return nil, err
 	}
 
-	for _, pkgs := range p.Packages {
-		for _, sfs := range pkgs.SourceFiles {
-			for _, fct := range sfs.Functions {
-				castStmts := make([]Statement, 0)
-
-				for _, stmt := range fct.StmtList {
-					castStmt, err := castToStatement(stmt.(map[string]interface{}))
-					if err != nil {
-						return nil, err
-					}
-
-					castStmts = append(castStmts, castStmt)
-				}
-
-				fct.StmtList = castStmts
-			}
-
-			for _, cls := range sfs.Classes {
-				for _, mds := range cls.Methods {
-					castStmts := make([]Statement, 0)
-
-					for _, stmt := range mds.StmtList {
-						castStmt, err := castToStatement(stmt.(map[string]interface{}))
-						if err != nil {
-							return nil, err
-						}
-
-						castStmts = append(castStmts, castStmt)
-					}
-				}
-			}
-
-			for _, mods := range sfs.Traits {
-				for _, mds := range mods.Methods {
-					castStmts := make([]Statement, 0)
-
-					for _, stmt := range mds.StmtList {
-						castStmt, err := castToStatement(stmt.(map[string]interface{}))
-						if err != nil {
-							return nil, err
-						}
-
-						castStmts = append(castStmts, castStmt)
-					}
-				}
-			}
-		}
+	if prj.LoC, err = extractInt64Value("loc", errPrefix, m); err != nil {
+		return nil, err
 	}
 
-	return p, nil
+	if prj.Packages, err = newPackagesSlice("packages", errPrefix, m); err != nil {
+		return nil, err
+	}
+
+	if prj.ProgLangs, err = newLanguagesSlice("languages", errPrefix, m); err != nil {
+		return nil, err
+	}
+
+	if prj.Repo, err = newRepo(m); err != nil {
+		return nil, err
+	}
+
+	return &prj, nil
 }

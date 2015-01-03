@@ -10,5 +10,24 @@ type Repo struct {
 	VCS string `json:"vcs"`
 
 	// The clone URL
-	cloneURL string `json:"url"`
+	CloneURL string `json:"url"`
+}
+
+// newRepo creates a new Repo from a generic map.
+func newRepo(m map[string]interface{}) (*Repo, error) {
+	var err error
+	errPrefix := "src/repo"
+	repo := Repo{}
+
+	repo.VCS, err = extractStringValue("vcs", errPrefix, m)
+	if err != nil {
+		return nil, err
+	}
+
+	repo.CloneURL, err = extractStringValue("url", errPrefix, m)
+	if err != nil {
+		return nil, err
+	}
+
+	return &repo, nil
 }

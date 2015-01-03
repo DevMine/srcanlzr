@@ -10,34 +10,31 @@ import "errors"
 type LoopStatement struct {
 	Type     string      `json:"type"`
 	StmtList []Statement `json:"statements_list"`
-	Line     int         `json:"line"` // Line number of the statement relatively to the function.
+	Line     int64       `json:"line"` // Line number of the statement relatively to the function.
 }
 
-// NewLoopStatement creates a new LoopStatement from a generic map.
-func NewLoopStatement(m map[string]interface{}) (*LoopStatement, error) {
+// newLoopStatement creates a new LoopStatement from a generic map.
+func newLoopStatement(m map[string]interface{}) (*LoopStatement, error) {
+
+	var err error
+	errPrefix := "src/loop_statement"
 	loopstmt := LoopStatement{}
 
-	if typ, ok := m["Type"]; !ok || typ != "LOOP" {
-		return nil, errors.New("the generic map supplied is not a LoopStatement")
+	// should never happen
+	if typ, ok := m["type"]; !ok || typ != IfStmtName {
+		return nil, errors.New("src/loop_statement: the generic map supplied is not a LoopStatement")
 	}
 
-	loopstmt.Type = m["Type"].(string)
-
-	if line, ok := m["Line"]; ok {
-		loopstmt.Line = int(line.(float64))
+	if loopstmt.Type, err = extractStringValue("type", errPrefix, m); err != nil {
+		return nil, err
 	}
 
-	if stmts, ok := m["StmtList"]; ok && stmts != nil {
-		loopstmt.StmtList = make([]Statement, 0)
+	if loopstmt.Line, err = extractInt64Value("line", errPrefix, m); err != nil {
+		return nil, err
+	}
 
-		for _, stmt := range m["StmtList"].([]interface{}) {
-			castStmt, err := castToStatement(stmt.(map[string]interface{}))
-			if err != nil {
-				return nil, err
-			}
-
-			loopstmt.StmtList = append(loopstmt.StmtList, castStmt)
-		}
+	if loopstmt.StmtList, err = newStatementsSlice("statements_list", errPrefix, m); err != nil {
+		return nil, err
 	}
 
 	return &loopstmt, nil

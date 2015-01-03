@@ -4,35 +4,35 @@
 
 package src
 
-import "errors"
+import (
+	"errors"
+	"fmt"
+)
 
 type CallStatement struct {
-	Type string  `json:"type"`
-	Ref  FuncRef `json:"reference"` // Reference to the function
-	Line int     `json:"line"`      // Line number of the statement relatively to the function.
+	Type string   `json:"type"`
+	Ref  *FuncRef `json:"reference"` // Reference to the function
+	Line int64    `json:"line"`      // Line number of the statement relatively to the function.
 }
 
-// NewCallStatement creates a new CallStatement from a generic map.
-func NewCallStatement(m map[string]interface{}) (*CallStatement, error) {
+// newCallStatement creates a new CallStatement from a generic map.
+func newCallStatement(m map[string]interface{}) (*CallStatement, error) {
+	var err error
+	errPrefix := "src/call_statement"
 	callstmt := CallStatement{}
 
-	if typ, ok := m["Type"]; !ok || typ != "CALL" {
-		return nil, errors.New("the generic map supplied is not a CallStatement")
+	// should never happen
+	if typ, ok := m["type"]; !ok || typ != CallStmtName {
+		return nil, errors.New(fmt.Sprintf("%s: the generic map supplied is not a AssignStatement",
+			errPrefix))
 	}
 
-	callstmt.Type = m["Type"].(string)
-
-	if line, ok := m["Line"]; ok {
-		callstmt.Line = int(line.(float64))
+	if callstmt.Ref, err = newFuncRef(m); err != nil {
+		return nil, err
 	}
 
-	if ref, ok := m["Ref"]; ok {
-		ref, err := NewFuncRef(ref.(map[string]interface{}))
-		if err != nil {
-			return nil, err
-		}
-
-		callstmt.Ref = *ref
+	if callstmt.Line, err = extractInt64Value("line", errPrefix, m); err != nil {
+		return nil, err
 	}
 
 	return &callstmt, nil

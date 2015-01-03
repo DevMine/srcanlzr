@@ -4,39 +4,39 @@
 
 package src
 
-import "errors"
+import (
+	"errors"
+	"fmt"
+)
 
 type IfStatement struct {
 	Type     string      `json:"type"`
 	StmtList []Statement `json:"statements_list"`
-	Line     int         `json:"line"` // Line number of the statement relatively to the function.
+	Line     int64       `json:"line"` // Line number of the statement relatively to the function.
 }
 
-// NewIfStatement creates a new IfStatement from a generic map.
-func NewIfStatement(m map[string]interface{}) (*IfStatement, error) {
+// newIfStatement creates a new IfStatement from a generic map.
+func newIfStatement(m map[string]interface{}) (*IfStatement, error) {
+	var err error
+	errPrefix := "src/if_statement"
 	ifstmt := IfStatement{}
 
-	if typ, ok := m["Type"]; !ok || typ != "IF" {
-		return nil, errors.New("the generic map supplied is not a IfStatement")
+	// should never happen
+	if typ, ok := m["type"]; !ok || typ != IfStmtName {
+		return nil, errors.New(fmt.Sprintf("%s: the generic map supplied is not a IfStatement",
+			errPrefix))
 	}
 
-	ifstmt.Type = m["Type"].(string)
-
-	if line, ok := m["Line"]; ok {
-		ifstmt.Line = int(line.(float64))
+	if ifstmt.Type, err = extractStringValue("type", errPrefix, m); err != nil {
+		return nil, err
 	}
 
-	if stmts, ok := m["StmtList"]; ok && stmts != nil {
-		ifstmt.StmtList = make([]Statement, 0)
+	if ifstmt.Line, err = extractInt64Value("line", errPrefix, m); err != nil {
+		return nil, err
+	}
 
-		for _, stmt := range m["StmtList"].([]interface{}) {
-			castStmt, err := castToStatement(stmt.(map[string]interface{}))
-			if err != nil {
-				return nil, err
-			}
-
-			ifstmt.StmtList = append(ifstmt.StmtList, castStmt)
-		}
+	if ifstmt.StmtList, err = newStatementsSlice("statements_list", errPrefix, m); err != nil {
+		return nil, err
 	}
 
 	return &ifstmt, nil
