@@ -14,7 +14,7 @@ func (lpl LocPerLang) Analyse(p *src.Project, r *Result) error {
 	// which is mostly the case
 	if len(p.ProgLangs) == 1 {
 		r.ProgLangs = append(r.ProgLangs,
-			Language{Language: p.ProgLangs[0], Lines: p.LoC})
+			Language{Language: *p.ProgLangs[0], Lines: p.LoC})
 		return nil
 	}
 
