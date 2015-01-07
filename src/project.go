@@ -4,8 +4,6 @@
 
 package src
 
-import "errors"
-
 // A project is the root of the src API and must be at the root of the JSON
 // generated string.
 //

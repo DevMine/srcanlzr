@@ -4,8 +4,6 @@
 
 package src
 
-import "errors"
-
 // SourceFile holds information about a source file.
 type SourceFile struct {
 	// The path of the source file, relative to the root of the project.
