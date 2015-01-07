@@ -5,7 +5,6 @@
 package anlzr_test
 
 import (
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"testing"
@@ -23,8 +22,8 @@ func TestRunAnalyzers(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	p := new(src.Project)
-	if err := json.Unmarshal(bs, p); err != nil {
+	p, err := src.Unmarshal(bs)
+	if err != nil {
 		t.Fatal(err)
 	}
 
@@ -33,8 +32,8 @@ func TestRunAnalyzers(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if fmt.Sprintf("%.3f", res.AverageFuncLen) != "7.256" {
-		t.Errorf("average_function_length: expected 7.256, found %.3f",
+	if fmt.Sprintf("%.3f", res.AverageFuncLen) != "7.265" {
+		t.Errorf("average_function_length: expected 7.265, found %.3f",
 			res.AverageFuncLen)
 	}
 
@@ -53,8 +52,8 @@ func TestRunAnalyzers(t *testing.T) {
 			res.MedianFuncLen)
 	}
 
-	if res.TotalLoC != 128042 {
-		t.Errorf("total_loc: expected 128042, found %d",
+	if res.TotalLoC != 128271 {
+		t.Errorf("total_loc: expected 128271, found %d",
 			res.TotalLoC)
 	}
 }

@@ -18,11 +18,11 @@ type OtherStatement struct {
 // newOtherStatement creates a new OtherStatement from a generic map.
 func newOtherStatement(m map[string]interface{}) (*OtherStatement, error) {
 	var err error
-	errPrefix := "src/loop_statement"
+	errPrefix := "src/other_statement"
 	otherstmt := OtherStatement{}
 
 	// should never happen
-	if typ, ok := m["Type"]; !ok || typ != OtherStmtName {
+	if typ, ok := m["type"]; !ok || typ != OtherStmtName {
 		return nil, errors.New(fmt.Sprintf("%s: the generic map supplied is not a OtherStatement",
 			errPrefix))
 	}

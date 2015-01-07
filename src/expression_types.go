@@ -112,7 +112,7 @@ func newStructsSlice(key, errPrefix string, m map[string]interface{}) ([]*Struct
 
 	structsMap, ok := m[key]
 	if !ok {
-		return nil, errors.New(fmt.Sprintf("%s: field '%s' does not exist", errPrefix, key))
+		return nil, errNotExist
 	}
 
 	if s = reflect.ValueOf(structsMap); s.Kind() != reflect.Slice {

@@ -4,6 +4,8 @@
 
 package src
 
+import "errors"
+
 // SourceFile holds information about a source file.
 type SourceFile struct {
 	// The path of the source file, relative to the root of the project.
@@ -59,35 +61,35 @@ func newSourceFile(m map[string]interface{}) (*SourceFile, error) {
 		return nil, err
 	}
 
-	if src.Imports, err = extractStringSliceValue("imports", errPrefix, m); src.Imports == nil && err != nil {
+	if src.Imports, err = extractStringSliceValue("imports", errPrefix, m); err != nil && isExist(err) {
 		return nil, err
 	}
 
-	if src.TypeDefs, err = newTypeDefsSlice("type_defs", errPrefix, m); err != nil {
+	if src.TypeDefs, err = newTypeDefsSlice("type_defs", errPrefix, m); err != nil && isExist(err) {
 		return nil, err
 	}
 
-	if src.Structs, err = newStructsSlice("structs", errPrefix, m); err != nil {
+	if src.Structs, err = newStructsSlice("structs", errPrefix, m); err != nil && isExist(err) {
 		return nil, err
 	}
 
-	if src.Constants, err = newConstantsSlice("constants", errPrefix, m); err != nil {
+	if src.Constants, err = newConstantsSlice("constants", errPrefix, m); err != nil && isExist(err) {
 		return nil, err
 	}
 
-	if src.Variables, err = newVariablesSlice("variables", errPrefix, m); err != nil {
+	if src.Variables, err = newVariablesSlice("variables", errPrefix, m); err != nil && isExist(err) {
 		return nil, err
 	}
 
-	if src.Functions, err = newFunctionsSlice("functions", errPrefix, m); err != nil {
+	if src.Functions, err = newFunctionsSlice("functions", errPrefix, m); err != nil && isExist(err) {
 		return nil, err
 	}
 
-	if src.Interfaces, err = newInterfacesSlice("interfaces", errPrefix, m); err != nil {
+	if src.Interfaces, err = newInterfacesSlice("interfaces", errPrefix, m); err != nil && isExist(err) {
 		return nil, err
 	}
 
-	if src.Traits, err = newTraitsSlice("traits", errPrefix, m); err != nil {
+	if src.Traits, err = newTraitsSlice("traits", errPrefix, m); err != nil && isExist(err) {
 		return nil, err
 	}
 

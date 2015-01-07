@@ -23,7 +23,7 @@ func newAssignStatement(m map[string]interface{}) (*AssignStatement, error) {
 	assignstmt := AssignStatement{}
 
 	// should never happen
-	if typ, ok := m["type"]; !ok || typ != IfStmtName {
+	if typ, ok := m["type"]; !ok || typ != AssignStmtName {
 		return nil, errors.New(fmt.Sprintf("%s: the generic map supplied is not a AssignStatement",
 			errPrefix))
 	}

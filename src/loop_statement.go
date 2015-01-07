@@ -21,7 +21,7 @@ func newLoopStatement(m map[string]interface{}) (*LoopStatement, error) {
 	loopstmt := LoopStatement{}
 
 	// should never happen
-	if typ, ok := m["type"]; !ok || typ != IfStmtName {
+	if typ, ok := m["type"]; !ok || typ != LoopStmtName {
 		return nil, errors.New("src/loop_statement: the generic map supplied is not a LoopStatement")
 	}
 

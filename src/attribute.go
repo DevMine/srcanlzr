@@ -49,7 +49,7 @@ func newAttributesSlice(key, errPrefix string, m map[string]interface{}) ([]*Att
 
 	attrsMap, ok := m[key]
 	if !ok {
-		return nil, errors.New(fmt.Sprintf("%s: field '%s' does not exist", errPrefix, key))
+		return nil, errNotExist
 	}
 
 	if s = reflect.ValueOf(attrsMap); s.Kind() != reflect.Slice {

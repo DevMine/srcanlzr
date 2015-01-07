@@ -42,7 +42,7 @@ func newLanguagesSlice(key, errPrefix string, m map[string]interface{}) ([]*Lang
 
 	langsMap, ok := m[key]
 	if !ok {
-		return nil, errors.New(fmt.Sprintf("%s: field '%s' does not exist", errPrefix, key))
+		return nil, errNotExist
 	}
 
 	if s = reflect.ValueOf(langsMap); s.Kind() != reflect.Slice {

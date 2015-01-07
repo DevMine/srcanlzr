@@ -4,6 +4,8 @@
 
 package src
 
+import "errors"
+
 // A project is the root of the src API and must be at the root of the JSON
 // generated string.
 //
@@ -16,7 +18,7 @@ type Project struct {
 	Name string `json:"name"`
 
 	// The repository in which the project is hosted.
-	Repo *Repo `json:"repository"`
+	Repo *Repo `json:"repository,omitempty"`
 
 	// Programming languages used in the project.
 	ProgLangs []*Language `json:"languages"`
@@ -51,7 +53,7 @@ func newProject(m map[string]interface{}) (*Project, error) {
 		return nil, err
 	}
 
-	if prj.Repo, err = newRepo(m); err != nil {
+	if prj.Repo, err = newRepo(m); err != nil && isExist(err) {
 		return nil, err
 	}
 

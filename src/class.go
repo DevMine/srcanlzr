@@ -58,7 +58,7 @@ func newClassesSlice(key, errPrefix string, m map[string]interface{}) ([]*Class,
 
 	clssMap, ok := m[key]
 	if !ok {
-		return nil, errors.New(fmt.Sprintf("%s: field '%s' does not exist", errPrefix, key))
+		return nil, errNotExist
 	}
 
 	if s = reflect.ValueOf(clssMap); s.Kind() != reflect.Slice {

@@ -52,7 +52,7 @@ func newTraitsSlice(key, errPrefix string, m map[string]interface{}) ([]*Trait, 
 
 	traitsMap, ok := m[key]
 	if !ok {
-		return nil, errors.New(fmt.Sprintf("%s: field '%s' does not exist", errPrefix, key))
+		return nil, errNotExist
 	}
 
 	if s = reflect.ValueOf(traitsMap); s.Kind() != reflect.Slice {

@@ -85,7 +85,7 @@ func newPackagesSlice(key, errPrefix string, m map[string]interface{}) ([]*Packa
 
 	pkgsMap, ok := m[key]
 	if !ok {
-		return nil, errors.New(fmt.Sprintf("%s: field '%s' does not exist", errPrefix, key))
+		return nil, errNotExist
 	}
 
 	if s = reflect.ValueOf(pkgsMap); s.Kind() != reflect.Slice {

@@ -47,7 +47,7 @@ func newConstantsSlice(key, errPrefix string, m map[string]interface{}) ([]*Cons
 
 	cstsMap, ok := m[key]
 	if !ok {
-		return nil, errors.New(fmt.Sprintf("%s: field '%s' does not exist", errPrefix, key))
+		return nil, errNotExist
 	}
 
 	if s = reflect.ValueOf(cstsMap); s.Kind() != reflect.Slice {

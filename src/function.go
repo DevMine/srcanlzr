@@ -17,12 +17,12 @@ import (
 // the parsing faster and the generated JSON smaller.
 type Function struct {
 	Name     string      `json:"name"`
-	Doc      string      `json:"doc"` // TODO rename into doc?
-	Args     []*Variable `json:"args"`
-	Return   []*Variable `json:"return"` // TODO put return in statements
-	StmtList []Statement `json:"statements_list"`
-	LoC      int64       `json:"loc"` // Lines of Code
-	Raw      string      `json:"raw"` // Function raw source code.
+	Doc      string      `json:"doc,omitempty"` // TODO rename into doc?
+	Args     []*Variable `json:"args,omitempty"`
+	Return   []*Variable `json:"return,omitempty"` // TODO put return in statements
+	StmtList []Statement `json:"statements_list,omitempty"`
+	LoC      int64       `json:"loc"`           // Lines of Code
+	Raw      string      `json:"raw,omitempty"` // Function raw source code.
 }
 
 func newFunction(m map[string]interface{}) (*Function, error) {
@@ -34,11 +34,11 @@ func newFunction(m map[string]interface{}) (*Function, error) {
 		return nil, err
 	}
 
-	if fct.Doc, err = extractStringValue("doc", errPrefix, m); err != nil {
+	if fct.Doc, err = extractStringValue("doc", errPrefix, m); err != nil && isExist(err) {
 		return nil, err
 	}
 
-	if fct.LoC, err = extractInt64Value("loc", errPrefix, m); err != nil {
+	if fct.LoC, err = extractInt64Value("loc", errPrefix, m); err != nil && isExist(err) {
 		return nil, err
 	}
 
@@ -46,15 +46,15 @@ func newFunction(m map[string]interface{}) (*Function, error) {
 		return nil, err
 	}
 
-	if fct.Args, err = newVariablesSlice("args", errPrefix, m); err != nil {
+	if fct.Args, err = newVariablesSlice("args", errPrefix, m); err != nil && isExist(err) {
 		return nil, err
 	}
 
-	if fct.Return, err = newVariablesSlice("returns", errPrefix, m); err != nil {
+	if fct.Return, err = newVariablesSlice("returns", errPrefix, m); err != nil && isExist(err) {
 		return nil, err
 	}
 
-	if fct.StmtList, err = newStatementsSlice("statements_list", errPrefix, m); err != nil {
+	if fct.StmtList, err = newStatementsSlice("statements_list", errPrefix, m); err != nil && isExist(err) {
 		return nil, err
 	}
 
@@ -67,7 +67,7 @@ func newFunctionsSlice(key, errPrefix string, m map[string]interface{}) ([]*Func
 
 	fctsMap, ok := m[key]
 	if !ok {
-		return nil, errors.New(fmt.Sprintf("%s: field '%s' does not exist", errPrefix, key))
+		return nil, errNotExist
 	}
 
 	if s = reflect.ValueOf(fctsMap); s.Kind() != reflect.Slice {

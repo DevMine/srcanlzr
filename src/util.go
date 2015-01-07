@@ -10,10 +10,22 @@ import (
 	"reflect"
 )
 
+var (
+	errNotExist = errors.New("the field does not exist")
+)
+
+func isNotExist(err error) bool {
+	return err == errNotExist
+}
+
+func isExist(err error) bool {
+	return err != errNotExist
+}
+
 func extractStringValue(key, errPrefix string, m map[string]interface{}) (string, error) {
 	val, ok := m[key]
 	if !ok {
-		return "", errors.New(fmt.Sprintf("%s: field '%s' does not exist", errPrefix, key))
+		return "", errNotExist
 	}
 
 	switch val.(type) {
@@ -29,7 +41,7 @@ func extractStringValue(key, errPrefix string, m map[string]interface{}) (string
 func extractBoolValue(key, errPrefix string, m map[string]interface{}) (bool, error) {
 	val, ok := m[key]
 	if !ok {
-		return false, errors.New(fmt.Sprintf("%s: field '%s' does not exist", errPrefix, key))
+		return false, errNotExist
 	}
 
 	switch val.(type) {
@@ -45,7 +57,7 @@ func extractBoolValue(key, errPrefix string, m map[string]interface{}) (bool, er
 func extractFloat64Value(key, errPrefix string, m map[string]interface{}) (float64, error) {
 	val, ok := m[key]
 	if !ok {
-		return 0.0, errors.New(fmt.Sprintf("%s: field '%s' does not exist", errPrefix, key))
+		return 0.0, errNotExist
 	}
 
 	switch val.(type) {
@@ -61,12 +73,16 @@ func extractFloat64Value(key, errPrefix string, m map[string]interface{}) (float
 func extractInt64Value(key, errPrefix string, m map[string]interface{}) (int64, error) {
 	val, ok := m[key]
 	if !ok {
-		return 0, errors.New(fmt.Sprintf("%s: field '%s' does not exist", errPrefix, key))
+		return 0, errNotExist
 	}
 
 	switch val.(type) {
 	case int64:
 		return val.(int64), nil
+	case float64:
+		fl := val.(float64)
+		// XXX make a safe cast...
+		return int64(fl), nil
 	}
 
 	return 0, errors.New(fmt.Sprintf(
@@ -77,7 +93,7 @@ func extractInt64Value(key, errPrefix string, m map[string]interface{}) (int64, 
 func extractMapValue(key, errPrefix string, m map[string]interface{}) (map[string]interface{}, error) {
 	val, ok := m[key]
 	if !ok {
-		return nil, errors.New(fmt.Sprintf("%s: field '%s' does not exist", errPrefix, key))
+		return nil, errNotExist
 	}
 
 	switch val.(type) {
@@ -91,30 +107,38 @@ func extractMapValue(key, errPrefix string, m map[string]interface{}) (map[strin
 }
 
 func extractStringSliceValue(key, errPrefix string, m map[string]interface{}) ([]string, error) {
-	val, ok := m[key]
-	if !ok {
-		return []string{}, errors.New(fmt.Sprintf("%s: field '%s' does not exist", errPrefix, key))
+	s, err := reflectSliceValue(key, errPrefix, m)
+	if err != nil {
+		return nil, err
 	}
 
-	switch val.(type) {
-	case []string:
-		return val.([]string), nil
+	ss := make([]string, s.Len(), s.Len())
+	for i := 0; i < s.Len(); i++ {
+		val := s.Index(i).Interface()
+
+		switch val.(type) {
+		case string:
+			ss = append(ss, val.(string))
+		default:
+			return nil, errors.New(fmt.Sprintf("%s: '%s' must be a []string", errPrefix, key))
+		}
 	}
 
-	return nil, errors.New(fmt.Sprintf(
-		"%s: '%s' field is expected to be a slice of string, found %v",
-		errPrefix, key, reflect.TypeOf(key)))
+	return ss, nil
+	/*return nil, errors.New(fmt.Sprintf(
+	"%s: '%s' field is expected to be a slice of string, found %v",
+	errPrefix, key, reflect.TypeOf(key)))*/
 }
 
 func reflectSliceValue(key, errPrefix string, m map[string]interface{}) (*reflect.Value, error) {
 	val, ok := m[key]
 	if !ok {
-		return nil, errors.New(fmt.Sprintf("%s: field '%s' does not exist", errPrefix, key))
+		return nil, errNotExist
 	}
 
 	var s reflect.Value
 	if s = reflect.ValueOf(val); s.Kind() != reflect.Slice {
-		return nil, errors.New(errPrefix + ": field 'languages' is supposed to be a slice")
+		return nil, errors.New(fmt.Sprintf("%s: field '%s' is supposed to be a slice", errPrefix, key))
 	}
 
 	return &s, nil

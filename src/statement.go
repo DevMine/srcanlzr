@@ -49,8 +49,8 @@ func newStatementsSlice(key, errPrefix string, m map[string]interface{}) ([]Stat
 	var s reflect.Value
 
 	stmtsMap, ok := m[key]
-	if !ok {
-		return nil, errors.New(fmt.Sprintf("%s: field '%s' does not exist", errPrefix, key))
+	if !ok || stmtsMap == nil {
+		return nil, errNotExist
 	}
 
 	if s = reflect.ValueOf(stmtsMap); s.Kind() != reflect.Slice {
