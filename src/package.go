@@ -20,7 +20,8 @@ type Package struct {
 	Path string `json:"path"`
 
 	// The package documentation.
-	Doc string `json:"doc"`
+	// FIXME use slice for packages with multiple languages
+	Doc string `json:"doc,omitempty"`
 
 	// The list of all source files contained in the package.
 	SourceFiles []*SourceFile `json:"source_files"`
