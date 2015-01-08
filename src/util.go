@@ -118,7 +118,7 @@ func extractStringSliceValue(key, errPrefix string, m map[string]interface{}) ([
 
 		switch val.(type) {
 		case string:
-			ss = append(ss, val.(string))
+			ss[i] = val.(string)
 		default:
 			return nil, errors.New(fmt.Sprintf("%s: '%s' must be a []string", errPrefix, key))
 		}
