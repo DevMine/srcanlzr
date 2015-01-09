@@ -13,13 +13,13 @@ import (
 // TODO proposal: keep only positions instead of a raw string. This would make
 // the parsing faster and the generated JSON smaller.
 type Func struct {
-	Name     string `json:"name"`
-	Doc      string `json:"doc,omitempty"`
-	Args     []*Var `json:"args,omitempty"`
-	Return   []*Var `json:"return,omitempty"` // TODO put return in statements
-	StmtList []Stmt `json:"statements_list,omitempty"`
-	LoC      int64  `json:"loc"`           // Lines of Code
-	Raw      string `json:"raw,omitempty"` // Function raw source code.
+	Name      string `json:"name"`
+	Doc       string `json:"doc,omitempty"`
+	Args      []*Var `json:"args,omitempty"`
+	Return    []*Var `json:"return,omitempty"` // TODO put return in statements
+	StmtsList []Stmt `json:"statements_list,omitempty"`
+	LoC       int64  `json:"loc"`           // Lines of Code
+	Raw       string `json:"raw,omitempty"` // Function raw source code.
 }
 
 func newFunc(m map[string]interface{}) (*Func, error) {
@@ -51,7 +51,7 @@ func newFunc(m map[string]interface{}) (*Func, error) {
 		return nil, addDebugInfo(err)
 	}
 
-	if fct.StmtList, err = newStmtsSlice("statements_list", errPrefix, m); err != nil && isExist(err) {
+	if fct.StmtsList, err = newStmtsSlice("statements_list", errPrefix, m); err != nil && isExist(err) {
 		return nil, addDebugInfo(err)
 	}
 

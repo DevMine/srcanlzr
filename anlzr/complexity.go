@@ -30,7 +30,7 @@ func (c Complexity) Analyze(p *src.Project, r *Result) error {
 				numFuncs++
 				fileComplexity += functionCyclomaticComplexity(f)
 
-				for _, stmt := range f.StmtList {
+				for _, stmt := range f.StmtsList {
 					switch stmt.(type) {
 					case src.IfStmt, src.LoopStmt:
 						fileComplexity++
@@ -45,7 +45,7 @@ func (c Complexity) Analyze(p *src.Project, r *Result) error {
 					numFuncs++
 					fileComplexity += methodCyclomaticComplexity(m)
 
-					for _, stmt := range m.StmtList {
+					for _, stmt := range m.StmtsList {
 						switch stmt.(type) {
 						case src.IfStmt, src.LoopStmt:
 							fileComplexity++
@@ -62,7 +62,7 @@ func (c Complexity) Analyze(p *src.Project, r *Result) error {
 					numFuncs++
 					fileComplexity += methodCyclomaticComplexity(m)
 
-					for _, stmt := range m.StmtList {
+					for _, stmt := range m.StmtsList {
 						switch stmt.(type) {
 						case src.IfStmt, src.LoopStmt:
 							fileComplexity++
@@ -94,7 +94,7 @@ func (c Complexity) Analyze(p *src.Project, r *Result) error {
 func functionCyclomaticComplexity(f *src.Func) int64 {
 	cc := int64(1) // cyclomatic complexity
 
-	for _, s := range f.StmtList {
+	for _, s := range f.StmtsList {
 		cc += statementComplexity(&s)
 	}
 
@@ -104,7 +104,7 @@ func functionCyclomaticComplexity(f *src.Func) int64 {
 func methodCyclomaticComplexity(m *src.Method) int64 {
 	cc := int64(1) // cyclomatic complexity
 
-	for _, s := range m.StmtList {
+	for _, s := range m.StmtsList {
 		cc += statementComplexity(&s)
 	}
 
