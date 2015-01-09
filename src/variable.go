@@ -5,7 +5,6 @@
 package src
 
 import (
-	"errors"
 	"fmt"
 	"reflect"
 )
@@ -53,8 +52,8 @@ func newVariablesSlice(key, errPrefix string, m map[string]interface{}) ([]*Vari
 	}
 
 	if s = reflect.ValueOf(varsMap); s.Kind() != reflect.Slice {
-		return nil, addDebugInfo(errors.New(fmt.Sprintf(
-			"%s: field '%s' is supposed to be a slice", errPrefix, key)))
+		return nil, addDebugInfo(fmt.Errorf(
+			"%s: field '%s' is supposed to be a slice", errPrefix, key))
 	}
 
 	vars := make([]*Variable, s.Len(), s.Len())
@@ -67,8 +66,8 @@ func newVariablesSlice(key, errPrefix string, m map[string]interface{}) ([]*Vari
 				return nil, addDebugInfo(err)
 			}
 		default:
-			return nil, addDebugInfo(errors.New(fmt.Sprintf(
-				"%s: '%s' must be a map[string]interface{}", errPrefix, key)))
+			return nil, addDebugInfo(fmt.Errorf(
+				"%s: '%s' must be a map[string]interface{}", errPrefix, key))
 		}
 	}
 

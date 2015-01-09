@@ -5,7 +5,6 @@
 package src
 
 import (
-	"errors"
 	"fmt"
 	"reflect"
 )
@@ -55,8 +54,8 @@ func newAttributesSlice(key, errPrefix string, m map[string]interface{}) ([]*Att
 	}
 
 	if s = reflect.ValueOf(attrsMap); s.Kind() != reflect.Slice {
-		return nil, addDebugInfo(errors.New(fmt.Sprintf(
-			"%s: field '%s' is supposed to be a slice", errPrefix, key)))
+		return nil, addDebugInfo(fmt.Errorf(
+			"%s: field '%s' is supposed to be a slice", errPrefix, key))
 	}
 
 	attrs := make([]*Attribute, s.Len(), s.Len())
@@ -69,8 +68,8 @@ func newAttributesSlice(key, errPrefix string, m map[string]interface{}) ([]*Att
 				return nil, addDebugInfo(err)
 			}
 		default:
-			return nil, addDebugInfo(errors.New(fmt.Sprintf(
-				"%s: '%s' must be a map[string]interface{}", errPrefix, key)))
+			return nil, addDebugInfo(fmt.Errorf(
+				"%s: '%s' must be a map[string]interface{}", errPrefix, key))
 		}
 	}
 

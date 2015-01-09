@@ -5,7 +5,6 @@
 package src
 
 import (
-	"errors"
 	"fmt"
 	"reflect"
 )
@@ -73,8 +72,8 @@ func newFunctionsSlice(key, errPrefix string, m map[string]interface{}) ([]*Func
 	}
 
 	if s = reflect.ValueOf(fctsMap); s.Kind() != reflect.Slice {
-		return nil, addDebugInfo(errors.New(fmt.Sprintf(
-			"%s: field '%s' is supposed to be a slice", errPrefix, key)))
+		return nil, addDebugInfo(fmt.Errorf(
+			"%s: field '%s' is supposed to be a slice", errPrefix, key))
 	}
 
 	fcts := make([]*Function, s.Len(), s.Len())
@@ -87,8 +86,8 @@ func newFunctionsSlice(key, errPrefix string, m map[string]interface{}) ([]*Func
 				return nil, addDebugInfo(err)
 			}
 		default:
-			return nil, addDebugInfo(errors.New(fmt.Sprintf(
-				"%s: '%s' must be a map[string]interface{}", errPrefix, key)))
+			return nil, addDebugInfo(fmt.Errorf(
+				"%s: '%s' must be a map[string]interface{}", errPrefix, key))
 		}
 	}
 

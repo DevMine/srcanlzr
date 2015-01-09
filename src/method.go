@@ -5,7 +5,6 @@
 package src
 
 import (
-	"errors"
 	"fmt"
 	"reflect"
 )
@@ -39,13 +38,13 @@ func newMethodsSlice(key, errPrefix string, m map[string]interface{}) ([]*Method
 
 	mthdsMap, ok := m[key]
 	if !ok {
-		return nil, addDebugInfo(errors.New(fmt.Sprintf(
-			"%s: field '%s' does not exist", errPrefix, key)))
+		return nil, addDebugInfo(fmt.Errorf(
+			"%s: field '%s' does not exist", errPrefix, key))
 	}
 
 	if s = reflect.ValueOf(mthdsMap); s.Kind() != reflect.Slice {
-		return nil, addDebugInfo(errors.New(fmt.Sprintf(
-			"%s: field '%s' is supposed to be a slice", errPrefix, key)))
+		return nil, addDebugInfo(fmt.Errorf(
+			"%s: field '%s' is supposed to be a slice", errPrefix, key))
 	}
 
 	mthds := make([]*Method, s.Len(), s.Len())
@@ -58,8 +57,8 @@ func newMethodsSlice(key, errPrefix string, m map[string]interface{}) ([]*Method
 				return nil, addDebugInfo(err)
 			}
 		default:
-			return nil, addDebugInfo(errors.New(fmt.Sprintf(
-				"%s: '%s' must be a map[string]interface{}", errPrefix, key)))
+			return nil, addDebugInfo(fmt.Errorf(
+				"%s: '%s' must be a map[string]interface{}", errPrefix, key))
 		}
 	}
 

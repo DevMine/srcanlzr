@@ -138,7 +138,7 @@ func MergeAll(ps ...*Project) (*Project, error) {
 	for i := 1; i < len(ps); i++ {
 		curr := ps[i]
 		if curr == nil {
-			return nil, addDebugInfo(errors.New(fmt.Sprintf("p[%d] is nil", i)))
+			return nil, addDebugInfo(fmt.Errorf("p[%d] is nil", i))
 		}
 
 		if newPrj, err = Merge(newPrj, curr); err != nil {

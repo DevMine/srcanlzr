@@ -4,10 +4,7 @@
 
 package src
 
-import (
-	"errors"
-	"fmt"
-)
+import "fmt"
 
 type OtherStatement struct {
 	Type     string      `json:"type"`
@@ -23,8 +20,8 @@ func newOtherStatement(m map[string]interface{}) (*OtherStatement, error) {
 
 	// should never happen
 	if typ, ok := m["type"]; !ok || typ != OtherStmtName {
-		return nil, addDebugInfo(errors.New(fmt.Sprintf(
-			"%s: the generic map supplied is not a OtherStatement", errPrefix)))
+		return nil, addDebugInfo(fmt.Errorf(
+			"%s: the generic map supplied is not a OtherStatement", errPrefix))
 	}
 
 	if otherstmt.Type, err = extractStringValue("type", errPrefix, m); err != nil {

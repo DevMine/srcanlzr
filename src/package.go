@@ -94,8 +94,8 @@ func newPackagesSlice(key, errPrefix string, m map[string]interface{}) ([]*Packa
 	}
 
 	if s = reflect.ValueOf(pkgsMap); s.Kind() != reflect.Slice {
-		return nil, addDebugInfo(errors.New(fmt.Sprintf(
-			"%s: field '%s' is supposed to be a slice", errPrefix, key)))
+		return nil, addDebugInfo(fmt.Errorf(
+			"%s: field '%s' is supposed to be a slice", errPrefix, key))
 	}
 
 	pkgs := make([]*Package, s.Len(), s.Len())
@@ -108,8 +108,8 @@ func newPackagesSlice(key, errPrefix string, m map[string]interface{}) ([]*Packa
 				return nil, addDebugInfo(err)
 			}
 		default:
-			return nil, addDebugInfo(errors.New(fmt.Sprintf(
-				"%s: '%s' must be a map[string]interface{}", errPrefix, key)))
+			return nil, addDebugInfo(fmt.Errorf(
+				"%s: '%s' must be a map[string]interface{}", errPrefix, key))
 		}
 	}
 

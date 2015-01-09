@@ -37,9 +37,9 @@ func extractStringValue(key, errPrefix string, m map[string]interface{}) (string
 		return val.(string), nil
 	}
 
-	return "", addDebugInfo(errors.New(fmt.Sprintf(
+	return "", addDebugInfo(fmt.Errorf(
 		"%s: '%s' field is expected to be a string, found %v",
-		errPrefix, key, reflect.TypeOf(key))))
+		errPrefix, key, reflect.TypeOf(key)))
 }
 
 func extractBoolValue(key, errPrefix string, m map[string]interface{}) (bool, error) {
@@ -55,9 +55,9 @@ func extractBoolValue(key, errPrefix string, m map[string]interface{}) (bool, er
 		return val.(bool), nil
 	}
 
-	return false, addDebugInfo(errors.New(fmt.Sprintf(
+	return false, addDebugInfo(fmt.Errorf(
 		"%s: '%s' field is expected to be a bool, found %v",
-		errPrefix, key, reflect.TypeOf(key))))
+		errPrefix, key, reflect.TypeOf(key)))
 }
 
 func extractFloat64Value(key, errPrefix string, m map[string]interface{}) (float64, error) {
@@ -71,9 +71,9 @@ func extractFloat64Value(key, errPrefix string, m map[string]interface{}) (float
 		return val.(float64), nil
 	}
 
-	return 0.0, addDebugInfo(errors.New(fmt.Sprintf(
+	return 0.0, addDebugInfo(fmt.Errorf(
 		"%s: '%s' field is expected to be a float64, found %v",
-		errPrefix, key, reflect.TypeOf(key))))
+		errPrefix, key, reflect.TypeOf(key)))
 }
 
 func extractInt64Value(key, errPrefix string, m map[string]interface{}) (int64, error) {
@@ -93,9 +93,9 @@ func extractInt64Value(key, errPrefix string, m map[string]interface{}) (int64, 
 		return int64(fl), nil
 	}
 
-	return 0, addDebugInfo(errors.New(fmt.Sprintf(
+	return 0, addDebugInfo(fmt.Errorf(
 		"%s: '%s' field is expected to be a int64, found %v",
-		errPrefix, key, reflect.TypeOf(key))))
+		errPrefix, key, reflect.TypeOf(key)))
 }
 
 func extractMapValue(key, errPrefix string, m map[string]interface{}) (map[string]interface{}, error) {
@@ -111,9 +111,9 @@ func extractMapValue(key, errPrefix string, m map[string]interface{}) (map[strin
 		return val.(map[string]interface{}), nil
 	}
 
-	return nil, addDebugInfo(errors.New(fmt.Sprintf(
+	return nil, addDebugInfo(fmt.Errorf(
 		"%s: '%s' field is expected to be a generic map, found %v",
-		errPrefix, key, reflect.TypeOf(key))))
+		errPrefix, key, reflect.TypeOf(key)))
 }
 
 func extractStringSliceValue(key, errPrefix string, m map[string]interface{}) ([]string, error) {
@@ -130,8 +130,8 @@ func extractStringSliceValue(key, errPrefix string, m map[string]interface{}) ([
 		case string:
 			ss[i] = val.(string)
 		default:
-			return nil, addDebugInfo(errors.New(fmt.Sprintf(
-				"%s: '%s' must be a []string", errPrefix, key)))
+			return nil, addDebugInfo(fmt.Errorf(
+				"%s: '%s' must be a []string", errPrefix, key))
 		}
 	}
 
@@ -148,8 +148,8 @@ func reflectSliceValue(key, errPrefix string, m map[string]interface{}) (*reflec
 
 	var s reflect.Value
 	if s = reflect.ValueOf(val); s.Kind() != reflect.Slice {
-		return nil, addDebugInfo(errors.New(fmt.Sprintf(
-			"%s: field '%s' is supposed to be a slice", errPrefix, key)))
+		return nil, addDebugInfo(fmt.Errorf(
+			"%s: field '%s' is supposed to be a slice", errPrefix, key))
 	}
 
 	return &s, nil
@@ -161,8 +161,8 @@ func castToMap(key, errPrefix string, val interface{}) (map[string]interface{}, 
 		return val.(map[string]interface{}), nil
 	}
 
-	return nil, addDebugInfo(errors.New(
-		fmt.Sprintf("%s: '%s' must be a map[string]interface{}", errPrefix, key)))
+	return nil, addDebugInfo(fmt.Errorf(
+		"%s: '%s' must be a map[string]interface{}", errPrefix, key))
 }
 
 func addDebugInfo(err error) error {
@@ -174,5 +174,5 @@ func addDebugInfo(err error) error {
 		file = filepath.Join(filepath.Base(filepath.Dir(file)), filepath.Base(file))
 	}
 
-	return errors.New(fmt.Sprintf("%s:%d > %v", file, line, err))
+	return fmt.Errorf("%s:%d > %v", file, line, err)
 }

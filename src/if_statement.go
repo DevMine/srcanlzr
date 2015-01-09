@@ -4,10 +4,7 @@
 
 package src
 
-import (
-	"errors"
-	"fmt"
-)
+import "fmt"
 
 type IfStatement struct {
 	Type     string      `json:"type"`
@@ -23,8 +20,8 @@ func newIfStatement(m map[string]interface{}) (*IfStatement, error) {
 
 	// should never happen
 	if typ, ok := m["type"]; !ok || typ != IfStmtName {
-		return nil, addDebugInfo(errors.New(fmt.Sprintf(
-			"%s: the generic map supplied is not a IfStatement", errPrefix)))
+		return nil, addDebugInfo(fmt.Errorf(
+			"%s: the generic map supplied is not a IfStatement", errPrefix))
 	}
 
 	if ifstmt.Type, err = extractStringValue("type", errPrefix, m); err != nil {

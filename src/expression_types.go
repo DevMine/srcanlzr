@@ -45,8 +45,7 @@ func newExprType(m map[string]interface{}) (ExprType, error) {
 
 	typ, ok := m["type"]
 	if !ok {
-		return nil, addDebugInfo(errors.New(fmt.Sprintf(
-			"%s: field 'type' does not exist", errPrefix)))
+		return nil, addDebugInfo(fmt.Errorf("%s: field 'type' does not exist", errPrefix))
 	}
 
 	switch typ {
@@ -66,9 +65,9 @@ func newPrimitive(m map[string]interface{}) (*PrimitiveType, error) {
 
 	// should never happen
 	if typ, ok := m["type"]; !ok || typ != PrimitiveTypeName {
-		return nil, addDebugInfo(errors.New(fmt.Sprintf(
+		return nil, addDebugInfo(fmt.Errorf(
 			"%s: the generic map supplied is not a PrimitiveType",
-			errPrefix)))
+			errPrefix))
 	}
 
 	if prim.Type, err = extractStringValue("type", errPrefix, m); err != nil {
@@ -89,9 +88,9 @@ func newStruct(m map[string]interface{}) (*StructuredType, error) {
 
 	// should never happen
 	if typ, ok := m["type"]; !ok || typ != StructTypeName {
-		return nil, addDebugInfo(errors.New(fmt.Sprintf(
+		return nil, addDebugInfo(fmt.Errorf(
 			"%s: the generic map supplied is not a PrimitiveType",
-			errPrefix)))
+			errPrefix))
 	}
 
 	if strct.Type, err = extractStringValue("type", errPrefix, m); err != nil {
@@ -121,8 +120,8 @@ func newStructsSlice(key, errPrefix string, m map[string]interface{}) ([]*Struct
 	}
 
 	if s = reflect.ValueOf(structsMap); s.Kind() != reflect.Slice {
-		return nil, addDebugInfo(errors.New(fmt.Sprintf(
-			"%s: field '%s' is supposed to be a slice", errPrefix, key)))
+		return nil, addDebugInfo(fmt.Errorf(
+			"%s: field '%s' is supposed to be a slice", errPrefix, key))
 	}
 
 	structs := make([]*StructuredType, s.Len(), s.Len())
@@ -135,8 +134,8 @@ func newStructsSlice(key, errPrefix string, m map[string]interface{}) ([]*Struct
 				return nil, addDebugInfo(err)
 			}
 		default:
-			return nil, addDebugInfo(errors.New(fmt.Sprintf(
-				"%s: '%s' must be a map[string]interface{}", errPrefix, key)))
+			return nil, addDebugInfo(fmt.Errorf(
+				"%s: '%s' must be a map[string]interface{}", errPrefix, key))
 		}
 	}
 
@@ -169,13 +168,13 @@ func newFieldsSlice(key, errPrefix string, m map[string]interface{}) ([]*Field, 
 
 	fieldsMap, ok := m[key]
 	if !ok {
-		return nil, addDebugInfo(errors.New(fmt.Sprintf(
-			"%s: field '%s' does not exist", errPrefix, key)))
+		return nil, addDebugInfo(fmt.Errorf(
+			"%s: field '%s' does not exist", errPrefix, key))
 	}
 
 	if s = reflect.ValueOf(fieldsMap); s.Kind() != reflect.Slice {
-		return nil, addDebugInfo(errors.New(fmt.Sprintf(
-			"%s: field '%s' is supposed to be a slice", errPrefix, key)))
+		return nil, addDebugInfo(fmt.Errorf(
+			"%s: field '%s' is supposed to be a slice", errPrefix, key))
 	}
 
 	fields := make([]*Field, s.Len(), s.Len())
@@ -188,8 +187,8 @@ func newFieldsSlice(key, errPrefix string, m map[string]interface{}) ([]*Field, 
 				return nil, addDebugInfo(err)
 			}
 		default:
-			return nil, addDebugInfo(errors.New(fmt.Sprintf(
-				"%s: '%s' must be a map[string]interface{}", errPrefix, key)))
+			return nil, addDebugInfo(fmt.Errorf(
+				"%s: '%s' must be a map[string]interface{}", errPrefix, key))
 		}
 	}
 

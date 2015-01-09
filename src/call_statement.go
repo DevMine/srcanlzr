@@ -4,10 +4,7 @@
 
 package src
 
-import (
-	"errors"
-	"fmt"
-)
+import "fmt"
 
 type CallStatement struct {
 	Type string   `json:"type"`
@@ -23,8 +20,8 @@ func newCallStatement(m map[string]interface{}) (*CallStatement, error) {
 
 	// should never happen
 	if typ, ok := m["type"]; !ok || typ != CallStmtName {
-		return nil, addDebugInfo(errors.New(fmt.Sprintf(
-			"%s: the generic map supplied is not a AssignStatement", errPrefix)))
+		return nil, addDebugInfo(fmt.Errorf(
+			"%s: the generic map supplied is not a AssignStatement", errPrefix))
 	}
 
 	refMap, err := extractMapValue("reference", errPrefix, m)

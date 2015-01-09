@@ -25,8 +25,8 @@ func newStatement(m map[string]interface{}) (Statement, error) {
 
 	typ, ok := m["type"]
 	if !ok {
-		return nil, addDebugInfo(errors.New(fmt.Sprintf(
-			"%s: field 'type' does not exist", errPrefix)))
+		return nil, addDebugInfo(fmt.Errorf(
+			"%s: field 'type' does not exist", errPrefix))
 	}
 
 	switch typ {
@@ -57,8 +57,8 @@ func newStatementsSlice(key, errPrefix string, m map[string]interface{}) ([]Stat
 	}
 
 	if s = reflect.ValueOf(stmtsMap); s.Kind() != reflect.Slice {
-		return nil, addDebugInfo(errors.New(fmt.Sprintf(
-			"%s: field '%s' is supposed to be a slice", errPrefix, key)))
+		return nil, addDebugInfo(fmt.Errorf(
+			"%s: field '%s' is supposed to be a slice", errPrefix, key))
 	}
 
 	stmts := make([]Statement, s.Len(), s.Len())
@@ -74,9 +74,9 @@ func newStatementsSlice(key, errPrefix string, m map[string]interface{}) ([]Stat
 				return nil, addDebugInfo(err)
 			}
 		default:
-			return nil, addDebugInfo(errors.New(fmt.Sprintf(
+			return nil, addDebugInfo(fmt.Errorf(
 				"%s: '%s' must be a map[string]interface{}, found %v",
-				errPrefix, key, reflect.TypeOf(stmt))))
+				errPrefix, key, reflect.TypeOf(stmt)))
 		}
 	}
 
