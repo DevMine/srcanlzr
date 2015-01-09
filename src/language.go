@@ -5,19 +5,16 @@
 package src
 
 import (
-	"encoding/xml"
 	"errors"
 	"fmt"
 	"reflect"
 )
 
 type Language struct {
-	XMLName xml.Name `json:"-" xml:"languages"`
-
 	// TODO rename into name
-	Lang string `json:"language" xml:"language"`
+	Lang string `json:"language"`
 
-	Paradigms []string `json:"paradigms" xml:"paradigm"`
+	Paradigms []string `json:"paradigms"`
 }
 
 func newLanguage(m map[string]interface{}) (*Language, error) {
