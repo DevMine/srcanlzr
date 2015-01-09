@@ -69,3 +69,32 @@ func newLanguagesSlice(key, errPrefix string, m map[string]interface{}) ([]*Lang
 
 	return langs, nil
 }
+
+func mergeLanguageSlices(ls1, ls2 []*Language) ([]*Language, error) {
+	if ls1 == nil {
+		return nil, addDebugInfo(errors.New("ls1 cannot be nil"))
+	}
+
+	if ls2 == nil {
+		return nil, addDebugInfo(errors.New("ls2 cannot be nil"))
+	}
+
+	newLangs := make([]*Language, 0)
+	newLangs = append(newLangs, ls1...)
+
+	for _, l2 := range ls2 {
+		var found bool
+		for _, l1 := range ls1 {
+			if l1.Lang == l2.Lang {
+				found = true
+				break
+			}
+		}
+
+		if !found {
+			newLangs = append(newLangs, l2)
+		}
+	}
+
+	return newLangs, nil
+}

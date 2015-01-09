@@ -4,6 +4,8 @@
 
 package src
 
+import "errors"
+
 // A project is the root of the src API and must be at the root of the JSON
 // generated string.
 //
@@ -60,4 +62,32 @@ func newProject(m map[string]interface{}) (*Project, error) {
 	}
 
 	return &prj, nil
+}
+
+// mergeProjects merges projects p1 and p2 into p1
+func mergeProjects(p1, p2 *Project) (*Project, error) {
+	if p1 == nil {
+		return nil, addDebugInfo(errors.New("p1 cannot be nil"))
+	}
+
+	if p2 == nil {
+		return nil, addDebugInfo(errors.New("p2 cannot be nil"))
+	}
+
+	newPrj := new(Project)
+	newPrj.Name = p1.Name
+
+	var err error
+
+	if newPrj.ProgLangs, err = mergeLanguageSlices(p1.ProgLangs, p2.ProgLangs); err != nil {
+		return nil, addDebugInfo(err)
+	}
+
+	if newPrj.Packages, err = mergePackageSlices(p1.Packages, p2.Packages); err != nil {
+		return nil, addDebugInfo(err)
+	}
+
+	newPrj.LoC += p1.LoC + p2.LoC
+
+	return newPrj, nil
 }

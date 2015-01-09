@@ -115,3 +115,63 @@ func newPackagesSlice(key, errPrefix string, m map[string]interface{}) ([]*Packa
 
 	return pkgs, nil
 }
+
+func mergePackage(p1, p2 *Package) (*Package, error) {
+	if p1 == nil {
+		return nil, addDebugInfo(errors.New("p1 cannot be nil"))
+	}
+
+	if p2 == nil {
+		return nil, addDebugInfo(errors.New("p2 cannot be nil"))
+	}
+
+	var err error
+
+	newPkg := new(Package)
+	newPkg.Name = p1.Name
+	newPkg.Path = p1.Path
+	newPkg.Doc = p1.Doc
+
+	if newPkg.SourceFiles, err = mergeSourceFilesSlices(p1.SourceFiles, p2.SourceFiles); err != nil {
+		return nil, addDebugInfo(err)
+	}
+
+	newPkg.LoC = p1.LoC + p2.LoC
+
+	return newPkg, nil
+}
+
+func mergePackageSlices(ps1, ps2 []*Package) ([]*Package, error) {
+	if ps1 == nil {
+		return nil, addDebugInfo(errors.New("ps1 cannot be nil"))
+	}
+
+	if ps2 == nil {
+		return nil, addDebugInfo(errors.New("ps2 cannot be nil"))
+	}
+
+	newPkgs := make([]*Package, 0)
+
+	var err error
+	for _, p2 := range ps2 {
+		var pkg *Package
+		for _, p1 := range ps1 {
+			if p1.Path == p2.Path {
+				pkg = p1
+				break
+			}
+		}
+
+		if pkg == nil {
+			newPkgs = append(newPkgs, p2)
+		} else {
+			if pkg, err = mergePackage(pkg, p2); err != nil {
+				return nil, addDebugInfo(err)
+			}
+
+			newPkgs = append(newPkgs, pkg)
+		}
+	}
+
+	return newPkgs, nil
+}

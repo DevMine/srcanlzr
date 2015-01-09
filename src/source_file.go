@@ -4,6 +4,8 @@
 
 package src
 
+import "errors"
+
 // SourceFile holds information about a source file.
 type SourceFile struct {
 	// The path of the source file, relative to the root of the project.
@@ -101,4 +103,20 @@ func newSourceFile(m map[string]interface{}) (*SourceFile, error) {
 	}
 
 	return &src, nil
+}
+
+func mergeSourceFilesSlices(sfs1, sfs2 []*SourceFile) ([]*SourceFile, error) {
+	if sfs1 == nil {
+		return nil, addDebugInfo(errors.New("ps1 cannot be nil"))
+	}
+
+	if sfs2 == nil {
+		return nil, addDebugInfo(errors.New("ps2 cannot be nil"))
+	}
+
+	newSfs := make([]*SourceFile, 0)
+	newSfs = append(newSfs, sfs1...)
+	newSfs = append(newSfs, sfs2...)
+
+	return newSfs, nil
 }
