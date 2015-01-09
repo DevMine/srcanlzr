@@ -21,7 +21,7 @@ type Project struct {
 	Repo *Repo `json:"repository,omitempty"`
 
 	// Programming languages used in the project.
-	ProgLangs []*Language `json:"languages"`
+	Langs []*Language `json:"languages"`
 
 	// List of all packages of the project. A packages is just a folder
 	// containing at least one source file.
@@ -49,7 +49,7 @@ func newProject(m map[string]interface{}) (*Project, error) {
 		return nil, addDebugInfo(err)
 	}
 
-	if prj.ProgLangs, err = newLanguagesSlice("languages", errPrefix, m); err != nil {
+	if prj.Langs, err = newLanguagesSlice("languages", errPrefix, m); err != nil {
 		return nil, addDebugInfo(err)
 	}
 
@@ -79,7 +79,7 @@ func mergeProjects(p1, p2 *Project) (*Project, error) {
 
 	var err error
 
-	if newPrj.ProgLangs, err = mergeLanguageSlices(p1.ProgLangs, p2.ProgLangs); err != nil {
+	if newPrj.Langs, err = mergeLanguageSlices(p1.Langs, p2.Langs); err != nil {
 		return nil, addDebugInfo(err)
 	}
 

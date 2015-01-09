@@ -9,23 +9,23 @@ import (
 	"reflect"
 )
 
-type Attribute struct {
-	Variable
+type Attr struct {
+	Var
 	Visibility string `json:"visibility"`
 	Constant   bool   `json:"constant"`
 	Static     bool   `json:"static"`
 }
 
-func newAttribute(m map[string]interface{}) (*Attribute, error) {
+func newAttr(m map[string]interface{}) (*Attr, error) {
 	var err error
-	errPrefix := "src/attribute"
-	attr := Attribute{}
+	errPrefix := "src/attr"
+	attr := Attr{}
 
-	var v *Variable
-	if v, err = newVariable(m); err != nil {
+	var v *Var
+	if v, err = newVar(m); err != nil {
 		return nil, addDebugInfo(err)
 	}
-	attr.Variable = *v
+	attr.Var = *v
 
 	if attr.Visibility, err = extractStringValue("visibility", errPrefix, m); err != nil {
 		return nil, addDebugInfo(err)
@@ -42,7 +42,7 @@ func newAttribute(m map[string]interface{}) (*Attribute, error) {
 	return &attr, nil
 }
 
-func newAttributesSlice(key, errPrefix string, m map[string]interface{}) ([]*Attribute, error) {
+func newAttrsSlice(key, errPrefix string, m map[string]interface{}) ([]*Attr, error) {
 	var err error
 	var s reflect.Value
 
@@ -58,13 +58,13 @@ func newAttributesSlice(key, errPrefix string, m map[string]interface{}) ([]*Att
 			"%s: field '%s' is supposed to be a slice", errPrefix, key))
 	}
 
-	attrs := make([]*Attribute, s.Len(), s.Len())
+	attrs := make([]*Attr, s.Len(), s.Len())
 	for i := 0; i < s.Len(); i++ {
 		attr := s.Index(i).Interface()
 
 		switch attr.(type) {
 		case map[string]interface{}:
-			if attrs[i], err = newAttribute(attr.(map[string]interface{})); err != nil {
+			if attrs[i], err = newAttr(attr.(map[string]interface{})); err != nil {
 				return nil, addDebugInfo(err)
 			}
 		default:

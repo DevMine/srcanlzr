@@ -22,17 +22,17 @@ func (c Complexity) Analyze(p *src.Project, r *Result) error {
 	var totalComplexityPerFile float32
 
 	for _, pkg := range p.Packages {
-		for _, sf := range pkg.SourceFiles {
+		for _, sf := range pkg.SrcFiles {
 			var fileComplexity int64
 			var numFuncs int64
 
-			for _, f := range sf.Functions {
+			for _, f := range sf.Funcs {
 				numFuncs++
 				fileComplexity += functionCyclomaticComplexity(f)
 
 				for _, stmt := range f.StmtList {
 					switch stmt.(type) {
-					case src.IfStatement, src.LoopStatement:
+					case src.IfStmt, src.LoopStmt:
 						fileComplexity++
 					}
 				}
@@ -47,7 +47,7 @@ func (c Complexity) Analyze(p *src.Project, r *Result) error {
 
 					for _, stmt := range m.StmtList {
 						switch stmt.(type) {
-						case src.IfStatement, src.LoopStatement:
+						case src.IfStmt, src.LoopStmt:
 							fileComplexity++
 						}
 					}
@@ -64,7 +64,7 @@ func (c Complexity) Analyze(p *src.Project, r *Result) error {
 
 					for _, stmt := range m.StmtList {
 						switch stmt.(type) {
-						case src.IfStatement, src.LoopStatement:
+						case src.IfStmt, src.LoopStmt:
 							fileComplexity++
 						}
 					}
@@ -91,7 +91,7 @@ func (c Complexity) Analyze(p *src.Project, r *Result) error {
 	return nil
 }
 
-func functionCyclomaticComplexity(f *src.Function) int64 {
+func functionCyclomaticComplexity(f *src.Func) int64 {
 	cc := int64(1) // cyclomatic complexity
 
 	for _, s := range f.StmtList {
@@ -111,29 +111,29 @@ func methodCyclomaticComplexity(m *src.Method) int64 {
 	return cc
 }
 
-func statementComplexity(s src.Statement) int64 {
+func statementComplexity(s src.Stmt) int64 {
 	var c int64
 
 	switch s.(type) {
-	case src.IfStatement:
+	case src.IfStmt:
 		fmt.Println("foo")
 		c++
 
-		stmt := s.(src.IfStatement)
+		stmt := s.(src.IfStmt)
 
-		for _, s := range stmt.StmtList {
+		for _, s := range stmt.StmtsList {
 			c += statementComplexity(s)
 		}
-	case src.LoopStatement:
+	case src.LoopStmt:
 		fmt.Println("bar")
 		c++
 
-		stmt := s.(src.LoopStatement)
+		stmt := s.(src.LoopStmt)
 
-		for _, s := range stmt.StmtList {
+		for _, s := range stmt.StmtsList {
 			c += statementComplexity(s)
 		}
-	case src.CallStatement:
+	case src.CallStmt:
 		fmt.Println("plop")
 		c++
 	}

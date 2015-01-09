@@ -24,7 +24,7 @@ type Package struct {
 	Doc string `json:"doc,omitempty"`
 
 	// The list of all source files contained in the package.
-	SourceFiles []*SourceFile `json:"source_files"`
+	SrcFiles []*SrcFile `json:"source_files"`
 
 	// The total number of lines of code.
 	LoC int64 `json:"loc"`
@@ -62,13 +62,13 @@ func newPackage(m map[string]interface{}) (*Package, error) {
 			errPrefix + ": field 'source_files' is supposed to be a slice"))
 	}
 
-	srcs := make([]*SourceFile, s.Len(), s.Len())
+	srcs := make([]*SrcFile, s.Len(), s.Len())
 	for i := 0; i < s.Len(); i++ {
 		src := s.Index(i).Interface()
 
 		switch src.(type) {
 		case map[string]interface{}:
-			if srcs[i], err = newSourceFile(src.(map[string]interface{})); err != nil {
+			if srcs[i], err = newSrcFile(src.(map[string]interface{})); err != nil {
 				return nil, addDebugInfo(err)
 			}
 		default:
@@ -77,7 +77,7 @@ func newPackage(m map[string]interface{}) (*Package, error) {
 		}
 	}
 
-	pkg.SourceFiles = srcs
+	pkg.SrcFiles = srcs
 
 	return &pkg, nil
 }
@@ -132,7 +132,7 @@ func mergePackage(p1, p2 *Package) (*Package, error) {
 	newPkg.Path = p1.Path
 	newPkg.Doc = p1.Doc
 
-	if newPkg.SourceFiles, err = mergeSourceFilesSlices(p1.SourceFiles, p2.SourceFiles); err != nil {
+	if newPkg.SrcFiles, err = mergeSrcFilesSlices(p1.SrcFiles, p2.SrcFiles); err != nil {
 		return nil, addDebugInfo(err)
 	}
 

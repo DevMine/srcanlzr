@@ -9,17 +9,17 @@ import (
 	"reflect"
 )
 
-type Variable struct {
+type Var struct {
 	Name  string `json:"name"`
 	Type  string `json:"type"`
 	Value string `json:"value"`
 	Doc   string `json:"doc"`
 }
 
-func newVariable(m map[string]interface{}) (*Variable, error) {
+func newVar(m map[string]interface{}) (*Var, error) {
 	var err error
-	errPrefix := "src/variable"
-	v := Variable{}
+	errPrefix := "src/var"
+	v := Var{}
 
 	if v.Name, err = extractStringValue("name", errPrefix, m); err != nil {
 		return nil, addDebugInfo(err)
@@ -40,7 +40,7 @@ func newVariable(m map[string]interface{}) (*Variable, error) {
 	return &v, nil
 }
 
-func newVariablesSlice(key, errPrefix string, m map[string]interface{}) ([]*Variable, error) {
+func newVarsSlice(key, errPrefix string, m map[string]interface{}) ([]*Var, error) {
 	var err error
 	var s reflect.Value
 
@@ -56,13 +56,13 @@ func newVariablesSlice(key, errPrefix string, m map[string]interface{}) ([]*Vari
 			"%s: field '%s' is supposed to be a slice", errPrefix, key))
 	}
 
-	vars := make([]*Variable, s.Len(), s.Len())
+	vars := make([]*Var, s.Len(), s.Len())
 	for i := 0; i < s.Len(); i++ {
 		v := s.Index(i).Interface()
 
 		switch v.(type) {
 		case map[string]interface{}:
-			if vars[i], err = newVariable(v.(map[string]interface{})); err != nil {
+			if vars[i], err = newVar(v.(map[string]interface{})); err != nil {
 				return nil, addDebugInfo(err)
 			}
 		default:

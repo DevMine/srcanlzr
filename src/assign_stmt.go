@@ -6,23 +6,23 @@ package src
 
 import "fmt"
 
-type AssignStatement struct {
+type AssignStmt struct {
 	Type     string `json:"type"`
 	VarName  string `json:"var_name"`
 	VarValue string `json:"var_value"` // TODO handle case where value is a literal, function call, etc.
 	Line     int64  `json:"line"`      // Line number of the statement relatively to the function.
 }
 
-// newAssignStatement creates a new AssignStatement from a generic map.
-func newAssignStatement(m map[string]interface{}) (*AssignStatement, error) {
+// newAssignStmt creates a new AssignStmt from a generic map.
+func newAssignStmt(m map[string]interface{}) (*AssignStmt, error) {
 	var err error
-	errPrefix := "src/assign_statement"
-	assignstmt := AssignStatement{}
+	errPrefix := "src/assign_stmt"
+	assignstmt := AssignStmt{}
 
 	// should never happen
 	if typ, ok := m["type"]; !ok || typ != AssignStmtName {
 		return nil, addDebugInfo(fmt.Errorf(
-			"%s: the generic map supplied is not a AssignStatement", errPrefix))
+			"%s: the generic map supplied is not a AssignStmt", errPrefix))
 	}
 
 	if assignstmt.Type, err = extractStringValue("type", errPrefix, m); err != nil {

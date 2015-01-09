@@ -124,10 +124,10 @@ func MergeAll(ps ...*Project) (*Project, error) {
 	}
 
 	newPrj := &Project{
-		Name:      ps[0].Name,
-		ProgLangs: ps[0].ProgLangs,
-		Packages:  ps[0].Packages,
-		LoC:       ps[0].LoC,
+		Name:     ps[0].Name,
+		Langs:    ps[0].Langs,
+		Packages: ps[0].Packages,
+		LoC:      ps[0].LoC,
 	}
 
 	if len(ps) == 1 {

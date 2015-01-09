@@ -10,11 +10,11 @@ import (
 )
 
 type Trait struct {
-	Name       string       `json:"name"`
-	Attributes []*Attribute `json:"attributes"`
-	Methods    []*Method    `json:"methods"`
-	Classes    []*Class     `json:"classes"`
-	Traits     []*Trait     `json:"traits"`
+	Name    string    `json:"name"`
+	Attrs   []*Attr   `json:"attributes"`
+	Methods []*Method `json:"methods"`
+	Classes []*Class  `json:"classes"`
+	Traits  []*Trait  `json:"traits"`
 }
 
 func newTrait(m map[string]interface{}) (*Trait, error) {
@@ -26,7 +26,7 @@ func newTrait(m map[string]interface{}) (*Trait, error) {
 		return nil, addDebugInfo(err)
 	}
 
-	if trait.Attributes, err = newAttributesSlice("attributes", errPrefix, m); err != nil {
+	if trait.Attrs, err = newAttrsSlice("attributes", errPrefix, m); err != nil {
 		return nil, addDebugInfo(err)
 	}
 

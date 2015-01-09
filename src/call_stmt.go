@@ -6,22 +6,22 @@ package src
 
 import "fmt"
 
-type CallStatement struct {
+type CallStmt struct {
 	Type string   `json:"type"`
 	Ref  *FuncRef `json:"reference"` // Reference to the function
 	Line int64    `json:"line"`      // Line number of the statement relatively to the function.
 }
 
-// newCallStatement creates a new CallStatement from a generic map.
-func newCallStatement(m map[string]interface{}) (*CallStatement, error) {
+// newCallStmt creates a new CallStmt from a generic map.
+func newCallStmt(m map[string]interface{}) (*CallStmt, error) {
 	var err error
-	errPrefix := "src/call_statement"
-	callstmt := CallStatement{}
+	errPrefix := "src/call_stmt"
+	callstmt := CallStmt{}
 
 	// should never happen
 	if typ, ok := m["type"]; !ok || typ != CallStmtName {
 		return nil, addDebugInfo(fmt.Errorf(
-			"%s: the generic map supplied is not a AssignStatement", errPrefix))
+			"%s: the generic map supplied is not a CallStmt", errPrefix))
 	}
 
 	refMap, err := extractMapValue("reference", errPrefix, m)

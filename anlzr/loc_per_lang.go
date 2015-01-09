@@ -12,24 +12,24 @@ func (lpl LocPerLang) Analyse(p *src.Project, r *Result) error {
 
 	// if the project has only one programming language,
 	// which is mostly the case
-	if len(p.ProgLangs) == 1 {
+	if len(p.Langs) == 1 {
 		r.ProgLangs = append(r.ProgLangs,
-			Language{Language: *p.ProgLangs[0], Lines: p.LoC})
+			Language{Language: *p.Langs[0], Lines: p.LoC})
 		return nil
 	}
 
 	m := make(map[string]Language)
 
 	for _, pkg := range p.Packages {
-		for _, srf := range pkg.SourceFiles {
+		for _, srf := range pkg.SrcFiles {
 			var lang Language
 			var ok bool
-			if lang, ok = m[srf.ProgLang.Lang]; !ok {
-				lang = Language{Language: *srf.ProgLang}
+			if lang, ok = m[srf.Lang.Lang]; !ok {
+				lang = Language{Language: *srf.Lang}
 			}
 
 			lang.Lines += srf.LoC
-			m[srf.ProgLang.Lang] = lang
+			m[srf.Lang.Lang] = lang
 		}
 	}
 

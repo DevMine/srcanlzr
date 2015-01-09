@@ -7,12 +7,12 @@ package src
 import "errors"
 
 // SourceFile holds information about a source file.
-type SourceFile struct {
+type SrcFile struct {
 	// The path of the source file, relative to the root of the project.
 	Path string `json:"path"`
 
 	// Programming language used.
-	ProgLang *Language `json:"language"`
+	Lang *Language `json:"language"`
 
 	// List of the imports used by the srouce file.
 	Imports []string `json:"imports,omitempty"`
@@ -29,10 +29,10 @@ type SourceFile struct {
 	Constants []*Constant `json:"constants,omitempty"`
 
 	// List of variables defined at the file level (e.g. global variables)
-	Variables []*Variable `json:"variables,omitempty"`
+	Vars []*Var `json:"variables,omitempty"`
 
 	// List of functions
-	Functions []*Function `json:"functions,omitempty"`
+	Funcs []*Func `json:"functions,omitempty"`
 
 	// List of interfaces
 	Interfaces []*Interface `json:"interfaces,omitempty"`
@@ -48,10 +48,10 @@ type SourceFile struct {
 	LoC int64 `json:"loc"`
 }
 
-func newSourceFile(m map[string]interface{}) (*SourceFile, error) {
+func newSrcFile(m map[string]interface{}) (*SrcFile, error) {
 	var err error
-	errPrefix := "src/source_file"
-	src := SourceFile{}
+	errPrefix := "src/src"
+	src := SrcFile{}
 
 	if src.Path, err = extractStringValue("path", errPrefix, m); err != nil {
 		return nil, addDebugInfo(err)
@@ -62,7 +62,7 @@ func newSourceFile(m map[string]interface{}) (*SourceFile, error) {
 		return nil, addDebugInfo(err)
 	}
 
-	if src.ProgLang, err = newLanguage(progLangMap); err != nil {
+	if src.Lang, err = newLanguage(progLangMap); err != nil {
 		return nil, addDebugInfo(err)
 	}
 
@@ -86,11 +86,11 @@ func newSourceFile(m map[string]interface{}) (*SourceFile, error) {
 		return nil, addDebugInfo(err)
 	}
 
-	if src.Variables, err = newVariablesSlice("variables", errPrefix, m); err != nil && isExist(err) {
+	if src.Vars, err = newVarsSlice("variables", errPrefix, m); err != nil && isExist(err) {
 		return nil, addDebugInfo(err)
 	}
 
-	if src.Functions, err = newFunctionsSlice("functions", errPrefix, m); err != nil && isExist(err) {
+	if src.Funcs, err = newFuncsSlice("functions", errPrefix, m); err != nil && isExist(err) {
 		return nil, addDebugInfo(err)
 	}
 
@@ -105,7 +105,7 @@ func newSourceFile(m map[string]interface{}) (*SourceFile, error) {
 	return &src, nil
 }
 
-func mergeSourceFilesSlices(sfs1, sfs2 []*SourceFile) ([]*SourceFile, error) {
+func mergeSrcFilesSlices(sfs1, sfs2 []*SrcFile) ([]*SrcFile, error) {
 	if sfs1 == nil {
 		return nil, addDebugInfo(errors.New("ps1 cannot be nil"))
 	}
@@ -114,7 +114,7 @@ func mergeSourceFilesSlices(sfs1, sfs2 []*SourceFile) ([]*SourceFile, error) {
 		return nil, addDebugInfo(errors.New("ps2 cannot be nil"))
 	}
 
-	newSfs := make([]*SourceFile, 0)
+	newSfs := make([]*SrcFile, 0)
 	newSfs = append(newSfs, sfs1...)
 	newSfs = append(newSfs, sfs2...)
 

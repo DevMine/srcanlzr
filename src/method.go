@@ -10,7 +10,7 @@ import (
 )
 
 type Method struct {
-	Function
+	Func
 	Visibility string `json:"visibility"`
 }
 
@@ -19,11 +19,11 @@ func newMethod(m map[string]interface{}) (*Method, error) {
 	errPrefix := "src/method"
 	mthd := Method{}
 
-	var fct *Function
-	if fct, err = newFunction(m); err != nil {
+	var fct *Func
+	if fct, err = newFunc(m); err != nil {
 		return nil, addDebugInfo(err)
 	}
-	mthd.Function = *fct
+	mthd.Func = *fct
 
 	if mthd.Visibility, err = extractStringValue("visibility", errPrefix, m); err != nil {
 		return nil, addDebugInfo(err)

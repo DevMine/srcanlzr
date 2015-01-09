@@ -14,20 +14,20 @@ import (
 // TODO proposal: keep only positions instead of a raw string. This would make
 // FIXME add the possibility to have multiple return statements
 // the parsing faster and the generated JSON smaller.
-type Function struct {
-	Name     string      `json:"name"`
-	Doc      string      `json:"doc,omitempty"` // TODO rename into doc?
-	Args     []*Variable `json:"args,omitempty"`
-	Return   []*Variable `json:"return,omitempty"` // TODO put return in statements
-	StmtList []Statement `json:"statements_list,omitempty"`
-	LoC      int64       `json:"loc"`           // Lines of Code
-	Raw      string      `json:"raw,omitempty"` // Function raw source code.
+type Func struct {
+	Name     string `json:"name"`
+	Doc      string `json:"doc,omitempty"` // TODO rename into doc?
+	Args     []*Var `json:"args,omitempty"`
+	Return   []*Var `json:"return,omitempty"` // TODO put return in statements
+	StmtList []Stmt `json:"statements_list,omitempty"`
+	LoC      int64  `json:"loc"`           // Lines of Code
+	Raw      string `json:"raw,omitempty"` // Function raw source code.
 }
 
-func newFunction(m map[string]interface{}) (*Function, error) {
+func newFunc(m map[string]interface{}) (*Func, error) {
 	var err error
-	errPrefix := "src/function"
-	fct := Function{}
+	errPrefix := "src/func"
+	fct := Func{}
 
 	if fct.Name, err = extractStringValue("name", errPrefix, m); err != nil {
 		return nil, addDebugInfo(err)
@@ -45,22 +45,22 @@ func newFunction(m map[string]interface{}) (*Function, error) {
 		return nil, addDebugInfo(err)
 	}
 
-	if fct.Args, err = newVariablesSlice("args", errPrefix, m); err != nil && isExist(err) {
+	if fct.Args, err = newVarsSlice("args", errPrefix, m); err != nil && isExist(err) {
 		return nil, addDebugInfo(err)
 	}
 
-	if fct.Return, err = newVariablesSlice("returns", errPrefix, m); err != nil && isExist(err) {
+	if fct.Return, err = newVarsSlice("returns", errPrefix, m); err != nil && isExist(err) {
 		return nil, addDebugInfo(err)
 	}
 
-	if fct.StmtList, err = newStatementsSlice("statements_list", errPrefix, m); err != nil && isExist(err) {
+	if fct.StmtList, err = newStmtsSlice("statements_list", errPrefix, m); err != nil && isExist(err) {
 		return nil, addDebugInfo(err)
 	}
 
 	return &fct, nil
 }
 
-func newFunctionsSlice(key, errPrefix string, m map[string]interface{}) ([]*Function, error) {
+func newFuncsSlice(key, errPrefix string, m map[string]interface{}) ([]*Func, error) {
 	var err error
 	var s reflect.Value
 
@@ -76,13 +76,13 @@ func newFunctionsSlice(key, errPrefix string, m map[string]interface{}) ([]*Func
 			"%s: field '%s' is supposed to be a slice", errPrefix, key))
 	}
 
-	fcts := make([]*Function, s.Len(), s.Len())
+	fcts := make([]*Func, s.Len(), s.Len())
 	for i := 0; i < s.Len(); i++ {
 		fct := s.Index(i).Interface()
 
 		switch fct.(type) {
 		case map[string]interface{}:
-			if fcts[i], err = newFunction(fct.(map[string]interface{})); err != nil {
+			if fcts[i], err = newFunc(fct.(map[string]interface{})); err != nil {
 				return nil, addDebugInfo(err)
 			}
 		default:

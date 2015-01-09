@@ -6,22 +6,22 @@ package src
 
 import "fmt"
 
-type OtherStatement struct {
-	Type     string      `json:"type"`
-	StmtList []Statement `json:"statements_list,omitempty"`
-	Line     int64       `json:"line"` // Line number of the statement relatively to the function.
+type OtherStmt struct {
+	Type      string `json:"type"`
+	StmtsList []Stmt `json:"statements_list,omitempty"`
+	Line      int64  `json:"line"` // Line number of the statement relatively to the function.
 }
 
-// newOtherStatement creates a new OtherStatement from a generic map.
-func newOtherStatement(m map[string]interface{}) (*OtherStatement, error) {
+// newOtherStmt creates a new OtherStmt from a generic map.
+func newOtherStmt(m map[string]interface{}) (*OtherStmt, error) {
 	var err error
-	errPrefix := "src/other_statement"
-	otherstmt := OtherStatement{}
+	errPrefix := "src/other_stmt"
+	otherstmt := OtherStmt{}
 
 	// should never happen
 	if typ, ok := m["type"]; !ok || typ != OtherStmtName {
 		return nil, addDebugInfo(fmt.Errorf(
-			"%s: the generic map supplied is not a OtherStatement", errPrefix))
+			"%s: the generic map supplied is not a OtherStmt", errPrefix))
 	}
 
 	if otherstmt.Type, err = extractStringValue("type", errPrefix, m); err != nil {
@@ -32,7 +32,7 @@ func newOtherStatement(m map[string]interface{}) (*OtherStatement, error) {
 		return nil, addDebugInfo(err)
 	}
 
-	if otherstmt.StmtList, err = newStatementsSlice("statements_list", errPrefix, m); err != nil && isExist(err) {
+	if otherstmt.StmtsList, err = newStmtsSlice("statements_list", errPrefix, m); err != nil && isExist(err) {
 		return nil, addDebugInfo(err)
 	}
 

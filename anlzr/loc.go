@@ -25,8 +25,8 @@ func (lca LoC) Analyze(p *src.Project, r *Result) error {
 	hist := make(map[int64]int64)
 
 	for _, pkg := range p.Packages {
-		for _, sf := range pkg.SourceFiles {
-			for _, f := range sf.Functions {
+		for _, sf := range pkg.SrcFiles {
+			for _, f := range sf.Funcs {
 				totalFuncs++
 				totalLoCFunc += f.LoC
 

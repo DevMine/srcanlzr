@@ -14,7 +14,7 @@ type Class struct {
 	Visibility            string       `json:"visibility"`
 	ExtendedClasses       []*Class     `json:"extended_classes"`
 	ImplementedInterfaces []*Interface `json:"implemented_interfaces"`
-	Attributes            []*Attribute `json:"attributes"`
+	Attrs                 []*Attr      `json:"attributes"`
 	Methods               []*Method    `json:"methods"`
 	Traits                []*Trait     `json:"traits"`
 }
@@ -40,7 +40,7 @@ func newClass(m map[string]interface{}) (*Class, error) {
 		return nil, addDebugInfo(err)
 	}
 
-	if cls.Attributes, err = newAttributesSlice("attributes", errPrefix, m); err != nil {
+	if cls.Attrs, err = newAttrsSlice("attributes", errPrefix, m); err != nil {
 		return nil, addDebugInfo(err)
 	}
 

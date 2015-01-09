@@ -18,10 +18,10 @@ const (
 	OtherStmtName  = "OTHER"
 )
 
-type Statement interface{}
+type Stmt interface{}
 
-func newStatement(m map[string]interface{}) (Statement, error) {
-	errPrefix := "src/statement"
+func newStmt(m map[string]interface{}) (Stmt, error) {
+	errPrefix := "src/stmt"
 
 	typ, ok := m["type"]
 	if !ok {
@@ -31,21 +31,21 @@ func newStatement(m map[string]interface{}) (Statement, error) {
 
 	switch typ {
 	case IfStmtName:
-		return newIfStatement(m)
+		return newIfStmt(m)
 	case LoopStmtName:
-		return newLoopStatement(m)
+		return newLoopStmt(m)
 	case AssignStmtName:
-		return newAssignStatement(m)
+		return newAssignStmt(m)
 	case CallStmtName:
-		return newCallStatement(m)
+		return newCallStmt(m)
 	case OtherStmtName:
-		return newOtherStatement(m)
+		return newOtherStmt(m)
 	}
 
 	return nil, addDebugInfo(errors.New("unknown statement type"))
 }
 
-func newStatementsSlice(key, errPrefix string, m map[string]interface{}) ([]Statement, error) {
+func newStmtsSlice(key, errPrefix string, m map[string]interface{}) ([]Stmt, error) {
 	var err error
 	var s reflect.Value
 
@@ -61,7 +61,7 @@ func newStatementsSlice(key, errPrefix string, m map[string]interface{}) ([]Stat
 			"%s: field '%s' is supposed to be a slice", errPrefix, key))
 	}
 
-	stmts := make([]Statement, s.Len(), s.Len())
+	stmts := make([]Stmt, s.Len(), s.Len())
 	for i := 0; i < s.Len(); i++ {
 		stmt := s.Index(i).Interface()
 		if stmt == nil {
@@ -70,7 +70,7 @@ func newStatementsSlice(key, errPrefix string, m map[string]interface{}) ([]Stat
 
 		switch stmt.(type) {
 		case map[string]interface{}:
-			if stmts[i], err = newStatement(stmt.(map[string]interface{})); err != nil {
+			if stmts[i], err = newStmt(stmt.(map[string]interface{})); err != nil {
 				return nil, addDebugInfo(err)
 			}
 		default:
