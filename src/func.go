@@ -9,14 +9,12 @@ import (
 	"reflect"
 )
 
-// TODO it would be nice to only have the raw function prototype instead of the
 // whole function.
 // TODO proposal: keep only positions instead of a raw string. This would make
-// FIXME add the possibility to have multiple return statements
 // the parsing faster and the generated JSON smaller.
 type Func struct {
 	Name     string `json:"name"`
-	Doc      string `json:"doc,omitempty"` // TODO rename into doc?
+	Doc      string `json:"doc,omitempty"`
 	Args     []*Var `json:"args,omitempty"`
 	Return   []*Var `json:"return,omitempty"` // TODO put return in statements
 	StmtList []Stmt `json:"statements_list,omitempty"`
