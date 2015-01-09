@@ -23,19 +23,19 @@ func newVariable(m map[string]interface{}) (*Variable, error) {
 	v := Variable{}
 
 	if v.Name, err = extractStringValue("name", errPrefix, m); err != nil {
-		return nil, err
+		return nil, addDebugInfo(err)
 	}
 
 	if v.Type, err = extractStringValue("type", errPrefix, m); err != nil {
-		return nil, err
+		return nil, addDebugInfo(err)
 	}
 
 	if v.Value, err = extractStringValue("value", errPrefix, m); err != nil {
-		return nil, err
+		return nil, addDebugInfo(err)
 	}
 
 	if v.Doc, err = extractStringValue("doc", errPrefix, m); err != nil {
-		return nil, err
+		return nil, addDebugInfo(err)
 	}
 
 	return &v, nil
@@ -47,12 +47,14 @@ func newVariablesSlice(key, errPrefix string, m map[string]interface{}) ([]*Vari
 
 	varsMap, ok := m[key]
 	if !ok {
+		// XXX It is not possible to add debug info on this error because it is
+		// required that this error be en "errNotExist".
 		return nil, errNotExist
 	}
 
 	if s = reflect.ValueOf(varsMap); s.Kind() != reflect.Slice {
-		return nil, errors.New(fmt.Sprintf("%s: field '%s' is supposed to be a slice",
-			errPrefix, key))
+		return nil, addDebugInfo(errors.New(fmt.Sprintf(
+			"%s: field '%s' is supposed to be a slice", errPrefix, key)))
 	}
 
 	vars := make([]*Variable, s.Len(), s.Len())
@@ -62,11 +64,11 @@ func newVariablesSlice(key, errPrefix string, m map[string]interface{}) ([]*Vari
 		switch v.(type) {
 		case map[string]interface{}:
 			if vars[i], err = newVariable(v.(map[string]interface{})); err != nil {
-				return nil, err
+				return nil, addDebugInfo(err)
 			}
 		default:
-			return nil, errors.New(fmt.Sprintf("%s: '%s' must be a map[string]interface{}",
-				errPrefix, key))
+			return nil, addDebugInfo(errors.New(fmt.Sprintf(
+				"%s: '%s' must be a map[string]interface{}", errPrefix, key)))
 		}
 	}
 

@@ -52,43 +52,52 @@ func newSourceFile(m map[string]interface{}) (*SourceFile, error) {
 	src := SourceFile{}
 
 	if src.Path, err = extractStringValue("path", errPrefix, m); err != nil {
-		return nil, err
+		return nil, addDebugInfo(err)
+	}
+
+	progLangMap, err := extractMapValue("language", errPrefix, m)
+	if err != nil {
+		return nil, addDebugInfo(err)
+	}
+
+	if src.ProgLang, err = newLanguage(progLangMap); err != nil {
+		return nil, addDebugInfo(err)
 	}
 
 	if src.LoC, err = extractInt64Value("loc", errPrefix, m); err != nil {
-		return nil, err
+		return nil, addDebugInfo(err)
 	}
 
 	if src.Imports, err = extractStringSliceValue("imports", errPrefix, m); err != nil && isExist(err) {
-		return nil, err
+		return nil, addDebugInfo(err)
 	}
 
 	if src.TypeDefs, err = newTypeDefsSlice("type_defs", errPrefix, m); err != nil && isExist(err) {
-		return nil, err
+		return nil, addDebugInfo(err)
 	}
 
 	if src.Structs, err = newStructsSlice("structs", errPrefix, m); err != nil && isExist(err) {
-		return nil, err
+		return nil, addDebugInfo(err)
 	}
 
 	if src.Constants, err = newConstantsSlice("constants", errPrefix, m); err != nil && isExist(err) {
-		return nil, err
+		return nil, addDebugInfo(err)
 	}
 
 	if src.Variables, err = newVariablesSlice("variables", errPrefix, m); err != nil && isExist(err) {
-		return nil, err
+		return nil, addDebugInfo(err)
 	}
 
 	if src.Functions, err = newFunctionsSlice("functions", errPrefix, m); err != nil && isExist(err) {
-		return nil, err
+		return nil, addDebugInfo(err)
 	}
 
 	if src.Interfaces, err = newInterfacesSlice("interfaces", errPrefix, m); err != nil && isExist(err) {
-		return nil, err
+		return nil, addDebugInfo(err)
 	}
 
 	if src.Traits, err = newTraitsSlice("traits", errPrefix, m); err != nil && isExist(err) {
-		return nil, err
+		return nil, addDebugInfo(err)
 	}
 
 	return &src, nil

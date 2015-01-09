@@ -24,24 +24,24 @@ func newAssignStatement(m map[string]interface{}) (*AssignStatement, error) {
 
 	// should never happen
 	if typ, ok := m["type"]; !ok || typ != AssignStmtName {
-		return nil, errors.New(fmt.Sprintf("%s: the generic map supplied is not a AssignStatement",
-			errPrefix))
+		return nil, addDebugInfo(errors.New(fmt.Sprintf(
+			"%s: the generic map supplied is not a AssignStatement", errPrefix)))
 	}
 
 	if assignstmt.Type, err = extractStringValue("type", errPrefix, m); err != nil {
-		return nil, err
+		return nil, addDebugInfo(err)
 	}
 
 	if assignstmt.VarName, err = extractStringValue("var_name", errPrefix, m); err != nil {
-		return nil, err
+		return nil, addDebugInfo(err)
 	}
 
 	if assignstmt.VarValue, err = extractStringValue("var_value", errPrefix, m); err != nil {
-		return nil, err
+		return nil, addDebugInfo(err)
 	}
 
 	if assignstmt.Line, err = extractInt64Value("line", errPrefix, m); err != nil {
-		return nil, err
+		return nil, addDebugInfo(err)
 	}
 
 	return &assignstmt, nil

@@ -23,20 +23,20 @@ func newIfStatement(m map[string]interface{}) (*IfStatement, error) {
 
 	// should never happen
 	if typ, ok := m["type"]; !ok || typ != IfStmtName {
-		return nil, errors.New(fmt.Sprintf("%s: the generic map supplied is not a IfStatement",
-			errPrefix))
+		return nil, addDebugInfo(errors.New(fmt.Sprintf(
+			"%s: the generic map supplied is not a IfStatement", errPrefix)))
 	}
 
 	if ifstmt.Type, err = extractStringValue("type", errPrefix, m); err != nil {
-		return nil, err
+		return nil, addDebugInfo(err)
 	}
 
 	if ifstmt.Line, err = extractInt64Value("line", errPrefix, m); err != nil {
-		return nil, err
+		return nil, addDebugInfo(err)
 	}
 
 	if ifstmt.StmtList, err = newStatementsSlice("statements_list", errPrefix, m); err != nil {
-		return nil, err
+		return nil, addDebugInfo(err)
 	}
 
 	return &ifstmt, nil

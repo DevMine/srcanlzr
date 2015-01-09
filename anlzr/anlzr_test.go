@@ -32,8 +32,8 @@ func TestRunAnalyzers(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if fmt.Sprintf("%.3f", res.AverageFuncLen) != "7.265" {
-		t.Errorf("average_function_length: expected 7.265, found %.3f",
+	if fmt.Sprintf("%.3f", res.AverageFuncLen) != "8.429" {
+		t.Errorf("average_function_length: expected 8.429, found %.3f",
 			res.AverageFuncLen)
 	}
 
@@ -47,13 +47,13 @@ func TestRunAnalyzers(t *testing.T) {
 			res.MaxFuncLen)
 	}
 
-	if res.MedianFuncLen != 4 {
-		t.Errorf("max_function_length: expected 4, found %d",
+	if res.MedianFuncLen != 6 {
+		t.Errorf("max_function_length: expected 6, found %d",
 			res.MedianFuncLen)
 	}
 
-	if res.TotalLoC != 128271 {
-		t.Errorf("total_loc: expected 128271, found %d",
+	if res.TotalLoC != 142513 {
+		t.Errorf("total_loc: expected 142513, found %d",
 			res.TotalLoC)
 	}
 }

@@ -36,23 +36,27 @@ func newProject(m map[string]interface{}) (*Project, error) {
 	prj := Project{}
 
 	if prj.Name, err = extractStringValue("name", errPrefix, m); err != nil {
-		return nil, err
+		return nil, addDebugInfo(err)
 	}
 
 	if prj.LoC, err = extractInt64Value("loc", errPrefix, m); err != nil {
-		return nil, err
+		return nil, addDebugInfo(err)
 	}
 
 	if prj.Packages, err = newPackagesSlice("packages", errPrefix, m); err != nil {
-		return nil, err
+		return nil, addDebugInfo(err)
 	}
 
 	if prj.ProgLangs, err = newLanguagesSlice("languages", errPrefix, m); err != nil {
-		return nil, err
+		return nil, addDebugInfo(err)
 	}
 
-	if prj.Repo, err = newRepo(m); err != nil && isExist(err) {
-		return nil, err
+	if repoMap, err := extractMapValue("repository", errPrefix, m); err != nil && isExist(err) {
+		return nil, addDebugInfo(err)
+	} else if err == nil {
+		if prj.Repo, err = newRepo(repoMap); err != nil && isExist(err) {
+			return nil, addDebugInfo(err)
+		}
 	}
 
 	return &prj, nil

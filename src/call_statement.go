@@ -23,16 +23,21 @@ func newCallStatement(m map[string]interface{}) (*CallStatement, error) {
 
 	// should never happen
 	if typ, ok := m["type"]; !ok || typ != CallStmtName {
-		return nil, errors.New(fmt.Sprintf("%s: the generic map supplied is not a AssignStatement",
-			errPrefix))
+		return nil, addDebugInfo(errors.New(fmt.Sprintf(
+			"%s: the generic map supplied is not a AssignStatement", errPrefix)))
 	}
 
-	if callstmt.Ref, err = newFuncRef(m); err != nil {
-		return nil, err
+	refMap, err := extractMapValue("reference", errPrefix, m)
+	if err != nil {
+		return nil, addDebugInfo(err)
+	}
+
+	if callstmt.Ref, err = newFuncRef(refMap); err != nil {
+		return nil, addDebugInfo(err)
 	}
 
 	if callstmt.Line, err = extractInt64Value("line", errPrefix, m); err != nil {
-		return nil, err
+		return nil, addDebugInfo(err)
 	}
 
 	return &callstmt, nil

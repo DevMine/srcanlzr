@@ -25,7 +25,8 @@ func newStatement(m map[string]interface{}) (Statement, error) {
 
 	typ, ok := m["type"]
 	if !ok {
-		return nil, errors.New(fmt.Sprintf("%s: field 'type' does not exist", errPrefix))
+		return nil, addDebugInfo(errors.New(fmt.Sprintf(
+			"%s: field 'type' does not exist", errPrefix)))
 	}
 
 	switch typ {
@@ -41,7 +42,7 @@ func newStatement(m map[string]interface{}) (Statement, error) {
 		return newOtherStatement(m)
 	}
 
-	return nil, errors.New("unknown statement type")
+	return nil, addDebugInfo(errors.New("unknown statement type"))
 }
 
 func newStatementsSlice(key, errPrefix string, m map[string]interface{}) ([]Statement, error) {
@@ -50,26 +51,32 @@ func newStatementsSlice(key, errPrefix string, m map[string]interface{}) ([]Stat
 
 	stmtsMap, ok := m[key]
 	if !ok || stmtsMap == nil {
+		// XXX It is not possible to add debug info on this error because it is
+		// required that this error be en "errNotExist".
 		return nil, errNotExist
 	}
 
 	if s = reflect.ValueOf(stmtsMap); s.Kind() != reflect.Slice {
-		return nil, errors.New(fmt.Sprintf("%s: field '%s' is supposed to be a slice",
-			errPrefix, key))
+		return nil, addDebugInfo(errors.New(fmt.Sprintf(
+			"%s: field '%s' is supposed to be a slice", errPrefix, key)))
 	}
 
 	stmts := make([]Statement, s.Len(), s.Len())
 	for i := 0; i < s.Len(); i++ {
 		stmt := s.Index(i).Interface()
+		if stmt == nil {
+			continue
+		}
 
 		switch stmt.(type) {
 		case map[string]interface{}:
 			if stmts[i], err = newStatement(stmt.(map[string]interface{})); err != nil {
-				return nil, err
+				return nil, addDebugInfo(err)
 			}
 		default:
-			return nil, errors.New(fmt.Sprintf("%s: '%s' must be a map[string]interface{}",
-				errPrefix, key))
+			return nil, addDebugInfo(errors.New(fmt.Sprintf(
+				"%s: '%s' must be a map[string]interface{}, found %v",
+				errPrefix, key, reflect.TypeOf(stmt))))
 		}
 	}
 

@@ -22,15 +22,15 @@ func newTypeDef(m map[string]interface{}) (*TypeDef, error) {
 	typeDef := TypeDef{}
 
 	if typeDef.Name, err = extractStringValue("name", errPrefix, m); err != nil {
-		return nil, err
+		return nil, addDebugInfo(err)
 	}
 
 	if typeDef.Doc, err = extractStringValue("doc", errPrefix, m); err != nil {
-		return nil, err
+		return nil, addDebugInfo(err)
 	}
 
 	if typeDef.Type, err = newExprType(m); err != nil {
-		return nil, err
+		return nil, addDebugInfo(err)
 	}
 
 	return &typeDef, nil
@@ -42,12 +42,14 @@ func newTypeDefsSlice(key, errPrefix string, m map[string]interface{}) ([]*TypeD
 
 	typeDefsMap, ok := m[key]
 	if !ok {
+		// XXX It is not possible to add debug info on this error because it is
+		// required that this error be en "errNotExist".
 		return nil, errNotExist
 	}
 
 	if s = reflect.ValueOf(typeDefsMap); s.Kind() != reflect.Slice {
-		return nil, errors.New(fmt.Sprintf("%s: field '%s' is supposed to be a slice",
-			errPrefix, key))
+		return nil, addDebugInfo(errors.New(fmt.Sprintf(
+			"%s: field '%s' is supposed to be a slice", errPrefix, key)))
 	}
 
 	typeDefs := make([]*TypeDef, s.Len(), s.Len())
@@ -57,11 +59,11 @@ func newTypeDefsSlice(key, errPrefix string, m map[string]interface{}) ([]*TypeD
 		switch typeDef.(type) {
 		case map[string]interface{}:
 			if typeDefs[i], err = newTypeDef(typeDef.(map[string]interface{})); err != nil {
-				return nil, err
+				return nil, addDebugInfo(err)
 			}
 		default:
-			return nil, errors.New(fmt.Sprintf("%s: '%s' must be a map[string]interface{}",
-				errPrefix, key))
+			return nil, addDebugInfo(errors.New(fmt.Sprintf(
+				"%s: '%s' must be a map[string]interface{}", errPrefix, key)))
 		}
 	}
 

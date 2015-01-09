@@ -31,31 +31,31 @@ func newFunction(m map[string]interface{}) (*Function, error) {
 	fct := Function{}
 
 	if fct.Name, err = extractStringValue("name", errPrefix, m); err != nil {
-		return nil, err
+		return nil, addDebugInfo(err)
 	}
 
 	if fct.Doc, err = extractStringValue("doc", errPrefix, m); err != nil && isExist(err) {
-		return nil, err
+		return nil, addDebugInfo(err)
 	}
 
 	if fct.LoC, err = extractInt64Value("loc", errPrefix, m); err != nil && isExist(err) {
-		return nil, err
+		return nil, addDebugInfo(err)
 	}
 
 	if fct.Raw, err = extractStringValue("raw", errPrefix, m); err != nil {
-		return nil, err
+		return nil, addDebugInfo(err)
 	}
 
 	if fct.Args, err = newVariablesSlice("args", errPrefix, m); err != nil && isExist(err) {
-		return nil, err
+		return nil, addDebugInfo(err)
 	}
 
 	if fct.Return, err = newVariablesSlice("returns", errPrefix, m); err != nil && isExist(err) {
-		return nil, err
+		return nil, addDebugInfo(err)
 	}
 
 	if fct.StmtList, err = newStatementsSlice("statements_list", errPrefix, m); err != nil && isExist(err) {
-		return nil, err
+		return nil, addDebugInfo(err)
 	}
 
 	return &fct, nil
@@ -67,12 +67,14 @@ func newFunctionsSlice(key, errPrefix string, m map[string]interface{}) ([]*Func
 
 	fctsMap, ok := m[key]
 	if !ok {
+		// XXX It is not possible to add debug info on this error because it is
+		// required that this error be en "errNotExist".
 		return nil, errNotExist
 	}
 
 	if s = reflect.ValueOf(fctsMap); s.Kind() != reflect.Slice {
-		return nil, errors.New(fmt.Sprintf("%s: field '%s' is supposed to be a slice",
-			errPrefix, key))
+		return nil, addDebugInfo(errors.New(fmt.Sprintf(
+			"%s: field '%s' is supposed to be a slice", errPrefix, key)))
 	}
 
 	fcts := make([]*Function, s.Len(), s.Len())
@@ -82,11 +84,11 @@ func newFunctionsSlice(key, errPrefix string, m map[string]interface{}) ([]*Func
 		switch fct.(type) {
 		case map[string]interface{}:
 			if fcts[i], err = newFunction(fct.(map[string]interface{})); err != nil {
-				return nil, err
+				return nil, addDebugInfo(err)
 			}
 		default:
-			return nil, errors.New(fmt.Sprintf("%s: '%s' must be a map[string]interface{}",
-				errPrefix, key))
+			return nil, addDebugInfo(errors.New(fmt.Sprintf(
+				"%s: '%s' must be a map[string]interface{}", errPrefix, key)))
 		}
 	}
 

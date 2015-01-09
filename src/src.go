@@ -96,12 +96,12 @@ var suppParadigms = []string{
 func Unmarshal(bs []byte) (*Project, error) {
 	genMap := map[string]interface{}{}
 	if err := json.Unmarshal(bs, &genMap); err != nil {
-		return nil, err
+		return nil, addDebugInfo(err)
 	}
 
 	prj, err := newProject(genMap)
 	if err != nil {
-		return nil, err
+		return nil, addDebugInfo(err)
 	}
 
 	return prj, nil

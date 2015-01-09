@@ -22,11 +22,11 @@ func newInterface(m map[string]interface{}) (*Interface, error) {
 	i := Interface{}
 
 	if i.Name, err = extractStringValue("name", errPrefix, m); err != nil {
-		return nil, err
+		return nil, addDebugInfo(err)
 	}
 
 	if i.Visibility, err = extractStringValue("visibility", errPrefix, m); err != nil {
-		return nil, err
+		return nil, addDebugInfo(err)
 	}
 
 	return &i, nil
@@ -38,12 +38,14 @@ func newInterfacesSlice(key, errPrefix string, m map[string]interface{}) ([]*Int
 
 	interfsMap, ok := m[key]
 	if !ok {
+		// XXX It is not possible to add debug info on this error because it is
+		// required that this error be en "errNotExist".
 		return nil, errNotExist
 	}
 
 	if s = reflect.ValueOf(interfsMap); s.Kind() != reflect.Slice {
-		return nil, errors.New(fmt.Sprintf("%s: field '%s' is supposed to be a slice",
-			errPrefix, key))
+		return nil, addDebugInfo(errors.New(fmt.Sprintf(
+			"%s: field '%s' is supposed to be a slice", errPrefix, key)))
 	}
 
 	interfs := make([]*Interface, s.Len(), s.Len())
@@ -53,11 +55,11 @@ func newInterfacesSlice(key, errPrefix string, m map[string]interface{}) ([]*Int
 		switch interf.(type) {
 		case map[string]interface{}:
 			if interfs[i], err = newInterface(interf.(map[string]interface{})); err != nil {
-				return nil, err
+				return nil, addDebugInfo(err)
 			}
 		default:
-			return nil, errors.New(fmt.Sprintf("%s: '%s' must be a map[string]interface{}",
-				errPrefix, key))
+			return nil, addDebugInfo(errors.New(fmt.Sprintf(
+				"%s: '%s' must be a map[string]interface{}", errPrefix, key)))
 		}
 	}
 

@@ -21,12 +21,12 @@ func newRepo(m map[string]interface{}) (*Repo, error) {
 
 	repo.VCS, err = extractStringValue("vcs", errPrefix, m)
 	if err != nil {
-		return nil, err
+		return nil, addDebugInfo(err)
 	}
 
 	repo.CloneURL, err = extractStringValue("url", errPrefix, m)
 	if err != nil {
-		return nil, err
+		return nil, addDebugInfo(err)
 	}
 
 	return &repo, nil

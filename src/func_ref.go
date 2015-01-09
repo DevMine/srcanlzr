@@ -16,16 +16,16 @@ func newFuncRef(m map[string]interface{}) (*FuncRef, error) {
 	errPrefix := "src/func_ref"
 	fctref := FuncRef{}
 
-	if fctref.Namespace, err = extractStringValue("namespace", errPrefix, m); err != nil {
-		return nil, err
+	if fctref.Namespace, err = extractStringValue("namespace", errPrefix, m); err != nil && isExist(err) {
+		return nil, addDebugInfo(err)
 	}
 
 	if fctref.FuncName, err = extractStringValue("function_name", errPrefix, m); err != nil {
-		return nil, err
+		return nil, addDebugInfo(err)
 	}
 
 	if fctref.External, err = extractBoolValue("external", errPrefix, m); err != nil {
-		return nil, err
+		return nil, addDebugInfo(err)
 	}
 
 	return &fctref, nil

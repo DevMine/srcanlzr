@@ -24,23 +24,23 @@ func newTrait(m map[string]interface{}) (*Trait, error) {
 	trait := Trait{}
 
 	if trait.Name, err = extractStringValue("name", errPrefix, m); err != nil {
-		return nil, err
+		return nil, addDebugInfo(err)
 	}
 
 	if trait.Attributes, err = newAttributesSlice("attributes", errPrefix, m); err != nil {
-		return nil, err
+		return nil, addDebugInfo(err)
 	}
 
 	if trait.Methods, err = newMethodsSlice("methods", errPrefix, m); err != nil {
-		return nil, err
+		return nil, addDebugInfo(err)
 	}
 
 	if trait.Classes, err = newClassesSlice("classes", errPrefix, m); err != nil {
-		return nil, err
+		return nil, addDebugInfo(err)
 	}
 
 	if trait.Traits, err = newTraitsSlice("traits", errPrefix, m); err != nil {
-		return nil, err
+		return nil, addDebugInfo(err)
 	}
 
 	return &trait, nil
@@ -52,12 +52,14 @@ func newTraitsSlice(key, errPrefix string, m map[string]interface{}) ([]*Trait, 
 
 	traitsMap, ok := m[key]
 	if !ok {
+		// XXX It is not possible to add debug info on this error because it is
+		// required that this error be en "errNotExist".
 		return nil, errNotExist
 	}
 
 	if s = reflect.ValueOf(traitsMap); s.Kind() != reflect.Slice {
-		return nil, errors.New(fmt.Sprintf("%s: field '%s' is supposed to be a slice",
-			errPrefix, key))
+		return nil, addDebugInfo(errors.New(fmt.Sprintf(
+			"%s: field '%s' is supposed to be a slice", errPrefix, key)))
 	}
 
 	traits := make([]*Trait, s.Len(), s.Len())
@@ -67,11 +69,11 @@ func newTraitsSlice(key, errPrefix string, m map[string]interface{}) ([]*Trait, 
 		switch trait.(type) {
 		case map[string]interface{}:
 			if traits[i], err = newTrait(trait.(map[string]interface{})); err != nil {
-				return nil, err
+				return nil, addDebugInfo(err)
 			}
 		default:
-			return nil, errors.New(fmt.Sprintf("%s: '%s' must be a map[string]interface{}",
-				errPrefix, key))
+			return nil, addDebugInfo(errors.New(fmt.Sprintf(
+				"%s: '%s' must be a map[string]interface{}", errPrefix, key)))
 		}
 	}
 

@@ -36,29 +36,30 @@ func newPackage(m map[string]interface{}) (*Package, error) {
 	pkg := Package{}
 
 	if pkg.Name, err = extractStringValue("name", errPrefix, m); err != nil {
-		return nil, err
+		return nil, addDebugInfo(err)
 	}
 
 	if pkg.Path, err = extractStringValue("path", errPrefix, m); err != nil {
-		return nil, err
+		return nil, addDebugInfo(err)
 	}
 
 	if pkg.Doc, err = extractStringValue("doc", errPrefix, m); err != nil {
-		return nil, err
+		return nil, addDebugInfo(err)
 	}
 
 	if pkg.LoC, err = extractInt64Value("loc", errPrefix, m); err != nil {
-		return nil, err
+		return nil, addDebugInfo(err)
 	}
 
 	srcsMap, ok := m["source_files"]
 	if !ok {
-		return nil, errors.New(errPrefix + ": field 'source_files' does not exist")
+		return nil, addDebugInfo(errors.New(errPrefix + ": field 'source_files' does not exist"))
 	}
 
 	var s reflect.Value
 	if s = reflect.ValueOf(srcsMap); s.Kind() != reflect.Slice {
-		return nil, errors.New(errPrefix + ": field 'source_files' is supposed to be a slice")
+		return nil, addDebugInfo(errors.New(
+			errPrefix + ": field 'source_files' is supposed to be a slice"))
 	}
 
 	srcs := make([]*SourceFile, s.Len(), s.Len())
@@ -68,10 +69,11 @@ func newPackage(m map[string]interface{}) (*Package, error) {
 		switch src.(type) {
 		case map[string]interface{}:
 			if srcs[i], err = newSourceFile(src.(map[string]interface{})); err != nil {
-				return nil, err
+				return nil, addDebugInfo(err)
 			}
 		default:
-			return nil, errors.New(errPrefix + ": 'source_file' must be a map[string]interface{}")
+			return nil, addDebugInfo(errors.New(
+				errPrefix + ": 'source_file' must be a map[string]interface{}"))
 		}
 	}
 
@@ -86,12 +88,14 @@ func newPackagesSlice(key, errPrefix string, m map[string]interface{}) ([]*Packa
 
 	pkgsMap, ok := m[key]
 	if !ok {
+		// XXX It is not possible to add debug info on this error because it is
+		// required that this error be en "errNotExist".
 		return nil, errNotExist
 	}
 
 	if s = reflect.ValueOf(pkgsMap); s.Kind() != reflect.Slice {
-		return nil, errors.New(fmt.Sprintf("%s: field '%s' is supposed to be a slice",
-			errPrefix, key))
+		return nil, addDebugInfo(errors.New(fmt.Sprintf(
+			"%s: field '%s' is supposed to be a slice", errPrefix, key)))
 	}
 
 	pkgs := make([]*Package, s.Len(), s.Len())
@@ -101,11 +105,11 @@ func newPackagesSlice(key, errPrefix string, m map[string]interface{}) ([]*Packa
 		switch pkg.(type) {
 		case map[string]interface{}:
 			if pkgs[i], err = newPackage(pkg.(map[string]interface{})); err != nil {
-				return nil, err
+				return nil, addDebugInfo(err)
 			}
 		default:
-			return nil, errors.New(fmt.Sprintf("%s: '%s' must be a map[string]interface{}",
-				errPrefix, key))
+			return nil, addDebugInfo(errors.New(fmt.Sprintf(
+				"%s: '%s' must be a map[string]interface{}", errPrefix, key)))
 		}
 	}
 

@@ -26,27 +26,27 @@ func newClass(m map[string]interface{}) (*Class, error) {
 	cls := Class{}
 
 	if cls.Name, err = extractStringValue("name", errPrefix, m); err != nil {
-		return nil, err
+		return nil, addDebugInfo(err)
 	}
 
 	if cls.Visibility, err = extractStringValue("visibility", errPrefix, m); err != nil {
-		return nil, err
+		return nil, addDebugInfo(err)
 	}
 
 	if cls.ExtendedClasses, err = newClassesSlice("classes", errPrefix, m); err != nil {
-		return nil, err
+		return nil, addDebugInfo(err)
 	}
 
 	if cls.ImplementedInterfaces, err = newInterfacesSlice("interfaces", errPrefix, m); err != nil {
-		return nil, err
+		return nil, addDebugInfo(err)
 	}
 
 	if cls.Attributes, err = newAttributesSlice("attributes", errPrefix, m); err != nil {
-		return nil, err
+		return nil, addDebugInfo(err)
 	}
 
 	if cls.Methods, err = newMethodsSlice("methods", errPrefix, m); err != nil {
-		return nil, err
+		return nil, addDebugInfo(err)
 	}
 
 	return &cls, nil
@@ -58,12 +58,14 @@ func newClassesSlice(key, errPrefix string, m map[string]interface{}) ([]*Class,
 
 	clssMap, ok := m[key]
 	if !ok {
+		// XXX It is not possible to add debug info on this error because it is
+		// required that this error be en "errNotExist".
 		return nil, errNotExist
 	}
 
 	if s = reflect.ValueOf(clssMap); s.Kind() != reflect.Slice {
-		return nil, errors.New(fmt.Sprintf("%s: field '%s' is supposed to be a slice",
-			errPrefix, key))
+		return nil, addDebugInfo(errors.New(fmt.Sprintf(
+			"%s: field '%s' is supposed to be a slice", errPrefix, key)))
 	}
 
 	clss := make([]*Class, s.Len(), s.Len())
@@ -73,11 +75,11 @@ func newClassesSlice(key, errPrefix string, m map[string]interface{}) ([]*Class,
 		switch cls.(type) {
 		case map[string]interface{}:
 			if clss[i], err = newClass(cls.(map[string]interface{})); err != nil {
-				return nil, err
+				return nil, addDebugInfo(err)
 			}
 		default:
-			return nil, errors.New(fmt.Sprintf("%s: '%s' must be a map[string]interface{}",
-				errPrefix, key))
+			return nil, addDebugInfo(errors.New(fmt.Sprintf(
+				"%s: '%s' must be a map[string]interface{}", errPrefix, key)))
 		}
 	}
 
