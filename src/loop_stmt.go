@@ -4,7 +4,7 @@
 
 package src
 
-import "errors"
+import "fmt"
 
 type LoopStmt struct {
 	Type      string `json:"type"`
@@ -20,9 +20,8 @@ func newLoopStmt(m map[string]interface{}) (*LoopStmt, error) {
 
 	// should never happen
 	if typ, ok := m["type"]; !ok || typ != LoopStmtName {
-		// FIXME use errPrefix
-		return nil, addDebugInfo(errors.New(
-			"src/loop_statement: the generic map supplied is not a LoopStmt"))
+		return nil, addDebugInfo(fmt.Errorf(
+			"%s: the generic map supplied is not a LoopStmt", errPrefix))
 	}
 
 	if loopstmt.Type, err = extractStringValue("type", errPrefix, m); err != nil {
