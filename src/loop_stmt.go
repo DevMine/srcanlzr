@@ -7,9 +7,13 @@ package src
 import "fmt"
 
 type LoopStmt struct {
-	Type      string `json:"type"`
-	StmtsList []Stmt `json:"statements_list"`
-	Line      int64  `json:"line"` // Line number of the statement relatively to the function.
+	Type       string `json:"type"`
+	Init       Stmt   `json:"initialization"`
+	Cond       Expr   `json:"condition"`
+	Post       Stmt   `json:"post_iteration_statement"`
+	StmtsList  []Stmt `json:"statements_list"`
+	IsPostEval bool   `json:"is_post_evaluated"`
+	Line       int64  `json:"line"` // Line number of the statement relatively to the function.
 }
 
 // newLoopStmt creates a new LoopStmt from a generic map.
@@ -25,6 +29,37 @@ func newLoopStmt(m map[string]interface{}) (*LoopStmt, error) {
 	}
 
 	if loopstmt.Type, err = extractStringValue("type", errPrefix, m); err != nil {
+		return nil, addDebugInfo(err)
+	}
+
+	initMap, err := extractMapValue("initialization", errPrefix, m)
+	if err != nil {
+		return nil, addDebugInfo(err)
+	}
+
+	if loopstmt.Init, err = newStmt(initMap); err != nil {
+		return nil, addDebugInfo(err)
+	}
+
+	condMap, err := extractMapValue("condition", errPrefix, m)
+	if err != nil {
+		return nil, addDebugInfo(err)
+	}
+
+	if loopstmt.Cond, err = newExpr(condMap); err != nil {
+		return nil, addDebugInfo(err)
+	}
+
+	postMap, err := extractMapValue("post_iteration_statement", errPrefix, m)
+	if err != nil {
+		return nil, addDebugInfo(err)
+	}
+
+	if loopstmt.Post, err = newStmt(postMap); err != nil {
+		return nil, addDebugInfo(err)
+	}
+
+	if loopstmt.IsPostEval, err = extractBoolValue("is_post_evaluated", errPrefix, m); err != nil {
 		return nil, addDebugInfo(err)
 	}
 

@@ -133,9 +133,6 @@ func statementComplexity(s src.Stmt) int64 {
 		for _, s := range stmt.StmtsList {
 			c += statementComplexity(s)
 		}
-	case src.CallStmt:
-		fmt.Println("plop")
-		c++
 	}
 
 	return c

@@ -18,12 +18,11 @@ type SrcFile struct {
 	Imports []string `json:"imports,omitempty"`
 
 	// Types definition
-	// TODO rename JSON key into type_definition
-	TypeDefs []*TypeDef `json:"type_defs,omitempty"`
+	TypeSpecs []*TypeSpec `json:"type_specifiers,omitempty"`
 
 	// Structures definition
 	// TODO rename JSON key into structures
-	Structs []*StructuredType `json:"structs,omitempty"`
+	Structs []*StructType `json:"structs,omitempty"`
 
 	// List of constants defined at the file level (e.g. global constants)
 	Constants []*Constant `json:"constants,omitempty"`
@@ -74,11 +73,11 @@ func newSrcFile(m map[string]interface{}) (*SrcFile, error) {
 		return nil, addDebugInfo(err)
 	}
 
-	if src.TypeDefs, err = newTypeDefsSlice("type_defs", errPrefix, m); err != nil && isExist(err) {
+	if src.TypeSpecs, err = newTypeSpecsSlice("type_specifiers", errPrefix, m); err != nil && isExist(err) {
 		return nil, addDebugInfo(err)
 	}
 
-	if src.Structs, err = newStructsSlice("structs", errPrefix, m); err != nil && isExist(err) {
+	if src.Structs, err = newStructTypesSlice("structs", errPrefix, m); err != nil && isExist(err) {
 		return nil, addDebugInfo(err)
 	}
 

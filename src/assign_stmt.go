@@ -7,10 +7,10 @@ package src
 import "fmt"
 
 type AssignStmt struct {
-	Type     string `json:"type"`
-	VarName  string `json:"var_name"`
-	VarValue string `json:"var_value"` // TODO handle case where value is a literal, function call, etc.
-	Line     int64  `json:"line"`      // Line number of the statement relatively to the function.
+	Type string `json:"type"`
+	Lhs  []Expr `json:"left_hand_side"`
+	Rhs  []Expr `json:"right_hand_side"`
+	Line int64  `json:"line"` // Line number of the statement relatively to the function.
 }
 
 // newAssignStmt creates a new AssignStmt from a generic map.
@@ -29,11 +29,11 @@ func newAssignStmt(m map[string]interface{}) (*AssignStmt, error) {
 		return nil, addDebugInfo(err)
 	}
 
-	if assignstmt.VarName, err = extractStringValue("var_name", errPrefix, m); err != nil {
+	if assignstmt.Lhs, err = newExprsSlice("left_hand_side", errPrefix, m); err != nil {
 		return nil, addDebugInfo(err)
 	}
 
-	if assignstmt.VarValue, err = extractStringValue("var_value", errPrefix, m); err != nil {
+	if assignstmt.Rhs, err = newExprsSlice("right_hand_side", errPrefix, m); err != nil {
 		return nil, addDebugInfo(err)
 	}
 

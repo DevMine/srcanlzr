@@ -1,0 +1,71 @@
+// Copyright 2014-2015 The DevMine Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
+package src
+
+import (
+	"errors"
+	"fmt"
+	"reflect"
+)
+
+const (
+	BinaryExprName = "BINARY"
+	CallExprName   = "CALL"
+	UnaryExprName  = "UNARY"
+)
+
+type Expr interface{}
+
+func newExpr(m map[string]interface{}) (Expr, error) {
+	errPrefix := "src/expr"
+
+	typ, ok := m["type"]
+	if !ok {
+		return nil, addDebugInfo(fmt.Errorf(
+			"%s: field 'type' does not exist", errPrefix))
+	}
+
+	switch typ {
+	case BinaryExprName:
+		return newBinaryExpr(m)
+	case CallExprName:
+		return newCallExpr(m)
+	case UnaryExprName:
+		return newUnaryExpr(m)
+	}
+
+	return nil, addDebugInfo(errors.New("unknown statement type"))
+}
+
+func newExprsSlice(key, errPrefix string, m map[string]interface{}) ([]Expr, error) {
+	var err error
+	var s *reflect.Value
+
+	if s, err = reflectSliceValue(key, errPrefix, m); err != nil {
+		return nil, addDebugInfo(err)
+	}
+
+	exprs := make([]Expr, s.Len(), s.Len())
+	for i := 0; i < s.Len(); i++ {
+		expr := s.Index(i).Interface()
+		if expr == nil {
+			continue
+		}
+
+		switch expr.(type) {
+		case map[string]interface{}:
+			if exprs[i], err = newExpr(expr.(map[string]interface{})); err != nil {
+				return nil, addDebugInfo(err)
+			}
+		default:
+			return nil, addDebugInfo(fmt.Errorf(
+				"%s: '%s' must be a map[string]interface{}, found %v",
+				errPrefix, key, reflect.TypeOf(expr)))
+
+		}
+	}
+
+	return exprs, nil
+}

@@ -8,7 +8,10 @@ import "fmt"
 
 type IfStmt struct {
 	Type      string `json:"type"`
+	Init      Stmt   `json:"initialization"`
+	Cond      Expr   `json:"condition"`
 	StmtsList []Stmt `json:"statements_list"`
+	Else      []Stmt `json:"else"`
 	Line      int64  `json:"line"` // Line number of the statement relatively to the function.
 }
 
@@ -28,11 +31,33 @@ func newIfStmt(m map[string]interface{}) (*IfStmt, error) {
 		return nil, addDebugInfo(err)
 	}
 
-	if ifstmt.Line, err = extractInt64Value("line", errPrefix, m); err != nil {
+	initMap, err := extractMapValue("initialization", errPrefix, m)
+	if err != nil {
+		return nil, addDebugInfo(err)
+	}
+
+	if ifstmt.Cond, err = newStmt(initMap); err != nil {
+		return nil, addDebugInfo(err)
+	}
+
+	condMap, err := extractMapValue("condition", errPrefix, m)
+	if err != nil {
+		return nil, addDebugInfo(err)
+	}
+
+	if ifstmt.Cond, err = newExpr(condMap); err != nil {
 		return nil, addDebugInfo(err)
 	}
 
 	if ifstmt.StmtsList, err = newStmtsSlice("statements_list", errPrefix, m); err != nil {
+		return nil, addDebugInfo(err)
+	}
+
+	if ifstmt.Else, err = newStmtsSlice("else", errPrefix, m); err != nil {
+		return nil, addDebugInfo(err)
+	}
+
+	if ifstmt.Line, err = extractInt64Value("line", errPrefix, m); err != nil {
 		return nil, addDebugInfo(err)
 	}
 

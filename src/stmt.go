@@ -14,7 +14,8 @@ const (
 	IfStmtName     = "IF"
 	LoopStmtName   = "LOOP"
 	AssignStmtName = "ASSIGN"
-	CallStmtName   = "CALL"
+	DeclStmtName   = "DECL"
+	ExprStmtName   = "EXPR"
 	OtherStmtName  = "OTHER"
 )
 
@@ -36,8 +37,10 @@ func newStmt(m map[string]interface{}) (Stmt, error) {
 		return newLoopStmt(m)
 	case AssignStmtName:
 		return newAssignStmt(m)
-	case CallStmtName:
-		return newCallStmt(m)
+	case DeclStmtName:
+		return newDeclStmt(m)
+	case ExprStmtName:
+		return newExprStmt(m)
 	case OtherStmtName:
 		return newOtherStmt(m)
 	}

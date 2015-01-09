@@ -5,93 +5,34 @@
 package src
 
 import (
-	"errors"
 	"fmt"
 	"reflect"
 )
 
-const (
-	PrimitiveTypeName = "PRIMITIVE"
-	StructTypeName    = "STRUCT"
-)
-
-// ExprType can be either a structured type (Struct) or another type (PrimitiveType)
-// such as an int, float, etc.
-type ExprType interface{}
-
-type PrimitiveType struct {
-	Type string `json:"type"`
-	Name string `json:"name"` // int, float, string, etc.
-}
-
-type StructuredType struct {
-	Type   string  `json:"type"`
-	Name   string  `json:"name"`
+type StructType struct {
 	Doc    string  `json:"doc"`
+	Name   string  `json:"name"`
+	Type   Expr    `json:"type"`
 	Fields []Field `json:"fields"`
 }
 
 type Field struct {
 	Name string `json:"name"`
-
-	// TODO rename into TypeName or use a type ExprType
 	Type string `json:"type"`
-
-	Doc string `json:"doc"`
+	Doc  string `json:"doc"`
 }
 
-func newExprType(m map[string]interface{}) (ExprType, error) {
-	errPrefix := "src/expression_type"
-
-	typ, ok := m["type"]
-	if !ok {
-		return nil, addDebugInfo(fmt.Errorf("%s: field 'type' does not exist", errPrefix))
-	}
-
-	switch typ {
-	case PrimitiveTypeName:
-		return newPrimitive(m)
-	case StructTypeName:
-		return newStruct(m)
-	}
-
-	return nil, addDebugInfo(errors.New("unknown expression type"))
-}
-
-func newPrimitive(m map[string]interface{}) (*PrimitiveType, error) {
+func newStructType(m map[string]interface{}) (*StructType, error) {
 	var err error
 	errPrefix := "src/structured_type"
-	prim := PrimitiveType{}
+	strct := StructType{}
 
 	// should never happen
-	if typ, ok := m["type"]; !ok || typ != PrimitiveTypeName {
+	/*if typ, ok := m["type"]; !ok || typ != StructTypeName {
 		return nil, addDebugInfo(fmt.Errorf(
 			"%s: the generic map supplied is not a PrimitiveType",
 			errPrefix))
-	}
-
-	if prim.Type, err = extractStringValue("type", errPrefix, m); err != nil {
-		return nil, addDebugInfo(err)
-	}
-
-	if prim.Name, err = extractStringValue("name", errPrefix, m); err != nil {
-		return nil, addDebugInfo(err)
-	}
-
-	return &prim, nil
-}
-
-func newStruct(m map[string]interface{}) (*StructuredType, error) {
-	var err error
-	errPrefix := "src/structured_type"
-	strct := StructuredType{}
-
-	// should never happen
-	if typ, ok := m["type"]; !ok || typ != StructTypeName {
-		return nil, addDebugInfo(fmt.Errorf(
-			"%s: the generic map supplied is not a PrimitiveType",
-			errPrefix))
-	}
+	}*/
 
 	if strct.Type, err = extractStringValue("type", errPrefix, m); err != nil {
 		return nil, addDebugInfo(err)
@@ -108,7 +49,7 @@ func newStruct(m map[string]interface{}) (*StructuredType, error) {
 	return &strct, nil
 }
 
-func newStructsSlice(key, errPrefix string, m map[string]interface{}) ([]*StructuredType, error) {
+func newStructTypesSlice(key, errPrefix string, m map[string]interface{}) ([]*StructType, error) {
 	var err error
 	var s reflect.Value
 
@@ -124,13 +65,13 @@ func newStructsSlice(key, errPrefix string, m map[string]interface{}) ([]*Struct
 			"%s: field '%s' is supposed to be a slice", errPrefix, key))
 	}
 
-	structs := make([]*StructuredType, s.Len(), s.Len())
+	structs := make([]*StructType, s.Len(), s.Len())
 	for i := 0; i < s.Len(); i++ {
 		strct := s.Index(i).Interface()
 
 		switch strct.(type) {
 		case map[string]interface{}:
-			if structs[i], err = newStruct(strct.(map[string]interface{})); err != nil {
+			if structs[i], err = newStructType(strct.(map[string]interface{})); err != nil {
 				return nil, addDebugInfo(err)
 			}
 		default:

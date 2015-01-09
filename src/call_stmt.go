@@ -6,36 +6,41 @@ package src
 
 import "fmt"
 
-type CallStmt struct {
+type CallExpr struct {
 	Type string   `json:"type"`
-	Ref  *FuncRef `json:"reference"` // Reference to the function
+	Fun  *FuncRef `json:"function"`  // Reference to the function
+	Args []Expr   `json:"arguments"` // function arguments
 	Line int64    `json:"line"`      // Line number of the statement relatively to the function.
 }
 
-// newCallStmt creates a new CallStmt from a generic map.
-func newCallStmt(m map[string]interface{}) (*CallStmt, error) {
+// newCallExpr creates a new CallExpr from a generic map.
+func newCallExpr(m map[string]interface{}) (*CallExpr, error) {
 	var err error
 	errPrefix := "src/call_stmt"
-	callstmt := CallStmt{}
+	callexpr := CallExpr{}
 
 	// should never happen
-	if typ, ok := m["type"]; !ok || typ != CallStmtName {
+	if typ, ok := m["type"]; !ok || typ != CallExprName {
 		return nil, addDebugInfo(fmt.Errorf(
-			"%s: the generic map supplied is not a CallStmt", errPrefix))
+			"%s: the generic map supplied is not a CallExpr", errPrefix))
 	}
 
-	refMap, err := extractMapValue("reference", errPrefix, m)
+	refMap, err := extractMapValue("function", errPrefix, m)
 	if err != nil {
 		return nil, addDebugInfo(err)
 	}
 
-	if callstmt.Ref, err = newFuncRef(refMap); err != nil {
+	if callexpr.Fun, err = newFuncRef(refMap); err != nil {
 		return nil, addDebugInfo(err)
 	}
 
-	if callstmt.Line, err = extractInt64Value("line", errPrefix, m); err != nil {
+	if callexpr.Args, err = newExprsSlice("arguments", errPrefix, m); err != nil {
 		return nil, addDebugInfo(err)
 	}
 
-	return &callstmt, nil
+	if callexpr.Line, err = extractInt64Value("line", errPrefix, m); err != nil {
+		return nil, addDebugInfo(err)
+	}
+
+	return &callexpr, nil
 }
