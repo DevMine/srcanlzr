@@ -7,18 +7,13 @@
 */
 package anlzr
 
-import (
-	"encoding/xml"
-
-	"github.com/DevMine/srcanlzr/src"
-)
+import "github.com/DevMine/srcanlzr/src"
 
 type Analyzer interface {
 	Analyze(p *src.Project, r *Result) error
 }
 
 type Result struct {
-	XMLName        xml.Name          `json:"-" xml:"result"`
 	ProgLangs      []Language        `json:"programming_languages" xml:"programming-languages"`
 	AverageFuncLen float32           `json:"average_function_length" xml:"average-function-length"`
 	MaxFuncLen     int64             `json:"max_function_length" xml:"max-function-length"`
@@ -30,13 +25,13 @@ type Result struct {
 
 // Cyclomatic complexity metrics, also known as McCabe metric.
 type ComplexityMetrics struct {
-	AveragePerFunc float32 `json:"average_per_func"` // Average complexity per function.
-	AveragePerFile float32 `json:"average_per_file"` // Average complexity per file.
+	AveragePerFunc float32 `json:"average_per_func" xml:"average-per-func"` // Average complexity per function.
+	AveragePerFile float32 `json:"average_per_file" xml:"average-per-file"` // Average complexity per file.
 }
 
 type Language struct {
 	src.Language
-	Lines int64
+	Lines int64 `json:"lines" xml:"lines"`
 }
 
 func RunAnalyzers(p *src.Project, a ...Analyzer) (*Result, error) {
