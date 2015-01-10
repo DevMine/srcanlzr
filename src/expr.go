@@ -18,6 +18,7 @@ const (
 
 const (
 	BasicLitName   = "BASIC_LIT"
+	StructTypeName = "STRUCT_TYPE"
 )
 
 type Expr interface{}
@@ -40,6 +41,8 @@ func newExpr(m map[string]interface{}) (Expr, error) {
 		return newUnaryExpr(m)
 	case BasicLitName:
 		return newBasicLit(m)
+	case StructTypeName:
+		return newStructType(m)
 	}
 
 	return nil, addDebugInfo(errors.New("unknown statement type"))
