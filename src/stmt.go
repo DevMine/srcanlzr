@@ -15,6 +15,7 @@ const (
 	LoopStmtName   = "LOOP"
 	AssignStmtName = "ASSIGN"
 	DeclStmtName   = "DECL"
+	ReturnStmtName = "RETURN"
 	ExprStmtName   = "EXPR"
 	OtherStmtName  = "OTHER"
 )
@@ -39,6 +40,8 @@ func newStmt(m map[string]interface{}) (Stmt, error) {
 		return newAssignStmt(m)
 	case DeclStmtName:
 		return newDeclStmt(m)
+	case ReturnStmtName:
+		return newReturnStmt(m)
 	case ExprStmtName:
 		return newExprStmt(m)
 	case OtherStmtName:
