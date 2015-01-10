@@ -16,6 +16,10 @@ const (
 	UnaryExprName  = "UNARY"
 )
 
+const (
+	BasicLitName   = "BASIC_LIT"
+)
+
 type Expr interface{}
 
 func newExpr(m map[string]interface{}) (Expr, error) {
@@ -34,6 +38,8 @@ func newExpr(m map[string]interface{}) (Expr, error) {
 		return newCallExpr(m)
 	case UnaryExprName:
 		return newUnaryExpr(m)
+	case BasicLitName:
+		return newBasicLit(m)
 	}
 
 	return nil, addDebugInfo(errors.New("unknown statement type"))
@@ -63,7 +69,6 @@ func newExprsSlice(key, errPrefix string, m map[string]interface{}) ([]Expr, err
 			return nil, addDebugInfo(fmt.Errorf(
 				"%s: '%s' must be a map[string]interface{}, found %v",
 				errPrefix, key, reflect.TypeOf(expr)))
-
 		}
 	}
 
