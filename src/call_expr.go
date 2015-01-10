@@ -16,7 +16,7 @@ type CallExpr struct {
 // newCallExpr creates a new CallExpr from a generic map.
 func newCallExpr(m map[string]interface{}) (*CallExpr, error) {
 	var err error
-	errPrefix := "src/call_stmt"
+	errPrefix := "src/call_expr"
 	callexpr := CallExpr{}
 
 	// should never happen
