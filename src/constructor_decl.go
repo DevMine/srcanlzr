@@ -10,12 +10,12 @@ import (
 )
 
 type ConstructorDecl struct {
-	Doc        string    `json:"doc,omitempty"`
-	Name       string    `json:"name"`
-	Type       *FuncType `json:"type"`
-	Body       []Stmt    `json:"body,omitempty"`
-	Visibility string    `json:"visibility"`
-	LoC        int64     `json:"loc"`
+	Doc        string   `json:"doc,omitempty"`
+	Name       string   `json:"name"`
+	Params     []*Field `json:"parameters,omitempty"`
+	Body       []Stmt   `json:"body,omitempty"`
+	Visibility string   `json:"visibility"`
+	LoC        int64    `json:"loc"`
 }
 
 func newConstructorDecl(m map[string]interface{}) (*ConstructorDecl, error) {
@@ -31,12 +31,7 @@ func newConstructorDecl(m map[string]interface{}) (*ConstructorDecl, error) {
 		return nil, addDebugInfo(err)
 	}
 
-	fctTypeMap, err := extractMapValue("type", errPrefix, m)
-	if err != nil {
-		return nil, addDebugInfo(err)
-	}
-
-	if construc.Type, err = newFuncType(fctTypeMap); err != nil {
+	if construc.Params, err = newFieldsSlice("parameters", errPrefix, m); err != nil && isExist(err) {
 		return nil, addDebugInfo(err)
 	}
 
