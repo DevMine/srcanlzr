@@ -22,7 +22,7 @@ type ClassDecl struct {
 
 func newClassDecl(m map[string]interface{}) (*ClassDecl, error) {
 	var err error
-	errPrefix := "src/class"
+	errPrefix := "src/class_decl"
 	cls := ClassDecl{}
 
 	if cls.Name, err = extractStringValue("name", errPrefix, m); err != nil {
@@ -33,11 +33,11 @@ func newClassDecl(m map[string]interface{}) (*ClassDecl, error) {
 		return nil, addDebugInfo(err)
 	}
 
-	if cls.ExtendedClasses, err = newClassRefsSlice("classes", errPrefix, m); err != nil {
+	if cls.ExtendedClasses, err = newClassRefsSlice("extended_classes", errPrefix, m); err != nil {
 		return nil, addDebugInfo(err)
 	}
 
-	if cls.ImplementedInterfaces, err = newInterfaceRefsSlice("interfaces", errPrefix, m); err != nil {
+	if cls.ImplementedInterfaces, err = newInterfaceRefsSlice("implemented_interfaces", errPrefix, m); err != nil {
 		return nil, addDebugInfo(err)
 	}
 
