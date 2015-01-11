@@ -14,12 +14,15 @@ const (
 	BinaryExprName = "BINARY"
 	CallExprName   = "CALL"
 	UnaryExprName  = "UNARY"
-)
 
-const (
-	BasicLitName   = "BASIC_LIT"
-	FuncLitName    = "FUNC_LIT"
+	BasicLitName = "BASIC_LIT"
+	FuncLitName  = "FUNC_LIT"
+
 	StructTypeName = "STRUCT_TYPE"
+
+	AttrRefName = "ATTR_REF"
+
+	IdentName = "IDENT"
 )
 
 type Expr interface{}
