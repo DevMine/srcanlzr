@@ -10,7 +10,7 @@ import (
 )
 
 type SwitchStmt struct {
-	Type        string        `json:"type"`
+	StmtName    string        `json:"statement_name"`
 	Init        Expr          `json:"initialization"`
 	Cond        Expr          `json:"condition"`
 	CaseClauses []*CaseClause `json:"case_clauses"`
@@ -28,14 +28,12 @@ func newSwitchStmt(m map[string]interface{}) (*SwitchStmt, error) {
 	switchstmt := SwitchStmt{}
 
 	// should never happen
-	if typ, ok := m["type"]; !ok || typ != IfStmtName {
+	if typ, ok := m["statement_name"]; !ok || typ != SwitchStmtName {
 		return nil, addDebugInfo(fmt.Errorf(
 			"%s: the generic map supplied is not a SwitchStmt", errPrefix))
 	}
 
-	if switchstmt.Type, err = extractStringValue("type", errPrefix, m); err != nil {
-		return nil, addDebugInfo(err)
-	}
+	switchstmt.StmtName = SwitchStmtName
 
 	initMap, err := extractMapValue("initialization", errPrefix, m)
 	if err != nil {

@@ -23,7 +23,7 @@ func newDeclStmt(m map[string]interface{}) (*DeclStmt, error) {
 			"%s: the generic map supplied is not a DeclStmt", errPrefix))
 	}
 
-	if declstmt.Type, err = extractStringValue("type", errPrefix, m); err != nil {
+	if declstmt.StmtName, err = extractStringValue("type", errPrefix, m); err != nil {
 		return nil, addDebugInfo(err)
 	}
 

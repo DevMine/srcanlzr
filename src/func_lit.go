@@ -7,12 +7,12 @@ package src
 import "fmt"
 
 type FuncLit struct {
-	Type    string   `json:"type"`
-	Name    string   `json:"name"`
-	Params  []*Field `json:"parameters,omitempty"`
-	Results []*Field `json:"results,omitempty"`
-	Body    []Stmt   `json:"body,omitempty"`
-	LoC     int64    `json:"loc"` // Lines of Code
+	ExprName string   `json:"expression_name"`
+	Name     string   `json:"name"`
+	Params   []*Field `json:"parameters,omitempty"`
+	Results  []*Field `json:"results,omitempty"`
+	Body     []Stmt   `json:"body,omitempty"`
+	LoC      int64    `json:"loc"` // Lines of Code
 }
 
 func newFuncLit(m map[string]interface{}) (*FuncLit, error) {
@@ -20,7 +20,7 @@ func newFuncLit(m map[string]interface{}) (*FuncLit, error) {
 	errPrefix := "src/func_lit"
 	fct := FuncLit{}
 
-	if typ, err := extractStringValue("type", errPrefix, m); err != nil {
+	if typ, err := extractStringValue("expression_name", errPrefix, m); err != nil {
 		// XXX It is not possible to add debug info on this error because it is
 		// required that this error be en "errNotExist".
 		return nil, errNotExist
@@ -28,7 +28,7 @@ func newFuncLit(m map[string]interface{}) (*FuncLit, error) {
 		return nil, fmt.Errorf("invalid type: expected 'FuncLit', found '%s'", typ)
 	}
 
-	fct.Type = FuncLitName
+	fct.ExprName = FuncLitName
 
 	if fct.Name, err = extractStringValue("name", errPrefix, m); err != nil {
 		return nil, addDebugInfo(err)

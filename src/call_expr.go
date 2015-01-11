@@ -7,10 +7,10 @@ package src
 import "fmt"
 
 type CallExpr struct {
-	Type string   `json:"type"`
-	Fun  *FuncRef `json:"function"`  // Reference to the function
-	Args []Expr   `json:"arguments"` // function arguments
-	Line int64    `json:"line"`      // Line number of the statement relatively to the function.
+	ExprName string   `json:"expression_name"`
+	Fun      *FuncRef `json:"function"`  // Reference to the function
+	Args     []Expr   `json:"arguments"` // function arguments
+	Line     int64    `json:"line"`      // Line number of the statement relatively to the function.
 }
 
 // newCallExpr creates a new CallExpr from a generic map.
@@ -20,10 +20,12 @@ func newCallExpr(m map[string]interface{}) (*CallExpr, error) {
 	callexpr := CallExpr{}
 
 	// should never happen
-	if typ, ok := m["type"]; !ok || typ != CallExprName {
+	if typ, ok := m["expression_name"]; !ok || typ != CallExprName {
 		return nil, addDebugInfo(fmt.Errorf(
 			"%s: the generic map supplied is not a CallExpr", errPrefix))
 	}
+
+	callexpr.ExprName = CallExprName
 
 	refMap, err := extractMapValue("function", errPrefix, m)
 	if err != nil {

@@ -8,9 +8,9 @@ import "fmt"
 
 // A ReturnStmt represents a return statement.
 type ReturnStmt struct {
-	Type    string `json:"type"`    // TODO rename this field into StmtName
-	Results []Expr `json:"results"` // result expressions; or nil
-	Line    int64  `json:"line"`
+	StmtName string `json:"statement_name"`
+	Results  []Expr `json:"results"` // result expressions; or nil
+	Line     int64  `json:"line"`
 }
 
 func newReturnStmt(m map[string]interface{}) (*ReturnStmt, error) {
@@ -19,14 +19,12 @@ func newReturnStmt(m map[string]interface{}) (*ReturnStmt, error) {
 	retstmt := ReturnStmt{}
 
 	// should never happen
-	if typ, ok := m["type"]; !ok || typ != ReturnStmtName {
+	if typ, ok := m["statement_name"]; !ok || typ != ReturnStmtName {
 		return nil, addDebugInfo(fmt.Errorf(
 			"%s: the generic map supplied is not a ReturnStmt", errPrefix))
 	}
 
-	if retstmt.Type, err = extractStringValue("type", errPrefix, m); err != nil {
-		return nil, addDebugInfo(err)
-	}
+	retstmt.StmtName = ReturnStmtName
 
 	if retstmt.Results, err = newExprsSlice("results", errPrefix, m); err != nil {
 		return nil, addDebugInfo(err)

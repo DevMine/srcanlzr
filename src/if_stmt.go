@@ -7,7 +7,7 @@ package src
 import "fmt"
 
 type IfStmt struct {
-	Type      string `json:"type"`
+	StmtName  string `json:"statement_name"`
 	Init      Stmt   `json:"initialization"`
 	Cond      Expr   `json:"condition"`
 	StmtsList []Stmt `json:"statements_list"`
@@ -22,14 +22,12 @@ func newIfStmt(m map[string]interface{}) (*IfStmt, error) {
 	ifstmt := IfStmt{}
 
 	// should never happen
-	if typ, ok := m["type"]; !ok || typ != IfStmtName {
+	if typ, ok := m["statement_name"]; !ok || typ != IfStmtName {
 		return nil, addDebugInfo(fmt.Errorf(
 			"%s: the generic map supplied is not a IfStmt", errPrefix))
 	}
 
-	if ifstmt.Type, err = extractStringValue("type", errPrefix, m); err != nil {
-		return nil, addDebugInfo(err)
-	}
+	ifstmt.StmtName = IfStmtName
 
 	initMap, err := extractMapValue("initialization", errPrefix, m)
 	if err != nil {

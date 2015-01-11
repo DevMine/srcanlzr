@@ -27,7 +27,7 @@ type Expr interface{}
 func newExpr(m map[string]interface{}) (Expr, error) {
 	errPrefix := "src/expr"
 
-	typ, ok := m["type"]
+	typ, ok := m["expression_name"]
 	if !ok {
 		return nil, addDebugInfo(fmt.Errorf(
 			"%s: field 'type' does not exist", errPrefix))

@@ -12,6 +12,7 @@ import (
 
 const (
 	IfStmtName     = "IF"
+	SwitchStmtName = "SWITCH"
 	LoopStmtName   = "LOOP"
 	AssignStmtName = "ASSIGN"
 	DeclStmtName   = "DECL"
@@ -25,7 +26,7 @@ type Stmt interface{}
 func newStmt(m map[string]interface{}) (Stmt, error) {
 	errPrefix := "src/stmt"
 
-	typ, ok := m["type"]
+	typ, ok := m["statement_name"]
 	if !ok {
 		return nil, addDebugInfo(fmt.Errorf(
 			"%s: field 'type' does not exist", errPrefix))
@@ -34,6 +35,8 @@ func newStmt(m map[string]interface{}) (Stmt, error) {
 	switch typ {
 	case IfStmtName:
 		return newIfStmt(m)
+	case SwitchStmtName:
+		return newSwitchStmt(m)
 	case LoopStmtName:
 		return newLoopStmt(m)
 	case AssignStmtName:

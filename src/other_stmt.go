@@ -7,7 +7,7 @@ package src
 import "fmt"
 
 type OtherStmt struct {
-	Type      string `json:"type"`
+	StmtName  string `json:"statement_name"`
 	StmtsList []Stmt `json:"statements_list,omitempty"`
 	Line      int64  `json:"line"` // Line number of the statement relatively to the function.
 }
@@ -19,14 +19,12 @@ func newOtherStmt(m map[string]interface{}) (*OtherStmt, error) {
 	otherstmt := OtherStmt{}
 
 	// should never happen
-	if typ, ok := m["type"]; !ok || typ != OtherStmtName {
+	if typ, ok := m["statement_name"]; !ok || typ != OtherStmtName {
 		return nil, addDebugInfo(fmt.Errorf(
 			"%s: the generic map supplied is not a OtherStmt", errPrefix))
 	}
 
-	if otherstmt.Type, err = extractStringValue("type", errPrefix, m); err != nil {
-		return nil, addDebugInfo(err)
-	}
+	otherstmt.StmtName = OtherStmtName
 
 	if otherstmt.Line, err = extractInt64Value("line", errPrefix, m); err != nil {
 		return nil, addDebugInfo(err)

@@ -7,7 +7,7 @@ package src
 import "fmt"
 
 type LoopStmt struct {
-	Type       string `json:"type"`
+	StmtName   string `json:"statement_name"`
 	Init       Stmt   `json:"initialization"`
 	Cond       Expr   `json:"condition"`
 	Post       Stmt   `json:"post_iteration_statement"`
@@ -23,14 +23,12 @@ func newLoopStmt(m map[string]interface{}) (*LoopStmt, error) {
 	loopstmt := LoopStmt{}
 
 	// should never happen
-	if typ, ok := m["type"]; !ok || typ != LoopStmtName {
+	if typ, ok := m["statement_name"]; !ok || typ != LoopStmtName {
 		return nil, addDebugInfo(fmt.Errorf(
 			"%s: the generic map supplied is not a LoopStmt", errPrefix))
 	}
 
-	if loopstmt.Type, err = extractStringValue("type", errPrefix, m); err != nil {
-		return nil, addDebugInfo(err)
-	}
+	loopstmt.StmtName = LoopStmtName
 
 	initMap, err := extractMapValue("initialization", errPrefix, m)
 	if err != nil {

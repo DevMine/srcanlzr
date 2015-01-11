@@ -13,9 +13,9 @@ const (
 )
 
 type BasicLit struct {
-	Type  string `json:"type"`
-	Kind  string `json:"kind"`
-	Value string `json:"value"`
+	ExprName string `json:"expression_name"`
+	Kind     string `json:"kind"`
+	Value    string `json:"value"`
 }
 
 func newBasicLit(m map[string]interface{}) (*BasicLit, error) {
@@ -23,14 +23,14 @@ func newBasicLit(m map[string]interface{}) (*BasicLit, error) {
 	errPrefix := "src/basic_lit"
 	basiclit := BasicLit{}
 
-	typ, ok := m["type"]
+	typ, ok := m["expression_name"]
 	if !ok && typ != BasicLitName {
 		// XXX It is not possible to add debug info on this error because it is
 		// required that this error be en "errNotExist".
 		return nil, errNotExist
 	}
 
-	basiclit.Type = BasicLitName
+	basiclit.ExprName = BasicLitName
 
 	if basiclit.Kind, err = extractStringValue("kind", errPrefix, m); err != nil {
 		return nil, err
