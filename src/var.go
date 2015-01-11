@@ -10,10 +10,11 @@ import (
 )
 
 type Var struct {
-	Doc   []string `json:"doc"`
-	Name  string   `json:"name"`
-	Type  string   `json:"type"`
-	Value string   `json:"value"`
+	Doc        []string `json:"doc"`
+	Name       string   `json:"name"`
+	Type       string   `json:"type"`
+	Value      string   `json:"value"`
+	Visibility string   `json:"visibility,omitempty"`
 }
 
 func newVar(m map[string]interface{}) (*Var, error) {
@@ -34,6 +35,10 @@ func newVar(m map[string]interface{}) (*Var, error) {
 	}
 
 	if v.Value, err = extractStringValue("value", errPrefix, m); err != nil {
+		return nil, addDebugInfo(err)
+	}
+
+	if v.Visibility, err = extractStringValue("visibility", errPrefix, m); err != nil && isExist(err) {
 		return nil, addDebugInfo(err)
 	}
 
