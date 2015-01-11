@@ -18,6 +18,7 @@ const (
 	DeclStmtName   = "DECL"
 	ReturnStmtName = "RETURN"
 	ExprStmtName   = "EXPR"
+	TryStmtName    = "TRY"
 	OtherStmtName  = "OTHER"
 )
 
@@ -47,6 +48,8 @@ func newStmt(m map[string]interface{}) (Stmt, error) {
 		return newReturnStmt(m)
 	case ExprStmtName:
 		return newExprStmt(m)
+	case TryStmtName:
+		return newTryStmt(m)
 	case OtherStmtName:
 		return newOtherStmt(m)
 	}
