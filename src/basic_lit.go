@@ -30,7 +30,7 @@ func newBasicLit(m map[string]interface{}) (*BasicLit, error) {
 		return nil, errNotExist
 	}
 
-	//basiclit.Type
+	basiclit.Type = BasicLitName
 
 	if basiclit.Kind, err = extractStringValue("kind", errPrefix, m); err != nil {
 		return nil, err
