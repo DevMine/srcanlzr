@@ -10,16 +10,16 @@ import (
 )
 
 type StructType struct {
-	Doc    string  `json:"doc"`
-	Name   string  `json:"name"`
-	Type   Expr    `json:"type"`
-	Fields []Field `json:"fields"`
+	Doc    []string `json:"doc"`
+	Name   string   `json:"name"`
+	Type   Expr     `json:"type"`
+	Fields []Field  `json:"fields"`
 }
 
 type Field struct {
-	Name string `json:"name"`
-	Type string `json:"type"`
-	Doc  string `json:"doc"`
+	Doc  []string `json:"doc"`
+	Name string   `json:"name"`
+	Type string   `json:"type"`
 }
 
 func newStructType(m map[string]interface{}) (*StructType, error) {
@@ -34,15 +34,15 @@ func newStructType(m map[string]interface{}) (*StructType, error) {
 			errPrefix))
 	}*/
 
+	if strct.Doc, err = extractStringSliceValue("doc", errPrefix, m); err != nil {
+		return nil, addDebugInfo(err)
+	}
+
 	if strct.Type, err = extractStringValue("type", errPrefix, m); err != nil {
 		return nil, addDebugInfo(err)
 	}
 
 	if strct.Name, err = extractStringValue("name", errPrefix, m); err != nil {
-		return nil, addDebugInfo(err)
-	}
-
-	if strct.Doc, err = extractStringValue("doc", errPrefix, m); err != nil {
 		return nil, addDebugInfo(err)
 	}
 
@@ -88,15 +88,15 @@ func newField(m map[string]interface{}) (*Field, error) {
 	errPrefix := "src/field"
 	field := Field{}
 
+	if field.Doc, err = extractStringSliceValue("doc", errPrefix, m); err != nil {
+		return nil, addDebugInfo(err)
+	}
+
 	if field.Name, err = extractStringValue("name", errPrefix, m); err != nil {
 		return nil, addDebugInfo(err)
 	}
 
 	if field.Type, err = extractStringValue("type", errPrefix, m); err != nil {
-		return nil, addDebugInfo(err)
-	}
-
-	if field.Doc, err = extractStringValue("doc", errPrefix, m); err != nil {
 		return nil, addDebugInfo(err)
 	}
 

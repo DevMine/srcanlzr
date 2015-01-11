@@ -10,8 +10,8 @@ import (
 )
 
 type TypeSpec struct {
-	Name string `json:"name"`
-	Doc  string `json:"doc"`
+	Doc  []string `json:"doc"`
+	Name string   `json:"name"`
 }
 
 func newTypeSpec(m map[string]interface{}) (*TypeSpec, error) {
@@ -19,11 +19,11 @@ func newTypeSpec(m map[string]interface{}) (*TypeSpec, error) {
 	errPrefix := "src/type_specifier"
 	typespec := TypeSpec{}
 
-	if typespec.Name, err = extractStringValue("name", errPrefix, m); err != nil {
+	if typespec.Doc, err = extractStringSliceValue("doc", errPrefix, m); err != nil {
 		return nil, addDebugInfo(err)
 	}
 
-	if typespec.Doc, err = extractStringValue("doc", errPrefix, m); err != nil {
+	if typespec.Name, err = extractStringValue("name", errPrefix, m); err != nil {
 		return nil, addDebugInfo(err)
 	}
 

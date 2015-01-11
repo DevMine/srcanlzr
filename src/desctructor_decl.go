@@ -18,7 +18,7 @@ func newDestructorDecl(m map[string]interface{}) (*DestructorDecl, error) {
 	errPrefix := "src/destructor_decl"
 	destruc := DestructorDecl{}
 
-	if destruc.Doc, err = extractStringValue("doc", errPrefix, m); err != nil && isExist(err) {
+	if destruc.Doc, err = extractStringSliceValue("doc", errPrefix, m); err != nil && isExist(err) {
 		return nil, addDebugInfo(err)
 	}
 

@@ -12,16 +12,16 @@ import (
 
 // A package is a folder contaning at least one source file.
 type Package struct {
+	// The package documentation.
+	// FIXME use slice for packages with multiple languages
+	Doc []string `json:"doc,omitempty"`
+
 	// The name of the pacakge (the folder name)
 	Name string `json:"name"`
 
 	// The full path of the package. The path must be relative to the root of
 	// the project and never be an absolute path.
 	Path string `json:"path"`
-
-	// The package documentation.
-	// FIXME use slice for packages with multiple languages
-	Doc string `json:"doc,omitempty"`
 
 	// The list of all source files contained in the package.
 	SrcFiles []*SrcFile `json:"source_files"`
@@ -35,15 +35,15 @@ func newPackage(m map[string]interface{}) (*Package, error) {
 	errPrefix := "src/package"
 	pkg := Package{}
 
+	if pkg.Doc, err = extractStringSliceValue("doc", errPrefix, m); err != nil {
+		return nil, addDebugInfo(err)
+	}
+
 	if pkg.Name, err = extractStringValue("name", errPrefix, m); err != nil {
 		return nil, addDebugInfo(err)
 	}
 
 	if pkg.Path, err = extractStringValue("path", errPrefix, m); err != nil {
-		return nil, addDebugInfo(err)
-	}
-
-	if pkg.Doc, err = extractStringValue("doc", errPrefix, m); err != nil {
 		return nil, addDebugInfo(err)
 	}
 

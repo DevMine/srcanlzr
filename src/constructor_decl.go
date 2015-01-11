@@ -10,7 +10,7 @@ import (
 )
 
 type ConstructorDecl struct {
-	Doc        string   `json:"doc,omitempty"`
+	Doc        []string `json:"doc,omitempty"`
 	Name       string   `json:"name"`
 	Params     []*Field `json:"parameters,omitempty"`
 	Body       []Stmt   `json:"body,omitempty"`
@@ -23,7 +23,7 @@ func newConstructorDecl(m map[string]interface{}) (*ConstructorDecl, error) {
 	errPrefix := "src/constructor_decl"
 	construc := ConstructorDecl{}
 
-	if construc.Doc, err = extractStringValue("doc", errPrefix, m); err != nil && isExist(err) {
+	if construc.Doc, err = extractStringSliceValue("doc", errPrefix, m); err != nil && isExist(err) {
 		return nil, addDebugInfo(err)
 	}
 

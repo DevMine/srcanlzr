@@ -10,7 +10,7 @@ import (
 )
 
 type FuncDecl struct {
-	Doc        string    `json:"doc,omitempty"`
+	Doc        []string  `json:"doc,omitempty"`
 	Name       string    `json:"name"`
 	Type       *FuncType `json:"type"`
 	Body       []Stmt    `json:"body,omitempty"`
@@ -23,7 +23,7 @@ func newFuncDecl(m map[string]interface{}) (*FuncDecl, error) {
 	errPrefix := "src/func_decl"
 	fct := FuncDecl{}
 
-	if fct.Doc, err = extractStringValue("doc", errPrefix, m); err != nil && isExist(err) {
+	if fct.Doc, err = extractStringSliceValue("doc", errPrefix, m); err != nil && isExist(err) {
 		return nil, addDebugInfo(err)
 	}
 

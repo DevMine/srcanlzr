@@ -10,16 +10,20 @@ import (
 )
 
 type Constant struct {
-	Name  string `json:"name"`
-	Type  string `json:"type"`  // TODO rename into TypeName or use a type Type
-	Value string `json:"value"` // TODO use an Expr instead of string value
-	Doc   string `json:"doc"`
+	Doc   []string `json:"doc"`
+	Name  string   `json:"name"`
+	Type  string   `json:"type"`  // TODO rename into TypeName or use a type Type
+	Value string   `json:"value"` // TODO use an Expr instead of string value
 }
 
 func newConstant(m map[string]interface{}) (*Constant, error) {
 	var err error
 	errPrefix := "src/constant"
 	cst := Constant{}
+
+	if cst.Doc, err = extractStringSliceValue("doc", errPrefix, m); err != nil {
+		return nil, addDebugInfo(err)
+	}
 
 	if cst.Name, err = extractStringValue("name", errPrefix, m); err != nil {
 		return nil, addDebugInfo(err)
@@ -30,10 +34,6 @@ func newConstant(m map[string]interface{}) (*Constant, error) {
 	}
 
 	if cst.Value, err = extractStringValue("value", errPrefix, m); err != nil {
-		return nil, addDebugInfo(err)
-	}
-
-	if cst.Doc, err = extractStringValue("doc", errPrefix, m); err != nil {
 		return nil, addDebugInfo(err)
 	}
 
