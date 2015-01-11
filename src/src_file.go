@@ -37,7 +37,7 @@ type SrcFile struct {
 	Interfaces []*Interface `json:"interfaces,omitempty"`
 
 	// List of classes
-	Classes []*Class `json:"classes,omitempty"`
+	Classes []*ClassDecl `json:"classes,omitempty"`
 
 	// List of traits
 	// See http://en.wikipedia.org/wiki/Trait_%28computer_programming%29

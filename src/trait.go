@@ -13,7 +13,7 @@ type Trait struct {
 	Name    string        `json:"name"`
 	Attrs   []*Attr       `json:"attributes"`
 	Methods []*MethodDecl `json:"methods"`
-	Classes []*Class      `json:"classes"`
+	Classes []*ClassDecl  `json:"classes"`
 	Traits  []*Trait      `json:"traits"`
 }
 
@@ -34,7 +34,7 @@ func newTrait(m map[string]interface{}) (*Trait, error) {
 		return nil, addDebugInfo(err)
 	}
 
-	if trait.Classes, err = newClassesSlice("classes", errPrefix, m); err != nil {
+	if trait.Classes, err = newClasseDeclsSlice("classes", errPrefix, m); err != nil {
 		return nil, addDebugInfo(err)
 	}
 

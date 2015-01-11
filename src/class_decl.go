@@ -9,10 +9,10 @@ import (
 	"reflect"
 )
 
-type Class struct {
+type ClassDecl struct {
 	Name                  string             `json:"name"`
 	Visibility            string             `json:"visibility"`
-	ExtendedClasses       []*Class           `json:"extended_classes"`
+	ExtendedClasses       []*ClassDecl       `json:"extended_classes"`
 	ImplementedInterfaces []*Interface       `json:"implemented_interfaces"`
 	Attrs                 []*Attr            `json:"attributes"`
 	Constructors          []*ConstructorDecl `json:"constructors"`
@@ -20,10 +20,10 @@ type Class struct {
 	Traits                []*Trait           `json:"traits"`
 }
 
-func newClass(m map[string]interface{}) (*Class, error) {
+func newClassDecl(m map[string]interface{}) (*ClassDecl, error) {
 	var err error
 	errPrefix := "src/class"
-	cls := Class{}
+	cls := ClassDecl{}
 
 	if cls.Name, err = extractStringValue("name", errPrefix, m); err != nil {
 		return nil, addDebugInfo(err)
@@ -33,7 +33,7 @@ func newClass(m map[string]interface{}) (*Class, error) {
 		return nil, addDebugInfo(err)
 	}
 
-	if cls.ExtendedClasses, err = newClassesSlice("classes", errPrefix, m); err != nil {
+	if cls.ExtendedClasses, err = newClasseDeclsSlice("classes", errPrefix, m); err != nil {
 		return nil, addDebugInfo(err)
 	}
 
@@ -56,7 +56,7 @@ func newClass(m map[string]interface{}) (*Class, error) {
 	return &cls, nil
 }
 
-func newClassesSlice(key, errPrefix string, m map[string]interface{}) ([]*Class, error) {
+func newClasseDeclsSlice(key, errPrefix string, m map[string]interface{}) ([]*ClassDecl, error) {
 	var err error
 	var s reflect.Value
 
@@ -72,13 +72,13 @@ func newClassesSlice(key, errPrefix string, m map[string]interface{}) ([]*Class,
 			"%s: field '%s' is supposed to be a slice", errPrefix, key))
 	}
 
-	clss := make([]*Class, s.Len(), s.Len())
+	clss := make([]*ClassDecl, s.Len(), s.Len())
 	for i := 0; i < s.Len(); i++ {
 		cls := s.Index(i).Interface()
 
 		switch cls.(type) {
 		case map[string]interface{}:
-			if clss[i], err = newClass(cls.(map[string]interface{})); err != nil {
+			if clss[i], err = newClassDecl(cls.(map[string]interface{})); err != nil {
 				return nil, addDebugInfo(err)
 			}
 		default:
