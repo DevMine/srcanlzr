@@ -23,6 +23,8 @@ const (
 
 	AttrRefName = "ATTR_REF"
 
+	ValueSpecName = "VALUE_SPEC"
+
 	IdentName = "IDENT"
 )
 
@@ -51,6 +53,8 @@ func newExpr(m map[string]interface{}) (Expr, error) {
 		return newFuncLit(m)
 	case ClassLitName:
 		return newClassLit(m)
+	case ValueSpecName:
+		return newValueSpec(m)
 	case StructTypeName:
 		return newStructType(m)
 	}
