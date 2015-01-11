@@ -16,7 +16,7 @@ type Class struct {
 	ImplementedInterfaces []*Interface       `json:"implemented_interfaces"`
 	Attrs                 []*Attr            `json:"attributes"`
 	Constructors          []*ConstructorDecl `json:"constructors"`
-	Methods               []*Method          `json:"methods"`
+	Methods               []*MethodDecl      `json:"methods"`
 	Traits                []*Trait           `json:"traits"`
 }
 
@@ -49,7 +49,7 @@ func newClass(m map[string]interface{}) (*Class, error) {
 		return nil, addDebugInfo(err)
 	}
 
-	if cls.Methods, err = newMethodsSlice("methods", errPrefix, m); err != nil {
+	if cls.Methods, err = newMethodDeclsSlice("methods", errPrefix, m); err != nil {
 		return nil, addDebugInfo(err)
 	}
 

@@ -101,7 +101,7 @@ func functionCyclomaticComplexity(f *src.FuncDecl) int64 {
 	return cc
 }
 
-func methodCyclomaticComplexity(m *src.Method) int64 {
+func methodCyclomaticComplexity(m *src.MethodDecl) int64 {
 	cc := int64(1) // cyclomatic complexity
 
 	for _, s := range m.Body {

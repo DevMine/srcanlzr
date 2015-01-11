@@ -9,13 +9,13 @@ import (
 	"reflect"
 )
 
-type Method struct {
+type MethodDecl struct {
 	FuncDecl
 }
 
-func newMethod(m map[string]interface{}) (*Method, error) {
+func newMethodDecl(m map[string]interface{}) (*MethodDecl, error) {
 	var err error
-	mthd := Method{}
+	mthd := MethodDecl{}
 
 	var fct *FuncDecl
 	if fct, err = newFuncDecl(m); err != nil {
@@ -26,7 +26,7 @@ func newMethod(m map[string]interface{}) (*Method, error) {
 	return &mthd, nil
 }
 
-func newMethodsSlice(key, errPrefix string, m map[string]interface{}) ([]*Method, error) {
+func newMethodDeclsSlice(key, errPrefix string, m map[string]interface{}) ([]*MethodDecl, error) {
 	var err error
 	var s reflect.Value
 
@@ -41,13 +41,13 @@ func newMethodsSlice(key, errPrefix string, m map[string]interface{}) ([]*Method
 			"%s: field '%s' is supposed to be a slice", errPrefix, key))
 	}
 
-	mthds := make([]*Method, s.Len(), s.Len())
+	mthds := make([]*MethodDecl, s.Len(), s.Len())
 	for i := 0; i < s.Len(); i++ {
 		mthd := s.Index(i).Interface()
 
 		switch mthd.(type) {
 		case map[string]interface{}:
-			if mthds[i], err = newMethod(mthd.(map[string]interface{})); err != nil {
+			if mthds[i], err = newMethodDecl(mthd.(map[string]interface{})); err != nil {
 				return nil, addDebugInfo(err)
 			}
 		default:
