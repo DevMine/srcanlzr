@@ -121,7 +121,7 @@ func statementComplexity(s src.Stmt) int64 {
 
 		stmt := s.(src.IfStmt)
 
-		for _, s := range stmt.StmtsList {
+		for _, s := range stmt.Body {
 			c += statementComplexity(s)
 		}
 	case src.LoopStmt:
@@ -130,7 +130,7 @@ func statementComplexity(s src.Stmt) int64 {
 
 		stmt := s.(src.LoopStmt)
 
-		for _, s := range stmt.StmtsList {
+		for _, s := range stmt.Body {
 			c += statementComplexity(s)
 		}
 	}

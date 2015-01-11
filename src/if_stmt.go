@@ -7,12 +7,12 @@ package src
 import "fmt"
 
 type IfStmt struct {
-	StmtName  string `json:"statement_name"`
-	Init      Stmt   `json:"initialization"`
-	Cond      Expr   `json:"condition"`
-	StmtsList []Stmt `json:"statements_list"`
-	Else      []Stmt `json:"else"`
-	Line      int64  `json:"line"` // Line number of the statement relatively to the function.
+	StmtName string `json:"statement_name"`
+	Init     Stmt   `json:"initialization"`
+	Cond     Expr   `json:"condition"`
+	Body     []Stmt `json:"body"`
+	Else     []Stmt `json:"else"`
+	Line     int64  `json:"line"` // Line number of the statement relatively to the function.
 }
 
 // newIfStmt creates a new IfStmt from a generic map.
@@ -49,7 +49,7 @@ func newIfStmt(m map[string]interface{}) (*IfStmt, error) {
 		return nil, addDebugInfo(err)
 	}
 
-	if ifstmt.StmtsList, err = newStmtsSlice("statements_list", errPrefix, m); err != nil {
+	if ifstmt.Body, err = newStmtsSlice("body", errPrefix, m); err != nil {
 		return nil, addDebugInfo(err)
 	}
 

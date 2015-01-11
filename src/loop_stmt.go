@@ -11,7 +11,7 @@ type LoopStmt struct {
 	Init       Stmt   `json:"initialization"`
 	Cond       Expr   `json:"condition"`
 	Post       Stmt   `json:"post_iteration_statement"`
-	StmtsList  []Stmt `json:"statements_list"`
+	Body       []Stmt `json:"body"`
 	Else       []Stmt `json:"else",omitempty`
 	IsPostEval bool   `json:"is_post_evaluated"`
 	Line       int64  `json:"line"` // Line number of the statement relatively to the function.
@@ -68,7 +68,7 @@ func newLoopStmt(m map[string]interface{}) (*LoopStmt, error) {
 		return nil, addDebugInfo(err)
 	}
 
-	if loopstmt.StmtsList, err = newStmtsSlice("statements_list", errPrefix, m); err != nil {
+	if loopstmt.Body, err = newStmtsSlice("body", errPrefix, m); err != nil {
 		return nil, addDebugInfo(err)
 	}
 

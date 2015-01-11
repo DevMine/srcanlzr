@@ -7,9 +7,9 @@ package src
 import "fmt"
 
 type OtherStmt struct {
-	StmtName  string `json:"statement_name"`
-	StmtsList []Stmt `json:"statements_list,omitempty"`
-	Line      int64  `json:"line"` // Line number of the statement relatively to the function.
+	StmtName string `json:"statement_name"`
+	Body     []Stmt `json:"body,omitempty"`
+	Line     int64  `json:"line"` // Line number of the statement relatively to the function.
 }
 
 // newOtherStmt creates a new OtherStmt from a generic map.
@@ -32,7 +32,7 @@ func newOtherStmt(m map[string]interface{}) (*OtherStmt, error) {
 		return nil, addDebugInfo(err)
 	}
 
-	if otherstmt.StmtsList, err = newStmtsSlice("statements_list", errPrefix, m); err != nil && isExist(err) {
+	if otherstmt.Body, err = newStmtsSlice("body", errPrefix, m); err != nil && isExist(err) {
 		return nil, addDebugInfo(err)
 	}
 
