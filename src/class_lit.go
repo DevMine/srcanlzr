@@ -15,6 +15,7 @@ type ClassLit struct {
 	ImplementedInterfaces []*InterfaceRef    `json:"implemented_interfaces"`
 	Attrs                 []*Attr            `json:"attributes"`
 	Constructors          []*ConstructorDecl `json:"constructors"`
+	Destructors           []*DestructorDecl  `json:"destructors"`
 	Methods               []*MethodDecl      `json:"methods"`
 }
 
@@ -46,6 +47,10 @@ func newClassLit(m map[string]interface{}) (*ClassLit, error) {
 	}
 
 	if cls.Constructors, err = newConstructorDeclsSlice("constructors", errPrefix, m); err != nil {
+		return nil, addDebugInfo(err)
+	}
+
+	if cls.Destructors, err = newDestructorDeclsSlice("destructors", errPrefix, m); err != nil {
 		return nil, addDebugInfo(err)
 	}
 

@@ -16,6 +16,7 @@ type ClassDecl struct {
 	ImplementedInterfaces []*InterfaceRef    `json:"implemented_interfaces"`
 	Attrs                 []*Attr            `json:"attributes"`
 	Constructors          []*ConstructorDecl `json:"constructors"`
+	Destructors           []*DestructorDecl  `json:"destructors"`
 	Methods               []*MethodDecl      `json:"methods"`
 	Traits                []*Trait           `json:"traits"`
 }
@@ -46,6 +47,10 @@ func newClassDecl(m map[string]interface{}) (*ClassDecl, error) {
 	}
 
 	if cls.Constructors, err = newConstructorDeclsSlice("constructors", errPrefix, m); err != nil {
+		return nil, addDebugInfo(err)
+	}
+
+	if cls.Destructors, err = newDestructorDeclsSlice("destructors", errPrefix, m); err != nil {
 		return nil, addDebugInfo(err)
 	}
 
