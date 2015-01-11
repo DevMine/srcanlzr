@@ -10,13 +10,14 @@ import (
 )
 
 type Class struct {
-	Name                  string       `json:"name"`
-	Visibility            string       `json:"visibility"`
-	ExtendedClasses       []*Class     `json:"extended_classes"`
-	ImplementedInterfaces []*Interface `json:"implemented_interfaces"`
-	Attrs                 []*Attr      `json:"attributes"`
-	Methods               []*Method    `json:"methods"`
-	Traits                []*Trait     `json:"traits"`
+	Name                  string             `json:"name"`
+	Visibility            string             `json:"visibility"`
+	ExtendedClasses       []*Class           `json:"extended_classes"`
+	ImplementedInterfaces []*Interface       `json:"implemented_interfaces"`
+	Attrs                 []*Attr            `json:"attributes"`
+	Constructors          []*ConstructorDecl `json:"constructors"`
+	Methods               []*Method          `json:"methods"`
+	Traits                []*Trait           `json:"traits"`
 }
 
 func newClass(m map[string]interface{}) (*Class, error) {
@@ -41,6 +42,10 @@ func newClass(m map[string]interface{}) (*Class, error) {
 	}
 
 	if cls.Attrs, err = newAttrsSlice("attributes", errPrefix, m); err != nil {
+		return nil, addDebugInfo(err)
+	}
+
+	if cls.Constructors, err = newConstructorDeclsSlice("constructors", errPrefix, m); err != nil {
 		return nil, addDebugInfo(err)
 	}
 
