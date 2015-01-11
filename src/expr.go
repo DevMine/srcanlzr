@@ -18,6 +18,7 @@ const (
 
 const (
 	BasicLitName   = "BASIC_LIT"
+	FuncLitName    = "FUNC_LIT"
 	StructTypeName = "STRUCT_TYPE"
 )
 
@@ -41,6 +42,8 @@ func newExpr(m map[string]interface{}) (Expr, error) {
 		return newUnaryExpr(m)
 	case BasicLitName:
 		return newBasicLit(m)
+	case FuncLitName:
+		return newFuncLit(m)
 	case StructTypeName:
 		return newStructType(m)
 	}
