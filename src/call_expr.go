@@ -19,10 +19,12 @@ func newCallExpr(m map[string]interface{}) (*CallExpr, error) {
 	errPrefix := "src/call_expr"
 	callexpr := CallExpr{}
 
-	// should never happen
-	if typ, ok := m["expression_name"]; !ok || typ != CallExprName {
-		return nil, addDebugInfo(fmt.Errorf(
-			"%s: the generic map supplied is not a CallExpr", errPrefix))
+	if typ, err := extractStringValue("expression_name", errPrefix, m); err != nil {
+		// XXX It is not possible to add debug info on this error because it is
+		// required that this error be en "errNotExist".
+		return nil, errNotExist
+	} else if typ != CallExprName {
+		return nil, fmt.Errorf("invalid type: expected 'CallExpr', found '%s'", typ)
 	}
 
 	callexpr.ExprName = CallExprName

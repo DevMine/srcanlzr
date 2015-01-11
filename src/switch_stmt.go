@@ -27,10 +27,12 @@ func newSwitchStmt(m map[string]interface{}) (*SwitchStmt, error) {
 	errPrefix := "src/switch_stmt"
 	switchstmt := SwitchStmt{}
 
-	// should never happen
-	if typ, ok := m["statement_name"]; !ok || typ != SwitchStmtName {
-		return nil, addDebugInfo(fmt.Errorf(
-			"%s: the generic map supplied is not a SwitchStmt", errPrefix))
+	if typ, err := extractStringValue("statement_name", errPrefix, m); err != nil {
+		// XXX It is not possible to add debug info on this error because it is
+		// required that this error be en "errNotExist".
+		return nil, errNotExist
+	} else if typ != SwitchStmtName {
+		return nil, fmt.Errorf("invalid type: expected 'SwitchStmt', found '%s'", typ)
 	}
 
 	switchstmt.StmtName = SwitchStmtName

@@ -17,10 +17,12 @@ func newDeclStmt(m map[string]interface{}) (*DeclStmt, error) {
 	errPrefix := "src/decl_stmt"
 	declstmt := DeclStmt{}
 
-	// should never happen
-	if typ, ok := m["type"]; !ok || typ != DeclStmtName {
-		return nil, addDebugInfo(fmt.Errorf(
-			"%s: the generic map supplied is not a DeclStmt", errPrefix))
+	if typ, err := extractStringValue("statement_name", errPrefix, m); err != nil {
+		// XXX It is not possible to add debug info on this error because it is
+		// required that this error be en "errNotExist".
+		return nil, errNotExist
+	} else if typ != DeclStmtName {
+		return nil, fmt.Errorf("invalid type: expected 'DeclStmt', found '%s'", typ)
 	}
 
 	if declstmt.StmtName, err = extractStringValue("type", errPrefix, m); err != nil {

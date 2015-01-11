@@ -22,10 +22,12 @@ func newLoopStmt(m map[string]interface{}) (*LoopStmt, error) {
 	errPrefix := "src/loop_stmt"
 	loopstmt := LoopStmt{}
 
-	// should never happen
-	if typ, ok := m["statement_name"]; !ok || typ != LoopStmtName {
-		return nil, addDebugInfo(fmt.Errorf(
-			"%s: the generic map supplied is not a LoopStmt", errPrefix))
+	if typ, err := extractStringValue("statement_name", errPrefix, m); err != nil {
+		// XXX It is not possible to add debug info on this error because it is
+		// required that this error be en "errNotExist".
+		return nil, errNotExist
+	} else if typ != LoopStmtName {
+		return nil, fmt.Errorf("invalid type: expected 'LoopStmt', found '%s'", typ)
 	}
 
 	loopstmt.StmtName = LoopStmtName

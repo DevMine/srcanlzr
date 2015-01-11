@@ -27,10 +27,11 @@ type Expr interface{}
 func newExpr(m map[string]interface{}) (Expr, error) {
 	errPrefix := "src/expr"
 
-	typ, ok := m["expression_name"]
-	if !ok {
-		return nil, addDebugInfo(fmt.Errorf(
-			"%s: field 'type' does not exist", errPrefix))
+	typ, err := extractStringValue("expression_name", errPrefix, m)
+	if err != nil {
+		// XXX It is not possible to add debug info on this error because it is
+		// required that this error be en "errNotExist".
+		return nil, errNotExist
 	}
 
 	switch typ {

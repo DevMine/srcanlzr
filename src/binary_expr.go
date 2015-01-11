@@ -30,10 +30,12 @@ func newBinaryExpr(m map[string]interface{}) (*BinaryExpr, error) {
 	errPrefix := "src/binary_expr"
 	binexpr := BinaryExpr{}
 
-	// should never happen
-	if typ, ok := m["type"]; !ok || typ != BinaryExprName {
-		return nil, addDebugInfo(fmt.Errorf(
-			"%s: the generic map supplied is not a BinaryExpr", errPrefix))
+	if typ, err := extractStringValue("expression_name", errPrefix, m); err != nil {
+		// XXX It is not possible to add debug info on this error because it is
+		// required that this error be en "errNotExist".
+		return nil, errNotExist
+	} else if typ != BinaryExprName {
+		return nil, fmt.Errorf("invalid type: expected 'BinaryExpr', found '%s'", typ)
 	}
 
 	exprMap, err := extractMapValue("left_expression", errPrefix, m)

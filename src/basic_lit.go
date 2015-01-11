@@ -4,6 +4,8 @@
 
 package src
 
+import "fmt"
+
 const (
 	IntLit    = "INT"
 	FloatLit  = "FLOAT"
@@ -23,11 +25,12 @@ func newBasicLit(m map[string]interface{}) (*BasicLit, error) {
 	errPrefix := "src/basic_lit"
 	basiclit := BasicLit{}
 
-	typ, ok := m["expression_name"]
-	if !ok && typ != BasicLitName {
+	if typ, err := extractStringValue("expression_name", errPrefix, m); err != nil {
 		// XXX It is not possible to add debug info on this error because it is
 		// required that this error be en "errNotExist".
 		return nil, errNotExist
+	} else if typ != BasicLitName {
+		return nil, fmt.Errorf("invalid type: expected 'BasicLit', found '%s'", typ)
 	}
 
 	basiclit.ExprName = BasicLitName

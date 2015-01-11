@@ -19,10 +19,12 @@ func newAssignStmt(m map[string]interface{}) (*AssignStmt, error) {
 	errPrefix := "src/assign_stmt"
 	assignstmt := AssignStmt{}
 
-	// should never happen
-	if typ, ok := m["statement_name"]; !ok || typ != AssignStmtName {
-		return nil, addDebugInfo(fmt.Errorf(
-			"%s: the generic map supplied is not a AssignStmt", errPrefix))
+	if typ, err := extractStringValue("statement_name", errPrefix, m); err != nil {
+		// XXX It is not possible to add debug info on this error because it is
+		// required that this error be en "errNotExist".
+		return nil, errNotExist
+	} else if typ != AssignStmtName {
+		return nil, fmt.Errorf("invalid type: expected 'AssignStmt', found '%s'", typ)
 	}
 
 	assignstmt.StmtName = AssignStmtName

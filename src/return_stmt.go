@@ -18,10 +18,12 @@ func newReturnStmt(m map[string]interface{}) (*ReturnStmt, error) {
 	errPrefix := "src/return_stmt"
 	retstmt := ReturnStmt{}
 
-	// should never happen
-	if typ, ok := m["statement_name"]; !ok || typ != ReturnStmtName {
-		return nil, addDebugInfo(fmt.Errorf(
-			"%s: the generic map supplied is not a ReturnStmt", errPrefix))
+	if typ, err := extractStringValue("statement_name", errPrefix, m); err != nil {
+		// XXX It is not possible to add debug info on this error because it is
+		// required that this error be en "errNotExist".
+		return nil, errNotExist
+	} else if typ != ReturnStmtName {
+		return nil, fmt.Errorf("invalid type: expected 'ReturnStmt', found '%s'", typ)
 	}
 
 	retstmt.StmtName = ReturnStmtName

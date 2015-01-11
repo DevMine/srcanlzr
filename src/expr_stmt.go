@@ -16,10 +16,12 @@ func newExprStmt(m map[string]interface{}) (*ExprStmt, error) {
 	errPrefix := "src/expr_stmt"
 	exprstmt := ExprStmt{}
 
-	// should never happen
-	if typ, ok := m["statement_name"]; !ok || typ != ExprStmtName {
-		return nil, addDebugInfo(fmt.Errorf(
-			"%s: the generic map supplied is not a ExprStmt", errPrefix))
+	if typ, err := extractStringValue("expression_name", errPrefix, m); err != nil {
+		// XXX It is not possible to add debug info on this error because it is
+		// required that this error be en "errNotExist".
+		return nil, errNotExist
+	} else if typ != ExprStmtName {
+		return nil, fmt.Errorf("invalid type: expected 'ExprStmt', found '%s'", typ)
 	}
 
 	exprstmt.StmtName = ExprStmtName

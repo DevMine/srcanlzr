@@ -21,10 +21,12 @@ func newIfStmt(m map[string]interface{}) (*IfStmt, error) {
 	errPrefix := "src/if_stmt"
 	ifstmt := IfStmt{}
 
-	// should never happen
-	if typ, ok := m["statement_name"]; !ok || typ != IfStmtName {
-		return nil, addDebugInfo(fmt.Errorf(
-			"%s: the generic map supplied is not a IfStmt", errPrefix))
+	if typ, err := extractStringValue("statement_name", errPrefix, m); err != nil {
+		// XXX It is not possible to add debug info on this error because it is
+		// required that this error be en "errNotExist".
+		return nil, errNotExist
+	} else if typ != IfStmtName {
+		return nil, fmt.Errorf("invalid type: expected 'IfStmt', found '%s'", typ)
 	}
 
 	ifstmt.StmtName = IfStmtName
