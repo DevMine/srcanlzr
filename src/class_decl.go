@@ -12,7 +12,7 @@ import (
 type ClassDecl struct {
 	Name                  string             `json:"name"`
 	Visibility            string             `json:"visibility"`
-	ExtendedClasses       []*ClassDecl       `json:"extended_classes"`
+	ExtendedClasses       []*ClassRef        `json:"extended_classes"`
 	ImplementedInterfaces []*Interface       `json:"implemented_interfaces"`
 	Attrs                 []*Attr            `json:"attributes"`
 	Constructors          []*ConstructorDecl `json:"constructors"`
@@ -33,7 +33,7 @@ func newClassDecl(m map[string]interface{}) (*ClassDecl, error) {
 		return nil, addDebugInfo(err)
 	}
 
-	if cls.ExtendedClasses, err = newClasseDeclsSlice("classes", errPrefix, m); err != nil {
+	if cls.ExtendedClasses, err = newClassRefsSlice("classes", errPrefix, m); err != nil {
 		return nil, addDebugInfo(err)
 	}
 
