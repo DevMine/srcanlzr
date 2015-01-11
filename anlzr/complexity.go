@@ -30,14 +30,14 @@ func (c Complexity) Analyze(p *src.Project, r *Result) error {
 				numFuncs++
 				fileComplexity += functionCyclomaticComplexity(f)
 
-				for _, stmt := range f.StmtsList {
+				for _, stmt := range f.Body {
 					switch stmt.(type) {
 					case src.IfStmt, src.LoopStmt:
 						fileComplexity++
 					}
 				}
 
-				fileComplexity += int64(len(f.Return))
+				fileComplexity += int64(len(f.Results))
 			}
 
 			for _, cls := range sf.Classes {
@@ -45,14 +45,14 @@ func (c Complexity) Analyze(p *src.Project, r *Result) error {
 					numFuncs++
 					fileComplexity += methodCyclomaticComplexity(m)
 
-					for _, stmt := range m.StmtsList {
+					for _, stmt := range m.Body {
 						switch stmt.(type) {
 						case src.IfStmt, src.LoopStmt:
 							fileComplexity++
 						}
 					}
 
-					fileComplexity += int64(len(m.Return))
+					fileComplexity += int64(len(m.Results))
 
 				}
 			}
@@ -62,14 +62,14 @@ func (c Complexity) Analyze(p *src.Project, r *Result) error {
 					numFuncs++
 					fileComplexity += methodCyclomaticComplexity(m)
 
-					for _, stmt := range m.StmtsList {
+					for _, stmt := range m.Body {
 						switch stmt.(type) {
 						case src.IfStmt, src.LoopStmt:
 							fileComplexity++
 						}
 					}
 
-					fileComplexity += int64(len(m.Return))
+					fileComplexity += int64(len(m.Results))
 
 				}
 			}
@@ -91,10 +91,10 @@ func (c Complexity) Analyze(p *src.Project, r *Result) error {
 	return nil
 }
 
-func functionCyclomaticComplexity(f *src.Func) int64 {
+func functionCyclomaticComplexity(f *src.FuncDecl) int64 {
 	cc := int64(1) // cyclomatic complexity
 
-	for _, s := range f.StmtsList {
+	for _, s := range f.Body {
 		cc += statementComplexity(&s)
 	}
 
@@ -104,7 +104,7 @@ func functionCyclomaticComplexity(f *src.Func) int64 {
 func methodCyclomaticComplexity(m *src.Method) int64 {
 	cc := int64(1) // cyclomatic complexity
 
-	for _, s := range m.StmtsList {
+	for _, s := range m.Body {
 		cc += statementComplexity(&s)
 	}
 

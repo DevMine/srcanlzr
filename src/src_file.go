@@ -31,7 +31,7 @@ type SrcFile struct {
 	Vars []*Var `json:"variables,omitempty"`
 
 	// List of functions
-	Funcs []*Func `json:"functions,omitempty"`
+	Funcs []*FuncDecl `json:"functions,omitempty"`
 
 	// List of interfaces
 	Interfaces []*Interface `json:"interfaces,omitempty"`
@@ -89,7 +89,7 @@ func newSrcFile(m map[string]interface{}) (*SrcFile, error) {
 		return nil, addDebugInfo(err)
 	}
 
-	if src.Funcs, err = newFuncsSlice("functions", errPrefix, m); err != nil && isExist(err) {
+	if src.Funcs, err = newFuncDeclsSlice("functions", errPrefix, m); err != nil && isExist(err) {
 		return nil, addDebugInfo(err)
 	}
 
