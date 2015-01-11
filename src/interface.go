@@ -10,8 +10,9 @@ import (
 )
 
 type Interface struct {
-	Name       string `json:"name"`
-	Visibility string `json:"visibility"`
+	Name       string       `json:"name"`
+	Protos     []*ProtoDecl `json:"prototypes"`
+	Visibility string       `json:"visibility"`
 	// TODO
 }
 
@@ -21,6 +22,10 @@ func newInterface(m map[string]interface{}) (*Interface, error) {
 	i := Interface{}
 
 	if i.Name, err = extractStringValue("name", errPrefix, m); err != nil {
+		return nil, addDebugInfo(err)
+	}
+
+	if i.Protos, err = newProtoDeclsSlice("prototypes", errPrefix, m); err != nil {
 		return nil, addDebugInfo(err)
 	}
 
