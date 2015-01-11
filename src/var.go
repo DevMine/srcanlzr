@@ -14,6 +14,7 @@ type Var struct {
 	Name       string   `json:"name"`
 	Type       string   `json:"type"`
 	Value      string   `json:"value"`
+	IsPointer  bool     `json:"is_pointer"`
 	Visibility string   `json:"visibility,omitempty"`
 }
 
@@ -35,6 +36,10 @@ func newVar(m map[string]interface{}) (*Var, error) {
 	}
 
 	if v.Value, err = extractStringValue("value", errPrefix, m); err != nil {
+		return nil, addDebugInfo(err)
+	}
+
+	if v.IsPointer, err = extractBoolValue("is_pointer", errPrefix, m); err != nil {
 		return nil, addDebugInfo(err)
 	}
 
