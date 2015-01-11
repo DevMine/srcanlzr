@@ -10,13 +10,12 @@ import (
 )
 
 type FuncDecl struct {
-	Doc        string   `json:"doc,omitempty"`
-	Name       string   `json:"name"`
-	Params     []*Field `json:"parameters,omitempty"`
-	Results    []*Field `json:"results,omitempty"`
-	Body       []Stmt   `json:"body,omitempty"`
-	Visibility string   `json:"visibility"`
-	LoC        int64    `json:"loc"` // Lines of Code
+	Doc        string    `json:"doc,omitempty"`
+	Name       string    `json:"name"`
+	Type       *FuncType `json:"type"`
+	Body       []Stmt    `json:"body,omitempty"`
+	Visibility string    `json:"visibility"`
+	LoC        int64     `json:"loc"` // Lines of Code
 }
 
 func newFuncDecl(m map[string]interface{}) (*FuncDecl, error) {
@@ -32,11 +31,12 @@ func newFuncDecl(m map[string]interface{}) (*FuncDecl, error) {
 		return nil, addDebugInfo(err)
 	}
 
-	if fct.Params, err = newFieldsSlice("parameters", errPrefix, m); err != nil && isExist(err) {
+	fctTypeMap, err := extractMapValue("type", errPrefix, m)
+	if err != nil {
 		return nil, addDebugInfo(err)
 	}
 
-	if fct.Results, err = newFieldsSlice("results", errPrefix, m); err != nil && isExist(err) {
+	if fct.Type, err = newFuncType(fctTypeMap); err != nil {
 		return nil, addDebugInfo(err)
 	}
 

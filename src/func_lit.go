@@ -7,12 +7,11 @@ package src
 import "fmt"
 
 type FuncLit struct {
-	ExprName string   `json:"expression_name"`
-	Name     string   `json:"name"`
-	Params   []*Field `json:"parameters,omitempty"`
-	Results  []*Field `json:"results,omitempty"`
-	Body     []Stmt   `json:"body,omitempty"`
-	LoC      int64    `json:"loc"` // Lines of Code
+	ExprName string    `json:"expression_name"`
+	Name     string    `json:"name"`
+	Type     *FuncType `json:"type"`
+	Body     []Stmt    `json:"body,omitempty"`
+	LoC      int64     `json:"loc"` // Lines of Code
 }
 
 func newFuncLit(m map[string]interface{}) (*FuncLit, error) {
@@ -34,11 +33,12 @@ func newFuncLit(m map[string]interface{}) (*FuncLit, error) {
 		return nil, addDebugInfo(err)
 	}
 
-	if fct.Params, err = newFieldsSlice("parameters", errPrefix, m); err != nil && isExist(err) {
+	fctTypeMap, err := extractMapValue("type", errPrefix, m)
+	if err != nil {
 		return nil, addDebugInfo(err)
 	}
 
-	if fct.Results, err = newFieldsSlice("results", errPrefix, m); err != nil && isExist(err) {
+	if fct.Type, err = newFuncType(fctTypeMap); err != nil {
 		return nil, addDebugInfo(err)
 	}
 

@@ -37,7 +37,7 @@ func (c Complexity) Analyze(p *src.Project, r *Result) error {
 					}
 				}
 
-				fileComplexity += int64(len(f.Results))
+				fileComplexity += int64(len(f.Type.Results))
 			}
 
 			for _, cls := range sf.Classes {
@@ -52,7 +52,7 @@ func (c Complexity) Analyze(p *src.Project, r *Result) error {
 						}
 					}
 
-					fileComplexity += int64(len(m.Results))
+					fileComplexity += int64(len(m.Type.Results))
 
 				}
 			}
@@ -69,7 +69,7 @@ func (c Complexity) Analyze(p *src.Project, r *Result) error {
 						}
 					}
 
-					fileComplexity += int64(len(m.Results))
+					fileComplexity += int64(len(m.Type.Results))
 
 				}
 			}
