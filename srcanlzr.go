@@ -5,12 +5,14 @@
 package main
 
 import (
+	"bufio"
+	"bytes"
 	"encoding/json"
 	"encoding/xml"
 	"errors"
 	"flag"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"os"
 	"path/filepath"
 
@@ -64,9 +66,36 @@ func main() {
 		return
 	}
 
-	if len(flag.Args()) != 1 {
-		fmt.Fprint(os.Stderr, "invalid # of arguments\n\n")
+	var bs []byte
+	var err error
+
+	if l := len(flag.Args()); l > 1 {
+		// more that one file are passed as arguments
+		fmt.Fprint(os.Stderr, "too many arguments\n\n")
 		flag.Usage()
+	} else if l == 0 {
+		// no argument, we read from stdin
+		buf := new(bytes.Buffer)
+		r := bufio.NewReader(os.Stdin)
+		if _, err = io.Copy(buf, r); err != nil {
+			fatal(err)
+		}
+		bs = buf.Bytes()
+	} else {
+		var f *os.File
+		if f, err = os.Open(flag.Arg(0)); err != nil {
+			fatal(err)
+		}
+
+		buf := new(bytes.Buffer)
+		r := bufio.NewReader(f)
+
+		// there is only one file passed as argument, so we read it
+		if _, err = io.Copy(buf, r); err != nil {
+			fatal(err)
+		}
+
+		bs = buf.Bytes()
 	}
 
 	out := os.Stdout
@@ -76,11 +105,6 @@ func main() {
 		if err != nil {
 			fatal(err)
 		}
-	}
-
-	bs, err := ioutil.ReadFile(flag.Arg(0))
-	if err != nil {
-		fatal(err)
 	}
 
 	p, err := src.Unmarshal(bs)
