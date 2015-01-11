@@ -7,16 +7,30 @@ package src
 import "fmt"
 
 const (
+	// numerical operators
+	ADD = "ADD"
+	SUB = "SUB"
+	MUL = "MUL"
+	QUO = "QUO"
+	MOD = "MOD"
+
 	// logical operators
-	AND = "AND"
-	OR  = "OR"
-	XOR = "XOR"
+	AND     = "AND"         // binary and (&)
+	OR      = "OR"          // binary or (|)
+	XOR     = "XOR"         // binary xor (^)
+	SHL     = "SHIFT_LEFT"  // binary left shift <<
+	SHR     = "SHIFT_RIGHT" // binary right shift >>
+	AND_NOT = "AND_NOT"     // binary and not (&^)
 
 	// comparison operators
-	NEQ = "NEQ" // not equal
-	LEQ = "LEQ" // less or equal
-	GEQ = "GEQ" // greater or equal
-	EQ  = "EQ"  // equal
+	NEQ  = "NEQ"  // not equal
+	LEQ  = "LEQ"  // less or equal
+	GEQ  = "GEQ"  // greater or equal
+	EQ   = "EQ"   // equal
+	LSS  = "LSS"  // less
+	GTR  = "GTR"  // greater
+	LAND = "LAND" // and (&&)
+	LOR  = "LOR"  // or (||)
 )
 
 type BinaryExpr struct {
