@@ -34,7 +34,7 @@ func newTrait(m map[string]interface{}) (*Trait, error) {
 		return nil, addDebugInfo(err)
 	}
 
-	if trait.Classes, err = newClasseDeclsSlice("classes", errPrefix, m); err != nil {
+	if trait.Classes, err = newClassDeclsSlice("classes", errPrefix, m); err != nil {
 		return nil, addDebugInfo(err)
 	}
 

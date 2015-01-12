@@ -97,6 +97,10 @@ func newSrcFile(m map[string]interface{}) (*SrcFile, error) {
 		return nil, addDebugInfo(err)
 	}
 
+	if src.Classes, err = newClassDeclsSlice("classes", errPrefix, m); err != nil && isExist(err) {
+		return nil, addDebugInfo(err)
+	}
+
 	if src.Traits, err = newTraitsSlice("traits", errPrefix, m); err != nil && isExist(err) {
 		return nil, addDebugInfo(err)
 	}

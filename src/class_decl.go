@@ -12,13 +12,14 @@ import (
 type ClassDecl struct {
 	Name                  string             `json:"name"`
 	Visibility            string             `json:"visibility"`
-	ExtendedClasses       []*ClassRef        `json:"extended_classes"`
-	ImplementedInterfaces []*InterfaceRef    `json:"implemented_interfaces"`
-	Attrs                 []*Attr            `json:"attributes"`
-	Constructors          []*ConstructorDecl `json:"constructors"`
-	Destructors           []*DestructorDecl  `json:"destructors"`
-	Methods               []*MethodDecl      `json:"methods"`
-	Traits                []*Trait           `json:"traits"`
+	ExtendedClasses       []*ClassRef        `json:"extended_classes,omitempty"`
+	ImplementedInterfaces []*InterfaceRef    `json:"implemented_interfaces,omitempty"`
+	Attrs                 []*Attr            `json:"attributes,omitempty"`
+	Constructors          []*ConstructorDecl `json:"constructors,omitempty"`
+	Destructors           []*DestructorDecl  `json:"destructors,omitempty"`
+	Methods               []*MethodDecl      `json:"methods,omitempty"`
+	NestedClasses         []*ClassDecl       `json:"nested_classes,omitempty"`
+	Mixins                []*TraitRef        `json:"mixins,omitempty"`
 }
 
 func newClassDecl(m map[string]interface{}) (*ClassDecl, error) {
@@ -34,34 +35,42 @@ func newClassDecl(m map[string]interface{}) (*ClassDecl, error) {
 		return nil, addDebugInfo(err)
 	}
 
-	if cls.ExtendedClasses, err = newClassRefsSlice("extended_classes", errPrefix, m); err != nil {
+	if cls.ExtendedClasses, err = newClassRefsSlice("extended_classes", errPrefix, m); err != nil && isExist(err) {
 		return nil, addDebugInfo(err)
 	}
 
-	if cls.ImplementedInterfaces, err = newInterfaceRefsSlice("implemented_interfaces", errPrefix, m); err != nil {
+	if cls.ImplementedInterfaces, err = newInterfaceRefsSlice("implemented_interfaces", errPrefix, m); err != nil && isExist(err) {
 		return nil, addDebugInfo(err)
 	}
 
-	if cls.Attrs, err = newAttrsSlice("attributes", errPrefix, m); err != nil {
+	if cls.Attrs, err = newAttrsSlice("attributes", errPrefix, m); err != nil && isExist(err) {
 		return nil, addDebugInfo(err)
 	}
 
-	if cls.Constructors, err = newConstructorDeclsSlice("constructors", errPrefix, m); err != nil {
+	if cls.Constructors, err = newConstructorDeclsSlice("constructors", errPrefix, m); err != nil && isExist(err) {
 		return nil, addDebugInfo(err)
 	}
 
-	if cls.Destructors, err = newDestructorDeclsSlice("destructors", errPrefix, m); err != nil {
+	if cls.Destructors, err = newDestructorDeclsSlice("destructors", errPrefix, m); err != nil && isExist(err) {
 		return nil, addDebugInfo(err)
 	}
 
-	if cls.Methods, err = newMethodDeclsSlice("methods", errPrefix, m); err != nil {
+	if cls.Methods, err = newMethodDeclsSlice("methods", errPrefix, m); err != nil && isExist(err) {
+		return nil, addDebugInfo(err)
+	}
+
+	if cls.NestedClasses, err = newClassDeclsSlice("nested_classes", errPrefix, m); err != nil && isExist(err) {
+		return nil, addDebugInfo(err)
+	}
+
+	if cls.Mixins, err = newTraitRefsSlice("mixins", errPrefix, m); err != nil && isExist(err) {
 		return nil, addDebugInfo(err)
 	}
 
 	return &cls, nil
 }
 
-func newClasseDeclsSlice(key, errPrefix string, m map[string]interface{}) ([]*ClassDecl, error) {
+func newClassDeclsSlice(key, errPrefix string, m map[string]interface{}) ([]*ClassDecl, error) {
 	var err error
 	var s reflect.Value
 
