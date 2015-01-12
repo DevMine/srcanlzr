@@ -12,6 +12,7 @@ import (
 
 const (
 	BinaryExprName          = "BINARY"
+	TernaryExprName         = "TERNARY"
 	CallExprName            = "CALL"
 	ConstructorCallExprName = "CONSTRUCTOR_CALL"
 	UnaryExprName           = "UNARY"
