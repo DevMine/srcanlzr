@@ -6,6 +6,7 @@ package src
 
 import "fmt"
 
+// Binary operators
 const (
 	// numerical operators
 	ADD = "ADD"
