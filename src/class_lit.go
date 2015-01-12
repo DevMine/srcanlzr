@@ -11,12 +11,12 @@ import (
 
 type ClassLit struct {
 	ExprName              string             `json:"expression_name"`
-	ExtendedClasses       []*ClassRef        `json:"extended_classes"`
-	ImplementedInterfaces []*InterfaceRef    `json:"implemented_interfaces"`
-	Attrs                 []*Attr            `json:"attributes"`
-	Constructors          []*ConstructorDecl `json:"constructors"`
-	Destructors           []*DestructorDecl  `json:"destructors"`
-	Methods               []*MethodDecl      `json:"methods"`
+	ExtendedClasses       []*ClassRef        `json:"extended_classes,omitempty"`
+	ImplementedInterfaces []*InterfaceRef    `json:"implemented_interfaces,omitempty"`
+	Attrs                 []*Attr            `json:"attributes,omitempty"`
+	Constructors          []*ConstructorDecl `json:"constructors,omitempty"`
+	Destructors           []*DestructorDecl  `json:"destructors,omitempty"`
+	Methods               []*MethodDecl      `json:"methods,omitempty"`
 }
 
 func newClassLit(m map[string]interface{}) (*ClassLit, error) {
@@ -34,27 +34,27 @@ func newClassLit(m map[string]interface{}) (*ClassLit, error) {
 
 	cls.ExprName = ClassLitName
 
-	if cls.ExtendedClasses, err = newClassRefsSlice("extended_classes", errPrefix, m); err != nil {
+	if cls.ExtendedClasses, err = newClassRefsSlice("extended_classes", errPrefix, m); err != nil && isExist(err) {
 		return nil, addDebugInfo(err)
 	}
 
-	if cls.ImplementedInterfaces, err = newInterfaceRefsSlice("implemented_interfaces", errPrefix, m); err != nil {
+	if cls.ImplementedInterfaces, err = newInterfaceRefsSlice("implemented_interfaces", errPrefix, m); err != nil && isExist(err) {
 		return nil, addDebugInfo(err)
 	}
 
-	if cls.Attrs, err = newAttrsSlice("attributes", errPrefix, m); err != nil {
+	if cls.Attrs, err = newAttrsSlice("attributes", errPrefix, m); err != nil && isExist(err) {
 		return nil, addDebugInfo(err)
 	}
 
-	if cls.Constructors, err = newConstructorDeclsSlice("constructors", errPrefix, m); err != nil {
+	if cls.Constructors, err = newConstructorDeclsSlice("constructors", errPrefix, m); err != nil && isExist(err) {
 		return nil, addDebugInfo(err)
 	}
 
-	if cls.Destructors, err = newDestructorDeclsSlice("destructors", errPrefix, m); err != nil {
+	if cls.Destructors, err = newDestructorDeclsSlice("destructors", errPrefix, m); err != nil && isExist(err) {
 		return nil, addDebugInfo(err)
 	}
 
-	if cls.Methods, err = newMethodDeclsSlice("methods", errPrefix, m); err != nil {
+	if cls.Methods, err = newMethodDeclsSlice("methods", errPrefix, m); err != nil && isExist(err) {
 		return nil, addDebugInfo(err)
 	}
 
