@@ -11,9 +11,10 @@ import (
 )
 
 const (
-	BinaryExprName = "BINARY"
-	CallExprName   = "CALL"
-	UnaryExprName  = "UNARY"
+	BinaryExprName          = "BINARY"
+	CallExprName            = "CALL"
+	ConstructorCallExprName = "CONSTRUCTOR_CALL"
+	UnaryExprName           = "UNARY"
 
 	BasicLitName = "BASIC_LIT"
 	FuncLitName  = "FUNC_LIT"
