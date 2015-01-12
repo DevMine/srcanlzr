@@ -39,6 +39,9 @@ type SrcFile struct {
 	// List of classes
 	Classes []*ClassDecl `json:"classes,omitempty"`
 
+	// List of enums
+	Enums []*EnumDecl `json:"enums,omitempty"`
+
 	// List of traits
 	// See http://en.wikipedia.org/wiki/Trait_%28computer_programming%29
 	Traits []*Trait `json:"traits,omitempty"`
