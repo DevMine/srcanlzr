@@ -15,6 +15,7 @@ const (
 	CallExprName            = "CALL"
 	ConstructorCallExprName = "CONSTRUCTOR_CALL"
 	UnaryExprName           = "UNARY"
+	IndexExprName           = "INDEX"
 
 	BasicLitName = "BASIC_LIT"
 	FuncLitName  = "FUNC_LIT"
