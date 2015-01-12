@@ -7,7 +7,6 @@ package src
 type FuncRef struct {
 	Namespace string `json:"namespace"`
 	FuncName  string `json:"function_name"`
-	External  bool   `json:"external"`
 }
 
 // newFuncRef creates a new FuncRef from a generic map.
@@ -21,10 +20,6 @@ func newFuncRef(m map[string]interface{}) (*FuncRef, error) {
 	}
 
 	if fctref.FuncName, err = extractStringValue("function_name", errPrefix, m); err != nil {
-		return nil, addDebugInfo(err)
-	}
-
-	if fctref.External, err = extractBoolValue("external", errPrefix, m); err != nil {
 		return nil, addDebugInfo(err)
 	}
 
