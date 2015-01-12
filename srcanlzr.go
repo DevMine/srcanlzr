@@ -13,8 +13,10 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"log"
 	"os"
 	"path/filepath"
+	"runtime/pprof"
 
 	"github.com/DevMine/srcanlzr/anlzr"
 	"github.com/DevMine/srcanlzr/src"
@@ -58,11 +60,32 @@ func main() {
 
 	format = flag.String("f", "JSON", "Output format. Possible values are: JSON, XML, protobuf")
 	outputFileName := flag.String("o", "", "Output file name. By default, the output is set to stdout")
+	cpuprofile := flag.String("cpuprofile", "", "write cpu profile to file")
+	memprofile := flag.String("memprofile", "", "write memory profile to this file")
 	vflag := flag.Bool("v", false, "Print version.")
 	flag.Parse()
 
 	if *vflag {
 		fmt.Printf("%s - v%s\n", filepath.Base(os.Args[0]), version)
+		return
+	}
+
+	if *cpuprofile != "" {
+		f, err := os.Create(*cpuprofile)
+		if err != nil {
+			log.Fatal(err)
+		}
+		pprof.StartCPUProfile(f)
+		defer pprof.StopCPUProfile()
+	}
+
+	if *memprofile != "" {
+		f, err := os.Create(*memprofile)
+		if err != nil {
+			log.Fatal(err)
+		}
+		pprof.WriteHeapProfile(f)
+		f.Close()
 		return
 	}
 
