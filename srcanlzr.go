@@ -26,8 +26,6 @@ const (
 	version = "0.0.0"
 )
 
-var format *string
-
 func formatOutput(r *anlzr.Result) ([]byte, error) {
 	var bs []byte
 	var err error
@@ -51,18 +49,21 @@ func fatal(err error) {
 	os.Exit(1)
 }
 
+// program flags
+var (
+	format         = flag.String("f", "JSON", "Output format. Possible values are: JSON, XML, protobuf")
+	outputFileName = flag.String("o", "", "Output file name. By default, the output is set to stdout")
+	cpuprofile     = flag.String("cpuprofile", "", "write cpu profile to file")
+	memprofile     = flag.String("memprofile", "", "write memory profile to this file")
+	vflag          = flag.Bool("v", false, "Print version.")
+)
+
 func main() {
 	flag.Usage = func() {
 		fmt.Printf("usage: %s [PROJECT PATH]\n\n", os.Args[0])
 		flag.PrintDefaults()
 		os.Exit(0)
 	}
-
-	format = flag.String("f", "JSON", "Output format. Possible values are: JSON, XML, protobuf")
-	outputFileName := flag.String("o", "", "Output file name. By default, the output is set to stdout")
-	cpuprofile := flag.String("cpuprofile", "", "write cpu profile to file")
-	memprofile := flag.String("memprofile", "", "write memory profile to this file")
-	vflag := flag.Bool("v", false, "Print version.")
 	flag.Parse()
 
 	if *vflag {
