@@ -12,6 +12,8 @@ const (
 	ImagLit   = "IMAG"
 	CharLit   = "CHAR"
 	StringLit = "STRING"
+	BoolLit   = "BOOl"
+	NilLit    = "NIL"
 )
 
 type BasicLit struct {
