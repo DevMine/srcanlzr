@@ -11,16 +11,17 @@ import (
 )
 
 const (
-	IfStmtName     = "IF"
-	SwitchStmtName = "SWITCH"
-	LoopStmtName   = "LOOP"
-	AssignStmtName = "ASSIGN"
-	DeclStmtName   = "DECL"
-	ReturnStmtName = "RETURN"
-	ExprStmtName   = "EXPR"
-	TryStmtName    = "TRY"
-	ThrowStmtName  = "THROW"
-	OtherStmtName  = "OTHER"
+	IfStmtName        = "IF"
+	SwitchStmtName    = "SWITCH"
+	LoopStmtName      = "LOOP"
+	RangeLoopStmtName = "RANGE_LOOP"
+	AssignStmtName    = "ASSIGN"
+	DeclStmtName      = "DECL"
+	ReturnStmtName    = "RETURN"
+	ExprStmtName      = "EXPR"
+	TryStmtName       = "TRY"
+	ThrowStmtName     = "THROW"
+	OtherStmtName     = "OTHER"
 )
 
 type Stmt interface{}

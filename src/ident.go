@@ -4,7 +4,10 @@
 
 package src
 
-import "fmt"
+import (
+	"fmt"
+	"reflect"
+)
 
 type Ident struct {
 	ExprName string `json:"expression_name"`
@@ -31,4 +34,34 @@ func newIdent(m map[string]interface{}) (*Ident, error) {
 	}
 
 	return &ident, nil
+}
+
+func newIdentsSlice(key, errPrefix string, m map[string]interface{}) ([]*Ident, error) {
+	var err error
+	var s *reflect.Value
+
+	if s, err = reflectSliceValue(key, errPrefix, m); err != nil {
+		return nil, addDebugInfo(err)
+	}
+
+	idents := make([]*Ident, s.Len(), s.Len())
+	for i := 0; i < s.Len(); i++ {
+		ident := s.Index(i).Interface()
+		if ident == nil {
+			continue
+		}
+
+		switch ident.(type) {
+		case map[string]interface{}:
+			if idents[i], err = newIdent(ident.(map[string]interface{})); err != nil {
+				return nil, addDebugInfo(err)
+			}
+		default:
+			return nil, addDebugInfo(fmt.Errorf(
+				"%s: '%s' must be a map[string]interface{}, found %v",
+				errPrefix, key, reflect.TypeOf(ident)))
+		}
+	}
+
+	return idents, nil
 }
