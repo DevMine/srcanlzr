@@ -11,11 +11,12 @@ import (
 )
 
 const (
+	UnaryExprName           = "UNARY"
 	BinaryExprName          = "BINARY"
 	TernaryExprName         = "TERNARY"
+	IncDecExprName          = "INC_DEC"
 	CallExprName            = "CALL"
 	ConstructorCallExprName = "CONSTRUCTOR_CALL"
-	UnaryExprName           = "UNARY"
 	IndexExprName           = "INDEX"
 
 	BasicLitName = "BASIC_LIT"
@@ -44,22 +45,36 @@ func newExpr(m map[string]interface{}) (Expr, error) {
 	}
 
 	switch typ {
-	case BinaryExprName:
-		return newBinaryExpr(m)
-	case CallExprName:
-		return newCallExpr(m)
 	case UnaryExprName:
 		return newUnaryExpr(m)
+	case BinaryExprName:
+		return newBinaryExpr(m)
+	case TernaryExprName:
+		return newTernaryExpr(m)
+	case IncDecExprName:
+		return newIncDecExpr(m)
+	case CallExprName:
+		return newCallExpr(m)
+	case ConstructorCallExprName:
+		return newConstructorCallExpr(m)
+	case IndexExprName:
+		return newConstructorCallExpr(m)
+
 	case BasicLitName:
 		return newBasicLit(m)
 	case FuncLitName:
 		return newFuncLit(m)
 	case ClassLitName:
 		return newClassLit(m)
-	case ValueSpecName:
-		return newValueSpec(m)
+
 	case StructTypeName:
 		return newStructType(m)
+	case AttrRefName:
+		return newAttrRef(m)
+	case ValueSpecName:
+		return newValueSpec(m)
+	case IdentName:
+		return newIdent(m)
 	}
 
 	return nil, addDebugInfo(errors.New("unknown statement type"))
