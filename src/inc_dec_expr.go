@@ -16,6 +16,7 @@ type IncDecExpr struct {
 	ExprName string `json:"expression_name"`
 	X        Expr   `json:"operand"`
 	Op       string `json:"operator"` // INC or DEC
+	IsPre    bool   `json:"is_pre"`   // pre = ++i, not pre = i++
 }
 
 func newIncDecExpr(m map[string]interface{}) (*IncDecExpr, error) {
@@ -43,6 +44,10 @@ func newIncDecExpr(m map[string]interface{}) (*IncDecExpr, error) {
 	}
 
 	if incdecexpr.Op, err = extractStringValue("operator", errPrefix, m); err != nil {
+		return nil, addDebugInfo(err)
+	}
+
+	if incdecexpr.IsPre, err = extractBoolValue("is_pre", errPrefix, m); err != nil {
 		return nil, addDebugInfo(err)
 	}
 
