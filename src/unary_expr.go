@@ -11,6 +11,9 @@ const (
 	NOT  = "NOT"
 	ADDR = "ADDR" // memory address (&foo)
 	STAR = "STAR" // dereference operator (*foo)
+
+	NEG = "NEG"
+	POS = "POS"
 )
 
 type UnaryExpr struct {
