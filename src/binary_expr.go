@@ -35,6 +35,7 @@ const (
 )
 
 type BinaryExpr struct {
+	ExprName  string `json"expression_name"`
 	LeftExpr  Expr   `json:"left_expression"`  // left operand
 	Op        string `json:"operator"`         // operator
 	RightExpr Expr   `json:"right_expression"` // right operand
@@ -52,6 +53,8 @@ func newBinaryExpr(m map[string]interface{}) (*BinaryExpr, error) {
 	} else if typ != BinaryExprName {
 		return nil, fmt.Errorf("invalid type: expected 'BinaryExpr', found '%s'", typ)
 	}
+
+	binexpr.ExprName = BinaryExprName
 
 	exprMap, err := extractMapValue("left_expression", errPrefix, m)
 	if err != nil {
