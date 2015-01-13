@@ -42,6 +42,8 @@ func newStmt(m map[string]interface{}) (Stmt, error) {
 		return newSwitchStmt(m)
 	case LoopStmtName:
 		return newLoopStmt(m)
+	case RangeLoopStmtName:
+		return newRangeLoopStmt(m)
 	case AssignStmtName:
 		return newAssignStmt(m)
 	case DeclStmtName:
