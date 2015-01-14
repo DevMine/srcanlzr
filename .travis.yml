@@ -7,4 +7,5 @@ go:
     - 1.4
     - tip
 
+install: make deps
 script: go test -v ./...

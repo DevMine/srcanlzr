@@ -13,7 +13,7 @@ test:
 	go test ${PKG}/...
 
 deps:
-	 go get -u github.com/DevMine/srcanlzr
+	 go get -u github.com/DevMine/repotool/model
 
 check:
 	go vet ${PKG}/...
