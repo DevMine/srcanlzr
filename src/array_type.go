@@ -5,8 +5,12 @@
 package src
 
 type ArrayType struct {
-	Len int64 `json:"length,omitempty"`
-	Elt Expr  `json:"element_type"` // element type
+	// Dimensions must have the following format:
+	//    D1xD2x...
+	// Where each D* represent the size of a dimension.
+	Dims string `json:"dimensions"`
+
+	Elt Expr `json:"element_type"` // element type
 }
 
 func newArrayType(m map[string]interface{}) (*ArrayType, error) {
