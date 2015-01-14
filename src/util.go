@@ -138,6 +138,28 @@ func extractStringSliceValue(key, errPrefix string, m map[string]interface{}) ([
 	return ss, nil
 }
 
+func extractInt64SliceValue(key, errPrefix string, m map[string]interface{}) ([]int64, error) {
+	s, err := reflectSliceValue(key, errPrefix, m)
+	if err != nil {
+		return nil, err
+	}
+
+	is := make([]int64, s.Len(), s.Len())
+	for i := 0; i < s.Len(); i++ {
+		val := s.Index(i).Interface()
+
+		switch val.(type) {
+		case int64:
+			is[i] = val.(int64)
+		default:
+			return nil, addDebugInfo(fmt.Errorf(
+				"%s: '%s' must be a []int64", errPrefix, key))
+		}
+	}
+
+	return is, nil
+}
+
 func reflectSliceValue(key, errPrefix string, m map[string]interface{}) (*reflect.Value, error) {
 	val, ok := m[key]
 	if !ok {

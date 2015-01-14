@@ -16,7 +16,7 @@ func newArrayType(m map[string]interface{}) (*ArrayType, error) {
 	errPrefix := "src/array_type"
 	arytype := ArrayType{}
 
-	if arytype.Len, err = extractInt64Value("length", errPrefix, m); err != nil && isExist(err) {
+	if arytype.Dims, err = extractInt64SliceValue("dimensions", errPrefix, m); err != nil {
 		return nil, addDebugInfo(err)
 	}
 
