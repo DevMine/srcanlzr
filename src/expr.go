@@ -17,11 +17,13 @@ const (
 	IncDecExprName          = "INC_DEC"
 	CallExprName            = "CALL"
 	ConstructorCallExprName = "CONSTRUCTOR_CALL"
+	ArrayExprName           = "ARRAY"
 	IndexExprName           = "INDEX"
 
 	BasicLitName = "BASIC_LIT"
 	FuncLitName  = "FUNC_LIT"
 	ClassLitName = "CLASS_LIT"
+	ArrayLitName = "ARRAY_LIT"
 
 	StructTypeName = "STRUCT_TYPE"
 
@@ -57,6 +59,8 @@ func newExpr(m map[string]interface{}) (Expr, error) {
 		return newCallExpr(m)
 	case ConstructorCallExprName:
 		return newConstructorCallExpr(m)
+	case ArrayExprName:
+		return newArrayExpr(m)
 	case IndexExprName:
 		return newConstructorCallExpr(m)
 
@@ -66,6 +70,8 @@ func newExpr(m map[string]interface{}) (Expr, error) {
 		return newFuncLit(m)
 	case ClassLitName:
 		return newClassLit(m)
+	case ArrayLitName:
+		return newArrayLit(m)
 
 	case StructTypeName:
 		return newStructType(m)

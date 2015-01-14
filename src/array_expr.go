@@ -6,39 +6,34 @@ package src
 
 import "fmt"
 
-type ArrayLit struct {
+type ArrayExpr struct {
 	ExprName string     `json:"expression_name"`
 	Type     *ArrayType `json:"type"`
-	Elts     []Expr     `json:"elements"`
 }
 
-func newArrayLit(m map[string]interface{}) (*ArrayLit, error) {
+func newArrayExpr(m map[string]interface{}) (*ArrayExpr, error) {
 	var err error
-	errPrefix := "src/array_lit"
-	arylit := ArrayLit{}
+	errPrefix := "src/array_expr"
+	aryexpr := ArrayExpr{}
 
 	if typ, err := extractStringValue("expression_name", errPrefix, m); err != nil {
 		// XXX It is not possible to add debug info on this error because it is
 		// required that this error be en "errNotExist".
 		return nil, errNotExist
-	} else if typ != ArrayLitName {
-		return nil, fmt.Errorf("invalid type: expected 'ArrayLit', found '%s'", typ)
+	} else if typ != ArrayExprName {
+		return nil, fmt.Errorf("invalid type: expected 'ArrayExpr', found '%s'", typ)
 	}
 
-	arylit.ExprName = ArrayLitName
+	aryexpr.ExprName = ArrayExprName
 
 	typeMap, err := extractMapValue("type", errPrefix, m)
 	if err != nil {
 		return nil, addDebugInfo(err)
 	}
 
-	if arylit.Type, err = newArrayType(typeMap); err != nil {
+	if aryexpr.Type, err = newArrayType(typeMap); err != nil {
 		return nil, addDebugInfo(err)
 	}
 
-	if arylit.Elts, err = newExprsSlice("elements", errPrefix, m); err != nil {
-		return nil, addDebugInfo(err)
-	}
-
-	return &arylit, nil
+	return &aryexpr, nil
 }
