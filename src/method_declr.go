@@ -11,10 +11,12 @@ import (
 
 type MethodDecl struct {
 	FuncDecl
+	Override bool `json:"override"`
 }
 
 func newMethodDecl(m map[string]interface{}) (*MethodDecl, error) {
 	var err error
+	errPrefix := "src/method_declr"
 	mthd := MethodDecl{}
 
 	var fct *FuncDecl
@@ -22,6 +24,10 @@ func newMethodDecl(m map[string]interface{}) (*MethodDecl, error) {
 		return nil, addDebugInfo(err)
 	}
 	mthd.FuncDecl = *fct
+
+	if mthd.Override, err = extractBoolValue("override", errPrefix, m); err != nil {
+		return nil, addDebugInfo(err)
+	}
 
 	return &mthd, nil
 }
