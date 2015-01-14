@@ -8,9 +8,9 @@ import "fmt"
 
 type LoopStmt struct {
 	StmtName   string `json:"statement_name"`
-	Init       Stmt   `json:"initialization"`
+	Init       []Stmt `json:"initialization"`
 	Cond       Expr   `json:"condition"`
-	Post       Stmt   `json:"post_iteration_statement"`
+	Post       []Stmt `json:"post_iteration_statement"`
 	Body       []Stmt `json:"body"`
 	Else       []Stmt `json:"else",omitempty`
 	IsPostEval bool   `json:"is_post_evaluated"`
@@ -33,12 +33,7 @@ func newLoopStmt(m map[string]interface{}) (*LoopStmt, error) {
 
 	loopstmt.StmtName = LoopStmtName
 
-	initMap, err := extractMapValue("initialization", errPrefix, m)
-	if err != nil {
-		return nil, addDebugInfo(err)
-	}
-
-	if loopstmt.Init, err = newStmt(initMap); err != nil {
+	if loopstmt.Init, err = newStmtsSlice("initialization", errPrefix, m); err != nil {
 		return nil, addDebugInfo(err)
 	}
 
@@ -51,12 +46,7 @@ func newLoopStmt(m map[string]interface{}) (*LoopStmt, error) {
 		return nil, addDebugInfo(err)
 	}
 
-	postMap, err := extractMapValue("post_iteration_statement", errPrefix, m)
-	if err != nil {
-		return nil, addDebugInfo(err)
-	}
-
-	if loopstmt.Post, err = newStmt(postMap); err != nil {
+	if loopstmt.Post, err = newStmtsSlice("post_iteration_statement", errPrefix, m); err != nil {
 		return nil, addDebugInfo(err)
 	}
 
