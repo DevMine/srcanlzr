@@ -4,7 +4,12 @@
 
 package src
 
-import "errors"
+import (
+	"encoding/json"
+	"errors"
+
+	"github.com/DevMine/repotool/model"
+)
 
 // A project is the root of the src API and must be at the root of the JSON
 // generated string.
@@ -18,7 +23,9 @@ type Project struct {
 	Name string `json:"name"`
 
 	// The repository in which the project is hosted.
-	Repo *Repo `json:"repository,omitempty"`
+	Repo *model.Repository `json:"-"`
+
+	RepoRaw json.RawMessage `json:"repository,omitempty"`
 
 	// Programming languages used in the project.
 	Langs []*Language `json:"languages"`
@@ -53,10 +60,9 @@ func newProject(m map[string]interface{}) (*Project, error) {
 		return nil, addDebugInfo(err)
 	}
 
-	if repoMap, err := extractMapValue("repository", errPrefix, m); err != nil && isExist(err) {
-		return nil, addDebugInfo(err)
-	} else if err == nil {
-		if prj.Repo, err = newRepo(repoMap); err != nil && isExist(err) {
+	if repoGen, ok := m["repository"]; ok && repoGen != nil {
+		rawRepo := repoGen.(json.RawMessage)
+		if err := json.Unmarshal(rawRepo, &prj.Repo); err != nil {
 			return nil, addDebugInfo(err)
 		}
 	}
