@@ -7,11 +7,11 @@ package src
 import "fmt"
 
 type RangeLoopStmt struct {
-	StmtName string   `json:"statement_name"`
-	Vars     []*Ident `json:"variables,omitempty"`
-	Iterable Expr     `json:"iterable"`
-	Body     []Stmt   `json:"body"`
-	Line     int64    `json:"line"` // Line number of the statement relatively to the function.
+	StmtName string       `json:"statement_name"`
+	Vars     []*ValueSpec `json:"variables,omitempty"`
+	Iterable Expr         `json:"iterable"`
+	Body     []Stmt       `json:"body"`
+	Line     int64        `json:"line"` // Line number of the statement relatively to the function.
 }
 
 // newRangeLoopStmt creates a new RangeLoopStmt from a generic map.
@@ -30,7 +30,7 @@ func newRangeLoopStmt(m map[string]interface{}) (*RangeLoopStmt, error) {
 
 	loopstmt.StmtName = RangeLoopStmtName
 
-	if loopstmt.Vars, err = newIdentsSlice("variables", errPrefix, m); err != nil && isExist(err) {
+	if loopstmt.Vars, err = newValueSpecsSlice("variables", errPrefix, m); err != nil && isExist(err) {
 		return nil, addDebugInfo(err)
 	}
 

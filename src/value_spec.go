@@ -4,7 +4,10 @@
 
 package src
 
-import "fmt"
+import (
+	"fmt"
+	"reflect"
+)
 
 type ValueSpec struct {
 	ExprName string `json:"expression_name"`
@@ -46,4 +49,34 @@ func newValueSpec(m map[string]interface{}) (*ValueSpec, error) {
 	}
 
 	return &valspec, nil
+}
+
+func newValueSpecsSlice(key, errPrefix string, m map[string]interface{}) ([]*ValueSpec, error) {
+	var err error
+	var s *reflect.Value
+
+	if s, err = reflectSliceValue(key, errPrefix, m); err != nil {
+		return nil, addDebugInfo(err)
+	}
+
+	valspecs := make([]*ValueSpec, s.Len(), s.Len())
+	for i := 0; i < s.Len(); i++ {
+		valspec := s.Index(i).Interface()
+		if valspec == nil {
+			continue
+		}
+
+		switch valspec.(type) {
+		case map[string]interface{}:
+			if valspecs[i], err = newValueSpec(valspec.(map[string]interface{})); err != nil {
+				return nil, addDebugInfo(err)
+			}
+		default:
+			return nil, addDebugInfo(fmt.Errorf(
+				"%s: '%s' must be a map[string]interface{}, found %v",
+				errPrefix, key, reflect.TypeOf(valspec)))
+		}
+	}
+
+	return valspecs, nil
 }
