@@ -5,10 +5,8 @@
 package src
 
 type ArrayType struct {
-	// Dimensions must have the following format:
-	//    D1xD2x...
-	// Where each D* represent the size of a dimension.
-	Dims string `json:"dimensions"`
+	// Dimensions
+	Dims []int64 `json:"dimensions"`
 
 	Elt Expr `json:"element_type"` // element type
 }
