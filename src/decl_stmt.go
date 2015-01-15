@@ -6,6 +6,12 @@ package src
 
 import "fmt"
 
+// Kind of declarations
+const (
+	ConstDecl = "CONSTANT" // constant
+	VarDecl   = "VAR"      // variable
+)
+
 type DeclStmt struct {
 	AssignStmt
 	Kind string `json:"kind"`
@@ -25,9 +31,7 @@ func newDeclStmt(m map[string]interface{}) (*DeclStmt, error) {
 		return nil, fmt.Errorf("invalid type: expected 'DeclStmt', found '%s'", typ)
 	}
 
-	if declstmt.StmtName, err = extractStringValue("type", errPrefix, m); err != nil {
-		return nil, addDebugInfo(err)
-	}
+	declstmt.StmtName = DeclStmtName
 
 	if declstmt.Lhs, err = newExprsSlice("left_hand_side", errPrefix, m); err != nil {
 		return nil, addDebugInfo(err)
