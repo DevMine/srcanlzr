@@ -10,16 +10,20 @@ import (
 )
 
 type Interface struct {
+	Doc        []string     `json:"doc,omitempty"`
 	Name       string       `json:"name"`
 	Protos     []*ProtoDecl `json:"prototypes"`
 	Visibility string       `json:"visibility"`
-	// TODO
 }
 
 func newInterface(m map[string]interface{}) (*Interface, error) {
 	var err error
-	errPrefix := "src/constant"
+	errPrefix := "src/interface"
 	i := Interface{}
+
+	if i.Doc, err = extractStringSliceValue("doc", errPrefix, m); err != nil && isExist(err) {
+		return nil, addDebugInfo(err)
+	}
 
 	if i.Name, err = extractStringValue("name", errPrefix, m); err != nil {
 		return nil, addDebugInfo(err)

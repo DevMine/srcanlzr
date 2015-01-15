@@ -10,6 +10,7 @@ import (
 )
 
 type ClassDecl struct {
+	Doc                   []string           `json:"doc,omitempty"`
 	Name                  string             `json:"name"`
 	Visibility            string             `json:"visibility"`
 	ExtendedClasses       []*ClassRef        `json:"extended_classes,omitempty"`
@@ -26,6 +27,10 @@ func newClassDecl(m map[string]interface{}) (*ClassDecl, error) {
 	var err error
 	errPrefix := "src/class_decl"
 	cls := ClassDecl{}
+
+	if cls.Doc, err = extractStringSliceValue("doc", errPrefix, m); err != nil && isExist(err) {
+		return nil, addDebugInfo(err)
+	}
 
 	if cls.Name, err = extractStringValue("name", errPrefix, m); err != nil {
 		return nil, addDebugInfo(err)

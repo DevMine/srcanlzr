@@ -10,6 +10,7 @@ import (
 )
 
 type EnumDecl struct {
+	Doc                   []string           `json:"doc,omitempty"`
 	Name                  string             `json:"name"`
 	Visibility            string             `json:"visibility"`
 	ImplementedInterfaces []*InterfaceRef    `json:"implemented_interfaces,omitempty"`
@@ -24,6 +25,10 @@ func newEnumDecl(m map[string]interface{}) (*EnumDecl, error) {
 	var err error
 	errPrefix := "src/enum_decl"
 	cls := EnumDecl{}
+
+	if cls.Doc, err = extractStringSliceValue("doc", errPrefix, m); err != nil && isExist(err) {
+		return nil, addDebugInfo(err)
+	}
 
 	if cls.Name, err = extractStringValue("name", errPrefix, m); err != nil {
 		return nil, addDebugInfo(err)
