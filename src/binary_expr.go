@@ -35,7 +35,7 @@ const (
 )
 
 type BinaryExpr struct {
-	ExprName  string `json"expression_name"`
+	ExprName  string `json:"expression_name"`
 	LeftExpr  Expr   `json:"left_expression"`  // left operand
 	Op        string `json:"operator"`         // operator
 	RightExpr Expr   `json:"right_expression"` // right operand

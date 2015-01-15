@@ -12,7 +12,7 @@ type LoopStmt struct {
 	Cond       Expr   `json:"condition"`
 	Post       []Stmt `json:"post_iteration_statement,omitempty"`
 	Body       []Stmt `json:"body"`
-	Else       []Stmt `json:"else",omitempty`
+	Else       []Stmt `json:"else,omitempty"`
 	IsPostEval bool   `json:"is_post_evaluated"`
 	Line       int64  `json:"line"` // Line number of the statement relatively to the function.
 }
