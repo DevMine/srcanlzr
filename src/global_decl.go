@@ -10,24 +10,40 @@ import (
 )
 
 type GlobalDecl struct {
-	DeclStmt
+	Name       *Ident `json:"name"`
+	Value      Expr   `json:"value,omitempty"`
+	Type       *Ident `json:"type"`
 	Visibility string `json:"visibility"`
 }
 
 func newGlobalDecl(m map[string]interface{}) (*GlobalDecl, error) {
-	var err error
 	errPrefix := "src/global_decl"
 	globaldecl := GlobalDecl{}
 
-	if globaldecl.Lhs, err = newExprsSlice("left_hand_side", errPrefix, m); err != nil {
+	nameMap, err := extractMapValue("name", errPrefix, m)
+	if err != nil {
 		return nil, addDebugInfo(err)
 	}
 
-	if globaldecl.Rhs, err = newExprsSlice("right_hand_side", errPrefix, m); err != nil {
+	if globaldecl.Name, err = newIdent(nameMap); err != nil {
 		return nil, addDebugInfo(err)
 	}
 
-	if globaldecl.Kind, err = extractStringValue("kind", errPrefix, m); err != nil {
+	exprMap, err := extractMapValue("value", errPrefix, m)
+	if err != nil && isExist(err) {
+		return nil, addDebugInfo(err)
+	} else if err == nil {
+		if globaldecl.Value, err = newExpr(exprMap); err != nil {
+			return nil, addDebugInfo(err)
+		}
+	}
+
+	typeMap, err := extractMapValue("type", errPrefix, m)
+	if err != nil {
+		return nil, addDebugInfo(err)
+	}
+
+	if globaldecl.Type, err = newIdent(typeMap); err != nil {
 		return nil, addDebugInfo(err)
 	}
 
@@ -43,7 +59,9 @@ func newGlobalDeclsSlice(key, errPrefix string, m map[string]interface{}) ([]*Gl
 	var s *reflect.Value
 
 	if s, err = reflectSliceValue(key, errPrefix, m); err != nil {
-		return nil, addDebugInfo(err)
+		// XXX It is not possible to add debug info on this error because it is
+		// required that this error be en "errNotExist".
+		return nil, err
 	}
 
 	globaldecls := make([]*GlobalDecl, s.Len(), s.Len())
