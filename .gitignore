@@ -1,4 +1,5 @@
 # specific files
+.directory
 tags
 foo.json
 srcanlzr
