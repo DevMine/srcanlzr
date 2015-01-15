@@ -8,10 +8,10 @@ import "fmt"
 
 type IfStmt struct {
 	StmtName string `json:"statement_name"`
-	Init     Stmt   `json:"initialization"`
+	Init     Stmt   `json:"initialization,omitempty"`
 	Cond     Expr   `json:"condition"`
 	Body     []Stmt `json:"body"`
-	Else     []Stmt `json:"else"`
+	Else     []Stmt `json:"else,omitempty"`
 	Line     int64  `json:"line"` // Line number of the statement relatively to the function.
 }
 
@@ -32,12 +32,12 @@ func newIfStmt(m map[string]interface{}) (*IfStmt, error) {
 	ifstmt.StmtName = IfStmtName
 
 	initMap, err := extractMapValue("initialization", errPrefix, m)
-	if err != nil {
+	if err != nil && isExist(err) {
 		return nil, addDebugInfo(err)
-	}
-
-	if ifstmt.Cond, err = newStmt(initMap); err != nil {
-		return nil, addDebugInfo(err)
+	} else if err == nil {
+		if ifstmt.Init, err = newStmt(initMap); err != nil {
+			return nil, addDebugInfo(err)
+		}
 	}
 
 	condMap, err := extractMapValue("condition", errPrefix, m)
@@ -53,7 +53,7 @@ func newIfStmt(m map[string]interface{}) (*IfStmt, error) {
 		return nil, addDebugInfo(err)
 	}
 
-	if ifstmt.Else, err = newStmtsSlice("else", errPrefix, m); err != nil {
+	if ifstmt.Else, err = newStmtsSlice("else", errPrefix, m); err != nil && isExist(err) {
 		return nil, addDebugInfo(err)
 	}
 

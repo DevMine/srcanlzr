@@ -151,9 +151,11 @@ func extractInt64SliceValue(key, errPrefix string, m map[string]interface{}) ([]
 		switch val.(type) {
 		case int64:
 			is[i] = val.(int64)
+		case float64:
+			is[i] = int64(val.(float64))
 		default:
 			return nil, addDebugInfo(fmt.Errorf(
-				"%s: '%s' must be a []int64", errPrefix, key))
+				"%s: '%s' must be a []int64, found %v", errPrefix, key, reflect.TypeOf(val)))
 		}
 	}
 

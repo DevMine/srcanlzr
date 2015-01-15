@@ -10,10 +10,10 @@ import (
 )
 
 type Var struct {
-	Doc        []string `json:"doc"`
+	Doc        []string `json:"doc,omitempty"`
 	Name       string   `json:"name"`
-	Type       string   `json:"type"`
-	Value      string   `json:"value"`
+	Type       string   `json:"type,omitempty"`
+	Value      string   `json:"value,omitempty"`
 	IsPointer  bool     `json:"is_pointer"`
 	Visibility string   `json:"visibility,omitempty"`
 }
@@ -23,7 +23,7 @@ func newVar(m map[string]interface{}) (*Var, error) {
 	errPrefix := "src/var"
 	v := Var{}
 
-	if v.Doc, err = extractStringSliceValue("doc", errPrefix, m); err != nil {
+	if v.Doc, err = extractStringSliceValue("doc", errPrefix, m); err != nil && isExist(err) {
 		return nil, addDebugInfo(err)
 	}
 
@@ -31,11 +31,11 @@ func newVar(m map[string]interface{}) (*Var, error) {
 		return nil, addDebugInfo(err)
 	}
 
-	if v.Type, err = extractStringValue("type", errPrefix, m); err != nil {
+	if v.Type, err = extractStringValue("type", errPrefix, m); err != nil && isExist(err) {
 		return nil, addDebugInfo(err)
 	}
 
-	if v.Value, err = extractStringValue("value", errPrefix, m); err != nil {
+	if v.Value, err = extractStringValue("value", errPrefix, m); err != nil && isExist(err) {
 		return nil, addDebugInfo(err)
 	}
 

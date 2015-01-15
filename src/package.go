@@ -35,7 +35,7 @@ func newPackage(m map[string]interface{}) (*Package, error) {
 	errPrefix := "src/package"
 	pkg := Package{}
 
-	if pkg.Doc, err = extractStringSliceValue("doc", errPrefix, m); err != nil {
+	if pkg.Doc, err = extractStringSliceValue("doc", errPrefix, m); err != nil && isExist(err) {
 		return nil, addDebugInfo(err)
 	}
 

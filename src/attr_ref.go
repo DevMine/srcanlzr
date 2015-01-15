@@ -6,7 +6,7 @@ package src
 
 type AttrRef struct {
 	ExprName string `json:"expression_name"`
-	Ident    *Ident `json:"ident"`
+	Name     *Ident `json:"name"`
 }
 
 func newAttrRef(m map[string]interface{}) (*AttrRef, error) {
@@ -14,12 +14,12 @@ func newAttrRef(m map[string]interface{}) (*AttrRef, error) {
 	errPrefix := "src/attr_ref"
 	attrref := AttrRef{}
 
-	identMap, err := extractMapValue("ident", errPrefix, m)
+	identMap, err := extractMapValue("name", errPrefix, m)
 	if err != nil {
 		return nil, addDebugInfo(err)
 	}
 
-	if attrref.Ident, err = newIdent(identMap); err != nil {
+	if attrref.Name, err = newIdent(identMap); err != nil {
 		return nil, addDebugInfo(err)
 	}
 

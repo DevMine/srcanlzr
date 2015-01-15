@@ -12,8 +12,8 @@ import (
 type TryStmt struct {
 	StmtName     string         `json:"statement_name"`
 	Body         []Stmt         `json:"body"`
-	CatchClauses []*CatchClause `json:"catch_clauses"`
-	Finally      []Stmt         `json:"finally"`
+	CatchClauses []*CatchClause `json:"catch_clauses,omitempty"`
+	Finally      []Stmt         `json:"finally,omitempty"`
 }
 
 type CatchClause struct {
@@ -40,11 +40,11 @@ func newTryStmt(m map[string]interface{}) (*TryStmt, error) {
 		return nil, addDebugInfo(err)
 	}
 
-	if trystmt.CatchClauses, err = newCatchClausesSlice("catch_clauses", errPrefix, m); err != nil {
+	if trystmt.CatchClauses, err = newCatchClausesSlice("catch_clauses", errPrefix, m); err != nil && isExist(err) {
 		return nil, addDebugInfo(err)
 	}
 
-	if trystmt.Finally, err = newStmtsSlice("finally", errPrefix, m); err != nil {
+	if trystmt.Finally, err = newStmtsSlice("finally", errPrefix, m); err != nil && isExist(err) {
 		return nil, addDebugInfo(err)
 	}
 

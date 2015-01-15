@@ -10,16 +10,17 @@ import (
 )
 
 type StructType struct {
-	Doc    []string `json:"doc"`
-	Name   string   `json:"name"`
-	Type   Expr     `json:"type"`
-	Fields []Field  `json:"fields"`
+	ExprName string   `json:"expression_name"`
+	Doc      []string `json:"doc"`
+	Name     string   `json:"name"`
+	Type     Expr     `json:"type"`
+	Fields   []Field  `json:"fields"`
 }
 
 type Field struct {
-	Doc  []string `json:"doc"`
-	Name string   `json:"name"`
-	Type string   `json:"type"`
+	Doc  []string `json:"doc,omitempty"`
+	Name string   `json:"name,omitempty"`
+	Type string   `json:"type,omitempty"`
 }
 
 func newStructType(m map[string]interface{}) (*StructType, error) {
@@ -27,12 +28,15 @@ func newStructType(m map[string]interface{}) (*StructType, error) {
 	errPrefix := "src/structured_type"
 	strct := StructType{}
 
-	// should never happen
-	/*if typ, ok := m["type"]; !ok || typ != StructTypeName {
-		return nil, addDebugInfo(fmt.Errorf(
-			"%s: the generic map supplied is not a PrimitiveType",
-			errPrefix))
-	}*/
+	if typ, err := extractStringValue("expression_name", errPrefix, m); err != nil {
+		// XXX It is not possible to add debug info on this error because it is
+		// required that this error be en "errNotExist".
+		return nil, errNotExist
+	} else if typ != StructTypeName {
+		return nil, fmt.Errorf("invalid type: expected 'StructTypeName', found '%s'", typ)
+	}
+
+	strct.ExprName = StructTypeName
 
 	if strct.Doc, err = extractStringSliceValue("doc", errPrefix, m); err != nil {
 		return nil, addDebugInfo(err)
@@ -88,15 +92,15 @@ func newField(m map[string]interface{}) (*Field, error) {
 	errPrefix := "src/field"
 	field := Field{}
 
-	if field.Doc, err = extractStringSliceValue("doc", errPrefix, m); err != nil {
+	if field.Doc, err = extractStringSliceValue("doc", errPrefix, m); err != nil && isExist(err) {
 		return nil, addDebugInfo(err)
 	}
 
-	if field.Name, err = extractStringValue("name", errPrefix, m); err != nil {
+	if field.Name, err = extractStringValue("name", errPrefix, m); err != nil && isExist(err) {
 		return nil, addDebugInfo(err)
 	}
 
-	if field.Type, err = extractStringValue("type", errPrefix, m); err != nil {
+	if field.Type, err = extractStringValue("type", errPrefix, m); err != nil && isExist(err) {
 		return nil, addDebugInfo(err)
 	}
 
@@ -109,8 +113,9 @@ func newFieldsSlice(key, errPrefix string, m map[string]interface{}) ([]*Field, 
 
 	fieldsMap, ok := m[key]
 	if !ok {
-		return nil, addDebugInfo(fmt.Errorf(
-			"%s: field '%s' does not exist", errPrefix, key))
+		// XXX It is not possible to add debug info on this error because it is
+		// required that this error be en "errNotExist".
+		return nil, errNotExist
 	}
 
 	if s = reflect.ValueOf(fieldsMap); s.Kind() != reflect.Slice {

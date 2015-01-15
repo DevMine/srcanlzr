@@ -9,7 +9,7 @@ import "fmt"
 // A ReturnStmt represents a return statement.
 type ReturnStmt struct {
 	StmtName string `json:"statement_name"`
-	Results  []Expr `json:"results"` // result expressions; or nil
+	Results  []Expr `json:"results,omitempty"` // result expressions; or nil
 	Line     int64  `json:"line"`
 }
 
@@ -28,7 +28,7 @@ func newReturnStmt(m map[string]interface{}) (*ReturnStmt, error) {
 
 	retstmt.StmtName = ReturnStmtName
 
-	if retstmt.Results, err = newExprsSlice("results", errPrefix, m); err != nil {
+	if retstmt.Results, err = newExprsSlice("results", errPrefix, m); err != nil && isExist(err) {
 		return nil, addDebugInfo(err)
 	}
 

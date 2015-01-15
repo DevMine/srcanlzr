@@ -61,7 +61,7 @@ func newBinaryExpr(m map[string]interface{}) (*BinaryExpr, error) {
 		return nil, addDebugInfo(err)
 	}
 
-	if binexpr.LeftExpr, err = newExprStmt(exprMap); err != nil {
+	if binexpr.LeftExpr, err = newExpr(exprMap); err != nil {
 		return nil, addDebugInfo(err)
 	}
 

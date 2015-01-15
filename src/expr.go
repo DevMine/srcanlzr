@@ -62,7 +62,7 @@ func newExpr(m map[string]interface{}) (Expr, error) {
 	case ArrayExprName:
 		return newArrayExpr(m)
 	case IndexExprName:
-		return newConstructorCallExpr(m)
+		return newIndexExpr(m)
 
 	case BasicLitName:
 		return newBasicLit(m)
@@ -91,7 +91,9 @@ func newExprsSlice(key, errPrefix string, m map[string]interface{}) ([]Expr, err
 	var s *reflect.Value
 
 	if s, err = reflectSliceValue(key, errPrefix, m); err != nil {
-		return nil, addDebugInfo(err)
+		// XXX It is not possible to add debug info on this error because it is
+		// required that this error be en "errNotExist".
+		return nil, err
 	}
 
 	exprs := make([]Expr, s.Len(), s.Len())

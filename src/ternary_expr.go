@@ -31,7 +31,7 @@ func newTernaryExpr(m map[string]interface{}) (*TernaryExpr, error) {
 		return nil, addDebugInfo(err)
 	}
 
-	if ternexpr.Cond, err = newExprStmt(exprMap); err != nil {
+	if ternexpr.Cond, err = newExpr(exprMap); err != nil {
 		return nil, addDebugInfo(err)
 	}
 
@@ -39,7 +39,7 @@ func newTernaryExpr(m map[string]interface{}) (*TernaryExpr, error) {
 		return nil, addDebugInfo(err)
 	}
 
-	if ternexpr.Then, err = newExprStmt(exprMap); err != nil {
+	if ternexpr.Then, err = newExpr(exprMap); err != nil {
 		return nil, addDebugInfo(err)
 	}
 
@@ -47,7 +47,7 @@ func newTernaryExpr(m map[string]interface{}) (*TernaryExpr, error) {
 		return nil, addDebugInfo(err)
 	}
 
-	if ternexpr.Then, err = newExprStmt(exprMap); err != nil {
+	if ternexpr.Then, err = newExpr(exprMap); err != nil {
 		return nil, addDebugInfo(err)
 	}
 

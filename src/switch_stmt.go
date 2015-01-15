@@ -11,15 +11,15 @@ import (
 
 type SwitchStmt struct {
 	StmtName    string        `json:"statement_name"`
-	Init        Expr          `json:"initialization"`
+	Init        Expr          `json:"initialization,omitempty"`
 	Cond        Expr          `json:"condition"`
-	CaseClauses []*CaseClause `json:"case_clauses"`
-	Default     []Stmt        `json:"default"`
+	CaseClauses []*CaseClause `json:"case_clauses,omitempty"`
+	Default     []Stmt        `json:"default,omitempty"`
 }
 
 type CaseClause struct {
-	Conds []Expr `json:"conditions"`
-	Body  []Stmt `json:"body"`
+	Conds []Expr `json:"conditions,omitempty"`
+	Body  []Stmt `json:"body,omitempty"`
 }
 
 func newSwitchStmt(m map[string]interface{}) (*SwitchStmt, error) {
@@ -38,12 +38,12 @@ func newSwitchStmt(m map[string]interface{}) (*SwitchStmt, error) {
 	switchstmt.StmtName = SwitchStmtName
 
 	initMap, err := extractMapValue("initialization", errPrefix, m)
-	if err != nil {
+	if err != nil && isExist(err) {
 		return nil, addDebugInfo(err)
-	}
-
-	if switchstmt.Cond, err = newStmt(initMap); err != nil {
-		return nil, addDebugInfo(err)
+	} else if err == nil {
+		if switchstmt.Cond, err = newStmt(initMap); err != nil {
+			return nil, addDebugInfo(err)
+		}
 	}
 
 	condMap, err := extractMapValue("condition", errPrefix, m)
@@ -55,11 +55,11 @@ func newSwitchStmt(m map[string]interface{}) (*SwitchStmt, error) {
 		return nil, addDebugInfo(err)
 	}
 
-	if switchstmt.CaseClauses, err = newCaseClausesSlice("case_clauses", errPrefix, m); err != nil {
+	if switchstmt.CaseClauses, err = newCaseClausesSlice("case_clauses", errPrefix, m); err != nil && isExist(err) {
 		return nil, addDebugInfo(err)
 	}
 
-	if switchstmt.Default, err = newStmtsSlice("default", errPrefix, m); err != nil {
+	if switchstmt.Default, err = newStmtsSlice("default", errPrefix, m); err != nil && isExist(err) {
 		return nil, addDebugInfo(err)
 	}
 
@@ -71,11 +71,11 @@ func newCaseClause(m map[string]interface{}) (*CaseClause, error) {
 	errPrefix := "src/case_clause"
 	caseclause := CaseClause{}
 
-	if caseclause.Conds, err = newExprsSlice("conditions", errPrefix, m); err != nil {
+	if caseclause.Conds, err = newExprsSlice("conditions", errPrefix, m); err != nil && isExist(err) {
 		return nil, addDebugInfo(err)
 	}
 
-	if caseclause.Body, err = newStmtsSlice("case_clauses", errPrefix, m); err != nil {
+	if caseclause.Body, err = newStmtsSlice("body", errPrefix, m); err != nil && isExist(err) {
 		return nil, addDebugInfo(err)
 	}
 
@@ -87,7 +87,9 @@ func newCaseClausesSlice(key, errPrefix string, m map[string]interface{}) ([]*Ca
 	var s *reflect.Value
 
 	if s, err = reflectSliceValue(key, errPrefix, m); err != nil {
-		return nil, addDebugInfo(err)
+		// XXX It is not possible to add debug info on this error because it is
+		// required that this error be en "errNotExist".
+		return nil, err
 	}
 
 	ccs := make([]*CaseClause, s.Len(), s.Len())

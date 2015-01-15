@@ -12,7 +12,7 @@ import (
 // Method/Function prototype declaration
 type ProtoDecl struct {
 	Doc        []string  `json:"doc"`
-	Ident      *Ident    `json:"ident"`
+	Name       *Ident    `json:"name"`
 	Type       *FuncType `json:"type"`
 	Visibility string    `json:"visibility"`
 }
@@ -26,12 +26,12 @@ func newProtoDecl(m map[string]interface{}) (*ProtoDecl, error) {
 		return nil, addDebugInfo(err)
 	}
 
-	identMap, err := extractMapValue("ident", errPrefix, m)
+	identMap, err := extractMapValue("name", errPrefix, m)
 	if err != nil {
 		return nil, addDebugInfo(err)
 	}
 
-	if proto.Ident, err = newIdent(identMap); err != nil {
+	if proto.Name, err = newIdent(identMap); err != nil {
 		return nil, addDebugInfo(err)
 	}
 

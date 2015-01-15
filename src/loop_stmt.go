@@ -9,7 +9,7 @@ import "fmt"
 type LoopStmt struct {
 	StmtName   string `json:"statement_name"`
 	Init       []Stmt `json:"initialization,omitempty"`
-	Cond       Expr   `json:"condition"`
+	Cond       Expr   `json:"condition,omitempty"`
 	Post       []Stmt `json:"post_iteration_statement,omitempty"`
 	Body       []Stmt `json:"body"`
 	Else       []Stmt `json:"else,omitempty"`
@@ -38,12 +38,12 @@ func newLoopStmt(m map[string]interface{}) (*LoopStmt, error) {
 	}
 
 	condMap, err := extractMapValue("condition", errPrefix, m)
-	if err != nil {
+	if err != nil && isExist(err) {
 		return nil, addDebugInfo(err)
-	}
-
-	if loopstmt.Cond, err = newExpr(condMap); err != nil {
-		return nil, addDebugInfo(err)
+	} else if err == nil {
+		if loopstmt.Cond, err = newExpr(condMap); err != nil {
+			return nil, addDebugInfo(err)
+		}
 	}
 
 	if loopstmt.Post, err = newStmtsSlice("post_iteration_statement", errPrefix, m); err != nil && isExist(err) {
@@ -62,7 +62,7 @@ func newLoopStmt(m map[string]interface{}) (*LoopStmt, error) {
 		return nil, addDebugInfo(err)
 	}
 
-	if loopstmt.Else, err = newStmtsSlice("else", errPrefix, m); err != nil {
+	if loopstmt.Else, err = newStmtsSlice("else", errPrefix, m); err != nil && isExist(err) {
 		return nil, addDebugInfo(err)
 	}
 

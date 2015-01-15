@@ -29,10 +29,11 @@ type Stmt interface{}
 func newStmt(m map[string]interface{}) (Stmt, error) {
 	errPrefix := "src/stmt"
 
-	typ, ok := m["statement_name"]
-	if !ok {
-		return nil, addDebugInfo(fmt.Errorf(
-			"%s: field 'type' does not exist", errPrefix))
+	typ, err := extractStringValue("statement_name", errPrefix, m)
+	if err != nil {
+		// XXX It is not possible to add debug info on this error because it is
+		// required that this error be en "errNotExist".
+		return nil, errNotExist
 	}
 
 	switch typ {
@@ -65,18 +66,12 @@ func newStmt(m map[string]interface{}) (Stmt, error) {
 
 func newStmtsSlice(key, errPrefix string, m map[string]interface{}) ([]Stmt, error) {
 	var err error
-	var s reflect.Value
+	var s *reflect.Value
 
-	stmtsMap, ok := m[key]
-	if !ok || stmtsMap == nil {
+	if s, err = reflectSliceValue(key, errPrefix, m); err != nil {
 		// XXX It is not possible to add debug info on this error because it is
 		// required that this error be en "errNotExist".
-		return nil, errNotExist
-	}
-
-	if s = reflect.ValueOf(stmtsMap); s.Kind() != reflect.Slice {
-		return nil, addDebugInfo(fmt.Errorf(
-			"%s: field '%s' is supposed to be a slice", errPrefix, key))
+		return nil, err
 	}
 
 	stmts := make([]Stmt, s.Len(), s.Len())

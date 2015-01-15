@@ -10,10 +10,11 @@ import (
 )
 
 type Interface struct {
-	Doc        []string     `json:"doc,omitempty"`
-	Name       string       `json:"name"`
-	Protos     []*ProtoDecl `json:"prototypes"`
-	Visibility string       `json:"visibility"`
+	Doc                   []string        `json:"doc,omitempty"`
+	Name                  string          `json:"name"`
+	ImplementedInterfaces []*InterfaceRef `json:"implemented_interfaces,omitempty"`
+	Protos                []*ProtoDecl    `json:"prototypes"`
+	Visibility            string          `json:"visibility"`
 }
 
 func newInterface(m map[string]interface{}) (*Interface, error) {
@@ -26,6 +27,10 @@ func newInterface(m map[string]interface{}) (*Interface, error) {
 	}
 
 	if i.Name, err = extractStringValue("name", errPrefix, m); err != nil {
+		return nil, addDebugInfo(err)
+	}
+
+	if i.ImplementedInterfaces, err = newInterfaceRefsSlice("implemented_interfaces", errPrefix, m); err != nil && isExist(err) {
 		return nil, addDebugInfo(err)
 	}
 
