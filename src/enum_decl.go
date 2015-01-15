@@ -13,6 +13,7 @@ type EnumDecl struct {
 	Name                  string             `json:"name"`
 	Visibility            string             `json:"visibility"`
 	ImplementedInterfaces []*InterfaceRef    `json:"implemented_interfaces,omitempty"`
+	EnumConstants         []*Ident           `json:"enum_constants,omitempty"`
 	Attrs                 []*Attr            `json:"attributes,omitempty"`
 	Constructors          []*ConstructorDecl `json:"constructors,omitempty"`
 	Destructors           []*DestructorDecl  `json:"destructors,omitempty"`
@@ -37,6 +38,10 @@ func newEnumDecl(m map[string]interface{}) (*EnumDecl, error) {
 	}
 
 	if cls.Attrs, err = newAttrsSlice("attributes", errPrefix, m); err != nil && isExist(err) {
+		return nil, addDebugInfo(err)
+	}
+
+	if cls.EnumConstants, err = newIdentsSlice("enum_constants", errPrefix, m); err != nil && isExist(err) {
 		return nil, addDebugInfo(err)
 	}
 
