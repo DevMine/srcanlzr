@@ -25,10 +25,10 @@ type SrcFile struct {
 	Structs []*StructType `json:"structs,omitempty"`
 
 	// List of constants defined at the file level (e.g. global constants)
-	Constants []*Constant `json:"constants,omitempty"`
+	Constants []*AssignStmt `json:"constants,omitempty"`
 
 	// List of variables defined at the file level (e.g. global variables)
-	Vars []*Var `json:"variables,omitempty"`
+	Vars []*AssignStmt `json:"variables,omitempty"`
 
 	// List of functions
 	Funcs []*FuncDecl `json:"functions,omitempty"`
@@ -84,11 +84,11 @@ func newSrcFile(m map[string]interface{}) (*SrcFile, error) {
 		return nil, addDebugInfo(err)
 	}
 
-	if src.Constants, err = newConstantsSlice("constants", errPrefix, m); err != nil && isExist(err) {
+	if src.Constants, err = newAssignStmtsSlice("constants", errPrefix, m); err != nil && isExist(err) {
 		return nil, addDebugInfo(err)
 	}
 
-	if src.Vars, err = newVarsSlice("variables", errPrefix, m); err != nil && isExist(err) {
+	if src.Vars, err = newAssignStmtsSlice("variables", errPrefix, m); err != nil && isExist(err) {
 		return nil, addDebugInfo(err)
 	}
 

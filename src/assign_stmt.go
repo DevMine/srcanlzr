@@ -4,7 +4,10 @@
 
 package src
 
-import "fmt"
+import (
+	"fmt"
+	"reflect"
+)
 
 type AssignStmt struct {
 	StmtName string `json:"statement_name"`
@@ -42,4 +45,34 @@ func newAssignStmt(m map[string]interface{}) (*AssignStmt, error) {
 	}
 
 	return &assignstmt, nil
+}
+
+func newAssignStmtsSlice(key, errPrefix string, m map[string]interface{}) ([]*AssignStmt, error) {
+	var err error
+	var s *reflect.Value
+
+	if s, err = reflectSliceValue(key, errPrefix, m); err != nil {
+		return nil, addDebugInfo(err)
+	}
+
+	stmts := make([]*AssignStmt, s.Len(), s.Len())
+	for i := 0; i < s.Len(); i++ {
+		stmt := s.Index(i).Interface()
+		if stmt == nil {
+			continue
+		}
+
+		switch stmt.(type) {
+		case map[string]interface{}:
+			if stmts[i], err = newAssignStmt(stmt.(map[string]interface{})); err != nil {
+				return nil, addDebugInfo(err)
+			}
+		default:
+			return nil, addDebugInfo(fmt.Errorf(
+				"%s: '%s' must be a map[string]interface{}, found %v",
+				errPrefix, key, reflect.TypeOf(stmt)))
+		}
+	}
+
+	return stmts, nil
 }
