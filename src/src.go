@@ -118,7 +118,17 @@ func Unmarshal(bs []byte) (*Project, error) {
 // This function only serves a semantic purpose. Since the src package must wrap
 // json.Unmarshal function, it makes sense to also provides a Marshal function.
 func Marshal(p *Project) ([]byte, error) {
-	return json.Marshal(p)
+	bs, err := json.Marshal(p.Repo)
+	if err != nil {
+		return nil, addDebugInfo(err)
+	}
+
+	p.RepoRaw = json.RawMessage(bs)
+
+	if bs, err = json.Marshal(p); err != nil {
+		return nil, addDebugInfo(err)
+	}
+	return bs, nil
 }
 
 // spaces to use when marshalling
@@ -127,7 +137,17 @@ const indentSpaces = "    "
 // MarshalIndent is like Marshal but applies Indent to format the output.
 // It uses 4 spaces for indentation.
 func MarshalIndent(p *Project) ([]byte, error) {
-	return json.MarshalIndent(p, "", indentSpaces)
+	bs, err := json.Marshal(p.Repo)
+	if err != nil {
+		return nil, addDebugInfo(err)
+	}
+
+	p.RepoRaw = json.RawMessage(bs)
+
+	if bs, err = json.MarshalIndent(p, "", indentSpaces); err != nil {
+		return nil, addDebugInfo(err)
+	}
+	return bs, nil
 }
 
 // MergeAll merges a list of projects.
