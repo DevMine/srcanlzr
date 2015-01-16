@@ -8,7 +8,6 @@ import "fmt"
 
 type FuncLit struct {
 	ExprName string    `json:"expression_name"`
-	Name     string    `json:"name"`
 	Type     *FuncType `json:"type"`
 	Body     []Stmt    `json:"body,omitempty"`
 	LoC      int64     `json:"loc"` // Lines of Code
@@ -28,10 +27,6 @@ func newFuncLit(m map[string]interface{}) (*FuncLit, error) {
 	}
 
 	fct.ExprName = FuncLitName
-
-	if fct.Name, err = extractStringValue("name", errPrefix, m); err != nil {
-		return nil, addDebugInfo(err)
-	}
 
 	fctTypeMap, err := extractMapValue("type", errPrefix, m)
 	if err != nil {
