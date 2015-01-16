@@ -10,15 +10,21 @@ import (
 )
 
 type GlobalDecl struct {
-	Name       *Ident `json:"name"`
-	Value      Expr   `json:"value,omitempty"`
-	Type       *Ident `json:"type"`
-	Visibility string `json:"visibility"`
+	Doc        []string `json:"doc,omitempty"`
+	Name       *Ident   `json:"name"`
+	Value      Expr     `json:"value,omitempty"`
+	Type       *Ident   `json:"type"`
+	Visibility string   `json:"visibility"`
 }
 
 func newGlobalDecl(m map[string]interface{}) (*GlobalDecl, error) {
+	var err error
 	errPrefix := "src/global_decl"
 	globaldecl := GlobalDecl{}
+
+	if globaldecl.Doc, err = extractStringSliceValue("doc", errPrefix, m); err != nil && isExist(err) {
+		return nil, addDebugInfo(err)
+	}
 
 	nameMap, err := extractMapValue("name", errPrefix, m)
 	if err != nil {
