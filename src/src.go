@@ -91,6 +91,16 @@ var suppParadigms = []string{
 	Reflective,
 }
 
+// Type names
+const (
+	MapTypeName         = "MAP"
+	StructTypeName      = "STRUCT"
+	ArrayTypeName       = "STRUCT"
+	FuncTypeName        = "FUNC"
+	InterfaceTypeName   = "INTERFACE"
+	UnsupportedTypeName = "STRUCT"
+)
+
 // Unmarshal unmarshals a JSON representation of a Project into a real
 //  Project structure.
 //
