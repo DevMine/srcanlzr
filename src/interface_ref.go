@@ -35,7 +35,9 @@ func newInterfaceRefsSlice(key, errPrefix string, m map[string]interface{}) ([]*
 	var s *reflect.Value
 
 	if s, err = reflectSliceValue(key, errPrefix, m); err != nil {
-		return nil, addDebugInfo(err)
+		// XXX It is not possible to add debug info on this error because it is
+		// required that this error be en "errNotExist".
+		return nil, err
 	}
 
 	irefs := make([]*InterfaceRef, s.Len(), s.Len())
