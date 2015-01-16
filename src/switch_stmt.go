@@ -12,7 +12,7 @@ import (
 type SwitchStmt struct {
 	StmtName    string        `json:"statement_name"`
 	Init        Expr          `json:"initialization,omitempty"`
-	Cond        Expr          `json:"condition"` // TODO rename with a more appropriate name
+	Cond        Expr          `json:"condition,omitempty"` // TODO rename with a more appropriate name
 	CaseClauses []*CaseClause `json:"case_clauses,omitempty"`
 	Default     []Stmt        `json:"default,omitempty"`
 }
@@ -51,7 +51,7 @@ func newSwitchStmt(m map[string]interface{}) (*SwitchStmt, error) {
 		return nil, addDebugInfo(err)
 	}
 
-	if switchstmt.Cond, err = newExpr(condMap); err != nil {
+	if switchstmt.Cond, err = newExpr(condMap); err != nil && isExist(err) {
 		return nil, addDebugInfo(err)
 	}
 
