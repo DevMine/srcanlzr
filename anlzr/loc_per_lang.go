@@ -8,7 +8,7 @@ import "github.com/DevMine/srcanlzr/src"
 
 type LocPerLang struct{}
 
-func (lpl LocPerLang) Analyse(p *src.Project, r *Result) error {
+func (lpl LocPerLang) Analyze(p *src.Project, r *Result) error {
 
 	// if the project has only one programming language,
 	// which is mostly the case

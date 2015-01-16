@@ -136,7 +136,7 @@ func main() {
 		fatal(err)
 	}
 
-	res, err := anlzr.RunAnalyzers(p, anlzr.LoC{}, anlzr.Complexity{})
+	res, err := anlzr.RunAnalyzers(p, anlzr.LoC{}, anlzr.Complexity{}, anlzr.LocPerLang{})
 	if err != nil {
 		fatal(err)
 	}
