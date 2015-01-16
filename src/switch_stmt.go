@@ -12,7 +12,7 @@ import (
 type SwitchStmt struct {
 	StmtName    string        `json:"statement_name"`
 	Init        Expr          `json:"initialization,omitempty"`
-	Cond        Expr          `json:"condition"`
+	Cond        Expr          `json:"condition"` // TODO rename with a more appropriate name
 	CaseClauses []*CaseClause `json:"case_clauses,omitempty"`
 	Default     []Stmt        `json:"default,omitempty"`
 }
