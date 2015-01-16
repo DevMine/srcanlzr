@@ -17,8 +17,8 @@ type TryStmt struct {
 }
 
 type CatchClause struct {
-	Params []*Field `json:"params"`
-	Body   []Stmt   `json:"body"`
+	Params []*Field `json:"params,omitempty"`
+	Body   []Stmt   `json:"body,omitempty"`
 }
 
 func newTryStmt(m map[string]interface{}) (*TryStmt, error) {
@@ -56,11 +56,11 @@ func newCatchClause(m map[string]interface{}) (*CatchClause, error) {
 	errPrefix := "src/catch_clause"
 	catchclause := CatchClause{}
 
-	if catchclause.Params, err = newFieldsSlice("parameters", errPrefix, m); err != nil {
+	if catchclause.Params, err = newFieldsSlice("parameters", errPrefix, m); err != nil && isExist(err) {
 		return nil, addDebugInfo(err)
 	}
 
-	if catchclause.Body, err = newStmtsSlice("body", errPrefix, m); err != nil {
+	if catchclause.Body, err = newStmtsSlice("body", errPrefix, m); err != nil && isExist(err) {
 		return nil, addDebugInfo(err)
 	}
 
