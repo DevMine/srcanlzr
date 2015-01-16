@@ -100,7 +100,7 @@ func extractInt64Value(key, errPrefix string, m map[string]interface{}) (int64, 
 
 func extractMapValue(key, errPrefix string, m map[string]interface{}) (map[string]interface{}, error) {
 	val, ok := m[key]
-	if !ok {
+	if !ok || val == nil {
 		// XXX It is not possible to add debug info on this error because it is
 		// required that this error be en "errNotExist".
 		return nil, errNotExist
@@ -113,7 +113,7 @@ func extractMapValue(key, errPrefix string, m map[string]interface{}) (map[strin
 
 	return nil, addDebugInfo(fmt.Errorf(
 		"%s: '%s' field is expected to be a generic map, found %v",
-		errPrefix, key, reflect.TypeOf(key)))
+		errPrefix, key, reflect.TypeOf(val)))
 }
 
 func extractStringSliceValue(key, errPrefix string, m map[string]interface{}) ([]string, error) {
@@ -164,7 +164,7 @@ func extractInt64SliceValue(key, errPrefix string, m map[string]interface{}) ([]
 
 func reflectSliceValue(key, errPrefix string, m map[string]interface{}) (*reflect.Value, error) {
 	val, ok := m[key]
-	if !ok {
+	if !ok || val == nil {
 		// XXX It is not possible to add debug info on this error because it is
 		// required that this error be en "errNotExist".
 		return nil, errNotExist

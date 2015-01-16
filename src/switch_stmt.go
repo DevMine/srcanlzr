@@ -47,12 +47,12 @@ func newSwitchStmt(m map[string]interface{}) (*SwitchStmt, error) {
 	}
 
 	condMap, err := extractMapValue("condition", errPrefix, m)
-	if err != nil {
+	if err != nil && isExist(err) {
 		return nil, addDebugInfo(err)
-	}
-
-	if switchstmt.Cond, err = newExpr(condMap); err != nil && isExist(err) {
-		return nil, addDebugInfo(err)
+	} else if err == nil {
+		if switchstmt.Cond, err = newExpr(condMap); err != nil && isExist(err) {
+			return nil, addDebugInfo(err)
+		}
 	}
 
 	if switchstmt.CaseClauses, err = newCaseClausesSlice("case_clauses", errPrefix, m); err != nil && isExist(err) {

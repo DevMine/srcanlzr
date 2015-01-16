@@ -18,8 +18,8 @@ const (
 
 type UnaryExpr struct {
 	ExprName string `json:"expression_name"`
-	Op       string `json:"operator"` // operator
-	X        Expr   `json:"operand"`  // operand
+	Op       string `json:"operator"`          // operator
+	X        Expr   `json:"operand,omitempty"` // operand (XXX investigate the omitempty)
 }
 
 func newUnaryExpr(m map[string]interface{}) (*UnaryExpr, error) {
@@ -42,12 +42,12 @@ func newUnaryExpr(m map[string]interface{}) (*UnaryExpr, error) {
 	}
 
 	exprMap, err := extractMapValue("operand", errPrefix, m)
-	if err != nil {
+	if err != nil && isExist(err) {
 		return nil, addDebugInfo(err)
-	}
-
-	if unaryexpr.X, err = newExpr(exprMap); err != nil {
-		return nil, addDebugInfo(err)
+	} else if err == nil {
+		if unaryexpr.X, err = newExpr(exprMap); err != nil {
+			return nil, addDebugInfo(err)
+		}
 	}
 
 	return &unaryexpr, nil

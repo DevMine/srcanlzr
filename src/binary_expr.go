@@ -36,9 +36,9 @@ const (
 
 type BinaryExpr struct {
 	ExprName  string `json:"expression_name"`
-	LeftExpr  Expr   `json:"left_expression"`  // left operand
-	Op        string `json:"operator"`         // operator
-	RightExpr Expr   `json:"right_expression"` // right operand
+	LeftExpr  Expr   `json:"left_expression,omitempty"`  // left operand
+	Op        string `json:"operator"`                   // operator
+	RightExpr Expr   `json:"right_expression,omitempty"` // right operand
 }
 
 func newBinaryExpr(m map[string]interface{}) (*BinaryExpr, error) {
@@ -57,24 +57,24 @@ func newBinaryExpr(m map[string]interface{}) (*BinaryExpr, error) {
 	binexpr.ExprName = BinaryExprName
 
 	exprMap, err := extractMapValue("left_expression", errPrefix, m)
-	if err != nil {
+	if err != nil && isExist(err) {
 		return nil, addDebugInfo(err)
-	}
-
-	if binexpr.LeftExpr, err = newExpr(exprMap); err != nil {
-		return nil, addDebugInfo(err)
+	} else if err == nil {
+		if binexpr.LeftExpr, err = newExpr(exprMap); err != nil {
+			return nil, addDebugInfo(err)
+		}
 	}
 
 	if binexpr.Op, err = extractStringValue("operator", errPrefix, m); err != nil {
 		return nil, addDebugInfo(err)
 	}
 
-	if exprMap, err = extractMapValue("right_expression", errPrefix, m); err != nil {
+	if exprMap, err = extractMapValue("right_expression", errPrefix, m); err != nil && isExist(err) {
 		return nil, addDebugInfo(err)
-	}
-
-	if binexpr.RightExpr, err = newExpr(exprMap); err != nil {
-		return nil, addDebugInfo(err)
+	} else if err == nil {
+		if binexpr.RightExpr, err = newExpr(exprMap); err != nil {
+			return nil, addDebugInfo(err)
+		}
 	}
 
 	return &binexpr, nil

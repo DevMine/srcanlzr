@@ -86,6 +86,9 @@ func newStmtsSlice(key, errPrefix string, m map[string]interface{}) ([]Stmt, err
 			if stmts[i], err = newStmt(stmt.(map[string]interface{})); err != nil {
 				return nil, addDebugInfo(err)
 			}
+		case []interface{}:
+			// XXX investigate why this case happen?
+			continue
 		default:
 			return nil, addDebugInfo(fmt.Errorf(
 				"%s: '%s' must be a map[string]interface{}, found %v",

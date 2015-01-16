@@ -13,7 +13,7 @@ type GlobalDecl struct {
 	Doc        []string `json:"doc,omitempty"`
 	Name       *Ident   `json:"name"`
 	Value      Expr     `json:"value,omitempty"`
-	Type       *Ident   `json:"type"`
+	Type       *Ident   `json:"type,omitempty"`
 	Visibility string   `json:"visibility"`
 }
 
@@ -45,12 +45,12 @@ func newGlobalDecl(m map[string]interface{}) (*GlobalDecl, error) {
 	}
 
 	typeMap, err := extractMapValue("type", errPrefix, m)
-	if err != nil {
+	if err != nil && isExist(err) {
 		return nil, addDebugInfo(err)
-	}
-
-	if globaldecl.Type, err = newIdent(typeMap); err != nil {
-		return nil, addDebugInfo(err)
+	} else if err == nil {
+		if globaldecl.Type, err = newIdent(typeMap); err != nil {
+			return nil, addDebugInfo(err)
+		}
 	}
 
 	if globaldecl.Visibility, err = extractStringValue("visibility", errPrefix, m); err != nil {

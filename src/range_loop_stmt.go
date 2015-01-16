@@ -9,7 +9,7 @@ import "fmt"
 type RangeLoopStmt struct {
 	StmtName string `json:"statement_name"`
 	Vars     []Expr `json:"variables,omitempty"`
-	Iterable Expr   `json:"iterable"`
+	Iterable Expr   `json:"iterable,omitempty"`
 	Body     []Stmt `json:"body"`
 	Line     int64  `json:"line"` // Line number of the statement relatively to the function.
 }
@@ -35,12 +35,12 @@ func newRangeLoopStmt(m map[string]interface{}) (*RangeLoopStmt, error) {
 	}
 
 	iterMap, err := extractMapValue("iterable", errPrefix, m)
-	if err != nil {
+	if err != nil && isExist(err) {
 		return nil, addDebugInfo(err)
-	}
-
-	if loopstmt.Iterable, err = newExpr(iterMap); err != nil {
-		return nil, addDebugInfo(err)
+	} else if err == nil {
+		if loopstmt.Iterable, err = newExpr(iterMap); err != nil {
+			return nil, addDebugInfo(err)
+		}
 	}
 
 	if loopstmt.Body, err = newStmtsSlice("body", errPrefix, m); err != nil {

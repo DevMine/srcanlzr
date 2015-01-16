@@ -10,17 +10,17 @@ import (
 )
 
 type TypeSpec struct {
-	Doc  []string `json:"doc"`
+	Doc  []string `json:"doc,omitempty"`
 	Name *Ident   `json:"name"`
-	Type Expr     `json:"type"`
+	Type Expr     `json:"type,omitempty"` // XXX investigate omitempty
 }
 
 func newTypeSpec(m map[string]interface{}) (*TypeSpec, error) {
 	var err error
-	errPrefix := "src/type_specifier"
+	errPrefix := "src/type_spec"
 	typespec := TypeSpec{}
 
-	if typespec.Doc, err = extractStringSliceValue("doc", errPrefix, m); err != nil {
+	if typespec.Doc, err = extractStringSliceValue("doc", errPrefix, m); err != nil && isExist(err) {
 		return nil, addDebugInfo(err)
 	}
 
@@ -34,12 +34,12 @@ func newTypeSpec(m map[string]interface{}) (*TypeSpec, error) {
 	}
 
 	typeMap, err := extractMapValue("type", errPrefix, m)
-	if err != nil {
+	if err != nil && isExist(err) {
 		return nil, addDebugInfo(err)
-	}
-
-	if typespec.Type, err = newExpr(typeMap); err != nil {
-		return nil, addDebugInfo(err)
+	} else if err == nil {
+		if typespec.Type, err = newExpr(typeMap); err != nil {
+			return nil, addDebugInfo(err)
+		}
 	}
 
 	return &typespec, nil
