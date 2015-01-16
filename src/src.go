@@ -93,12 +93,12 @@ var suppParadigms = []string{
 
 // Type names
 const (
-	MapTypeName         = "MAP"
-	StructTypeName      = "STRUCT"
-	ArrayTypeName       = "STRUCT"
-	FuncTypeName        = "FUNC"
-	InterfaceTypeName   = "INTERFACE"
-	UnsupportedTypeName = "STRUCT"
+	TypeMapName         = "MAP"
+	TypeStructName      = "STRUCT"
+	TypeArrayName       = "ARRAY"
+	TypeFuncName        = "FUNC"
+	TypeInterfaceName   = "INTERFACE"
+	TypeUnsupportedName = "UNSUPPORTED"
 )
 
 // Unmarshal unmarshals a JSON representation of a Project into a real
