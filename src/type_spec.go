@@ -11,7 +11,8 @@ import (
 
 type TypeSpec struct {
 	Doc  []string `json:"doc"`
-	Name string   `json:"name"`
+	Name *Ident   `json:"name"`
+	Type Expr     `json:"type"`
 }
 
 func newTypeSpec(m map[string]interface{}) (*TypeSpec, error) {
@@ -23,7 +24,21 @@ func newTypeSpec(m map[string]interface{}) (*TypeSpec, error) {
 		return nil, addDebugInfo(err)
 	}
 
-	if typespec.Name, err = extractStringValue("name", errPrefix, m); err != nil {
+	nameMap, err := extractMapValue("name", errPrefix, m)
+	if err != nil {
+		return nil, addDebugInfo(err)
+	}
+
+	if typespec.Name, err = newIdent(nameMap); err != nil {
+		return nil, addDebugInfo(err)
+	}
+
+	typeMap, err := extractMapValue("type", errPrefix, m)
+	if err != nil {
+		return nil, addDebugInfo(err)
+	}
+
+	if typespec.Type, err = newExpr(typeMap); err != nil {
 		return nil, addDebugInfo(err)
 	}
 
