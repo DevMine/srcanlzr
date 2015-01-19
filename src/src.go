@@ -82,8 +82,7 @@ const (
 	TypeUnsupportedName = "UNSUPPORTED"
 )
 
-// Unmarshal unmarshals a JSON representation of a Project into a real
-//  Project structure.
+// Unmarshal parses a JSON-encoded src.Project and returns it.
 //
 // It is required to use this function instead of json.Unmarshal because we use
 // an interface to abstract a Statement, thus json.Unmarshal is unable to
