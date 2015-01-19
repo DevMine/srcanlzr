@@ -162,14 +162,16 @@ func mergePackageSlices(ps1, ps2 []*Package) ([]*Package, error) {
 			}
 		}
 
-		if pkg == nil {
+		if pkg == nil && p2.LoC > 0 {
 			newPkgs = append(newPkgs, p2)
 		} else {
 			if pkg, err = mergePackage(pkg, p2); err != nil {
 				return nil, addDebugInfo(err)
 			}
 
-			newPkgs = append(newPkgs, pkg)
+			if pkg.LoC > 0 {
+				newPkgs = append(newPkgs, pkg)
+			}
 		}
 	}
 
