@@ -6,17 +6,19 @@ package src_test
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/DevMine/srcanlzr/src"
 )
 
 func ExampleUnmarshal() {
 	bs := []byte(`{"name": "foo", "languages": [], "packages": [], "loc": 0}`)
-	p, _ := src.Unmarshal(bs)
+	p, err := src.Unmarshal(bs)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	fmt.Printf("%#v\n", *p)
-	// Output:
-	// src.Project{Name:"foo", Repo:(*model.Repository)(nil), RepoRaw:json.RawMessage(nil), Langs:[]*src.Language{}, Packages:[]*src.Package{}, LoC:0}
 }
 
 func ExampleMarshal() {
