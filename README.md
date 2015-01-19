@@ -2,7 +2,6 @@
 [![Build Status](https://travis-ci.org/DevMine/srcanlzr.png?branch=master)](https://travis-ci.org/DevMine/srcanlzr)
 [![GoDoc](http://godoc.org/github.com/DevMine/srcanlzr?status.svg)](http://godoc.org/github.com/DevMine/srcanlzr)
 [![GoWalker](http://img.shields.io/badge/doc-gowalker-blue.svg?style=flat)](https://gowalker.org/github.com/DevMine/srcanlzr)
-[![Gobuild Download](http://gobuild.io/badge/github.com/DevMine/srcanlzr/downloads.svg)](http://gobuild.io/github.com/DevMine/srcanlzr)
 
 `srcanlzr` is a tool to analyze source code repositories.
 
