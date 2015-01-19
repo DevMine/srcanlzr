@@ -11,30 +11,41 @@ import (
 	"github.com/DevMine/repotool/model"
 )
 
-// A project is the root of the src API and must be at the root of the JSON
-// generated string.
+// Project is the root of the src API and therefore it must be at the root of
+// the JSON.
 //
-// It contains the metadata of a project and the list of all packages (basically
-// folders).
+// It contains the metadata of a project and the list of all packages.
 type Project struct {
 	// The name of the project. Since it may be something really difficult to
 	// guess, it should generally be the name of the folder containing the
 	// project.
 	Name string `json:"name"`
 
-	// The repository in which the project is hosted.
+	// The repository in which the project is hosted, or nil. This field is not
+	// meant to be filled by one of the language parsers. Only repotool should
+	// take care of it. For more details, see:
+	//    https://github.com/DevMine/repotool
+	//
+	// Since this field uses an external type, it is not unmarshalled by
+	// src.Unmarshal itself but by the standard json.Unmarshal function.
+	// To do so, its unmarshalling is defered using json.RawMessage.
+	// See the RepoRaw field.
 	Repo *model.Repository `json:"-"`
 
+	// RepoRaw is only used to defer the unmarshalling of a model.Repository.
 	RepoRaw json.RawMessage `json:"repository,omitempty"`
 
-	// Programming languages used in the project.
+	// The list of all programming languages used by the project. Each language
+	// must be added by the corresponding language parsers if and only if the
+	// project contains at least one line of code written in this language.
 	Langs []*Language `json:"languages"`
 
-	// List of all packages of the project. A packages is just a folder
-	// containing at least one source file.
+	// List of all packages of the project. We call "package" every folder that
+	// contains at least one source file.
 	Packages []*Package `json:"packages"`
 
-	// The total number of lines of code in the whole project.
+	// The total number of lines of code in the whole project, independently of
+	// the language.
 	LoC int64 `json:"loc"`
 }
 
@@ -70,7 +81,7 @@ func newProject(m map[string]interface{}) (*Project, error) {
 	return &prj, nil
 }
 
-// mergeProjects merges projects p1 and p2 into p1
+// mergeProjects merges projects p1 and p2 into a new Project.
 func mergeProjects(p1, p2 *Project) (*Project, error) {
 	if p1 == nil {
 		return nil, addDebugInfo(errors.New("p1 cannot be nil"))

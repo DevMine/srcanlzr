@@ -10,13 +10,67 @@ import (
 	"reflect"
 )
 
-type Language struct {
-	// TODO rename into name
-	Lang string `json:"language"`
+// Supported programming languages
+const (
+	Go     = "go"
+	Ruby   = "ruby"
+	Python = "python"
+	C      = "c"
+	Java   = "java"
+	Scala  = "scala"
+)
 
+var suppLang = []string{
+	Go,
+	Ruby,
+	Python,
+	C,
+	Java,
+	Scala,
+}
+
+// Supported paradigms
+const (
+	Structured     = "structured"
+	Imperative     = "imperative"
+	Procedural     = "procedural"
+	Compiled       = "compiled"
+	Concurrent     = "concurrent"
+	Functional     = "functional"
+	ObjectOriented = "object oriented"
+	Generic        = "generic"
+	Reflective     = "reflective"
+)
+
+var suppParadigms = []string{
+	Structured,
+	Imperative,
+	Procedural,
+	Compiled,
+	Concurrent,
+	Functional,
+	ObjectOriented,
+	Generic,
+	Reflective,
+}
+
+// A Language represents a programming language.
+type Language struct {
+	// The programming language name (e.g. go, ruby, java, etc.)
+	//
+	// The name must match one of the supported programming languages defined in
+	// the constants.
+	Lang string `json:"language"` // TODO rename into name
+
+	// The paradigms of the programming language (e.g. structured, imperative,
+	// object oriented, etc.)
+	//
+	// The name must match one of the supported paradigms defined in the
+	// constants.
 	Paradigms []string `json:"paradigms"`
 }
 
+// newLanguage creates a new Language from a generic map.
 func newLanguage(m map[string]interface{}) (*Language, error) {
 	var err error
 	errPrefix := "src/language"
@@ -33,6 +87,7 @@ func newLanguage(m map[string]interface{}) (*Language, error) {
 	return &lang, nil
 }
 
+// newLanguagesSlice creates a new slice of Language from a generic map.
 func newLanguagesSlice(key, errPrefix string, m map[string]interface{}) ([]*Language, error) {
 	var err error
 	var s reflect.Value
@@ -67,6 +122,8 @@ func newLanguagesSlice(key, errPrefix string, m map[string]interface{}) ([]*Lang
 	return langs, nil
 }
 
+// mergeLanguageSlices merges language slices ls1 and ls2 into a new single
+// slice of Language.
 func mergeLanguageSlices(ls1, ls2 []*Language) ([]*Language, error) {
 	if ls1 == nil {
 		return nil, addDebugInfo(errors.New("ls1 cannot be nil"))

@@ -9,19 +9,36 @@ import (
 	"reflect"
 )
 
+// StructType represents a structured type. Most of the Object Oriented
+// languages use a Class or a Trait instead.
+//
+// In Go, a StructType would be something of the form:
+//    struct {
+//       Bar string
+//    }
 type StructType struct {
-	ExprName string   `json:"expression_name"`
-	Doc      []string `json:"doc"`
-	Name   *Ident   `json:"name,omitempty"`
-	Fields []*Field `json:"fields,omitempty"`
+	// This field is only used by the unmarshaller to "guess" the type while it
+	// is unmarshalling a generic type. Since the StructType is considered as
+	// an expression (which is represented by an interface{}), this is the only
+	// way for the unmarshaller to know what type is it.
+	//
+	// The value of the ExprName for a StructType must always be "STRUCT", as
+	// defined by the constant src.StructTypeName.
+	ExprName string `json:"expression_name"`
+
+	Doc    []string `json:"doc"`              // associated documentation; or nil
+	Name   *Ident   `json:"name,omitempty"`   // name of the struct; or nil
+	Fields []*Field `json:"fields,omitempty"` // the fields of the struct; or nil
 }
 
+// Field represents a pair name/type.
 type Field struct {
-	Doc  []string `json:"doc,omitempty"`
-	Name string   `json:"name,omitempty"`
-	Type string   `json:"type,omitempty"`
+	Doc  []string `json:"doc,omitempty"`  // associated documentation; or nil
+	Name string   `json:"name,omitempty"` // name of the field; or nil
+	Type string   `json:"type,omitempty"` // type of the field; or nil
 }
 
+// newStructType creates a new StructType from a generic map.
 func newStructType(m map[string]interface{}) (*StructType, error) {
 	var err error
 	errPrefix := "src/structured_type"
@@ -57,6 +74,7 @@ func newStructType(m map[string]interface{}) (*StructType, error) {
 	return &strct, nil
 }
 
+// newStructTypesSlice creates a new slice of StrucType from a generic map.
 func newStructTypesSlice(key, errPrefix string, m map[string]interface{}) ([]*StructType, error) {
 	var err error
 	var s reflect.Value
@@ -91,6 +109,7 @@ func newStructTypesSlice(key, errPrefix string, m map[string]interface{}) ([]*St
 	return structs, nil
 }
 
+// newField creates a new Field from a generic map.
 func newField(m map[string]interface{}) (*Field, error) {
 	var err error
 	errPrefix := "src/field"
@@ -111,6 +130,7 @@ func newField(m map[string]interface{}) (*Field, error) {
 	return &field, nil
 }
 
+// newFieldsSlice creates a new slice of fields from a generic map.
 func newFieldsSlice(key, errPrefix string, m map[string]interface{}) ([]*Field, error) {
 	var err error
 	var s reflect.Value

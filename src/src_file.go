@@ -6,7 +6,7 @@ package src
 
 import "errors"
 
-// SourceFile holds information about a source file.
+// SrcFile holds information about a source file.
 type SrcFile struct {
 	// The path of the source file, relative to the root of the project.
 	Path string `json:"path"`

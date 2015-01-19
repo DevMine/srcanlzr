@@ -9,14 +9,17 @@ import (
 	"reflect"
 )
 
+// GlobalDecl represents any declaration (var, const, type) declared outside of
+// a function, class, trait, etc.
 type GlobalDecl struct {
-	Doc        []string `json:"doc,omitempty"`
-	Name       *Ident   `json:"name"`
-	Value      Expr     `json:"value,omitempty"`
-	Type       *Ident   `json:"type,omitempty"`
-	Visibility string   `json:"visibility"`
+	Doc        []string `json:"doc,omitempty"`   // associated documentation; or nil
+	Name       *Ident   `json:"name"`            // name of the var, const, or type
+	Value      Expr     `json:"value,omitempty"` // default value; or nil
+	Type       *Ident   `json:"type,omitempty"`  // type identifier; or nil
+	Visibility string   `json:"visibility"`      // visibility (see the constants for the list of supported visibilities)
 }
 
+// newGlobalDecl creates a new GlobalDecl from a generic map.
 func newGlobalDecl(m map[string]interface{}) (*GlobalDecl, error) {
 	var err error
 	errPrefix := "src/global_decl"
@@ -60,6 +63,7 @@ func newGlobalDecl(m map[string]interface{}) (*GlobalDecl, error) {
 	return &globaldecl, nil
 }
 
+// newGlobalDeclsSlice creates a new slice of GlobalDecl from a generic map.
 func newGlobalDeclsSlice(key, errPrefix string, m map[string]interface{}) ([]*GlobalDecl, error) {
 	var err error
 	var s *reflect.Value

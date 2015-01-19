@@ -2,9 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-/*
-	Package anlz provides the necessary API for making source code analyzis.
-*/
+// Package anlzr provides the necessary API for making source code analyzis.
 package anlzr
 
 import "github.com/DevMine/srcanlzr/src"
@@ -23,7 +21,7 @@ type Result struct {
 	Complexity     ComplexityMetrics `json:"complexity" xml:"complexity"`
 }
 
-// Cyclomatic complexity metrics, also known as McCabe metric.
+// CyclomaticComplexity metrics, also known as McCabe metric.
 type ComplexityMetrics struct {
 	AveragePerFunc float32 `json:"average_per_func" xml:"average-per-func"` // Average complexity per function.
 	AveragePerFile float32 `json:"average_per_file" xml:"average-per-file"` // Average complexity per file.

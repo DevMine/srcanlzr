@@ -10,13 +10,14 @@ import (
 	"reflect"
 )
 
-// A package is a folder contaning at least one source file.
+// Package holds information about a package, which is, basically, just a
+// folder that contains at least one source file.
 type Package struct {
-	// The package documentation.
-	// FIXME use slice for packages with multiple languages
+	// The package documentation, or nil.
+	// TODO support docucmentation for multiple languages.
 	Doc []string `json:"doc,omitempty"`
 
-	// The name of the pacakge (the folder name)
+	// The package name. This should be the name of the parent folder.
 	Name string `json:"name"`
 
 	// The full path of the package. The path must be relative to the root of
@@ -26,10 +27,11 @@ type Package struct {
 	// The list of all source files contained in the package.
 	SrcFiles []*SrcFile `json:"source_files"`
 
-	// The total number of lines of code.
+	// The total number of lines of code of the package.
 	LoC int64 `json:"loc"`
 }
 
+// newPackage creates a new package from a generic map.
 func newPackage(m map[string]interface{}) (*Package, error) {
 	var err error
 	errPrefix := "src/package"
@@ -141,6 +143,8 @@ func mergePackage(p1, p2 *Package) (*Package, error) {
 	return newPkg, nil
 }
 
+// mergePackageSlices merges package slices ps1 and ps2 into a new single slice
+// of Package. The packages with 0 lines of code are removed
 func mergePackageSlices(ps1, ps2 []*Package) ([]*Package, error) {
 	if ps1 == nil {
 		return nil, addDebugInfo(errors.New("ps1 cannot be nil"))

@@ -9,12 +9,20 @@ import (
 	"reflect"
 )
 
+// TypeSpec represents a type declaration. Most of the object oriented languages
+// does not have such a node, they use classes and traits instead.
+//
+// In Go, a TypeSpec would be something of the form:
+//    type Foo struct {
+//       Bar string
+//    }
 type TypeSpec struct {
-	Doc  []string `json:"doc,omitempty"`
-	Name *Ident   `json:"name"`
-	Type Expr     `json:"type,omitempty"` // XXX investigate omitempty
+	Doc  []string `json:"doc,omitempty"`  // associated documentation; or nil
+	Name *Ident   `json:"name"`           // type name (in the exemple, the name is "Foo")
+	Type Expr     `json:"type,omitempty"` // *Ident or any of the *XxxType; or nil
 }
 
+// newTypeSpec creates a new TypeSpec from a generic map.
 func newTypeSpec(m map[string]interface{}) (*TypeSpec, error) {
 	var err error
 	errPrefix := "src/type_spec"
@@ -45,6 +53,7 @@ func newTypeSpec(m map[string]interface{}) (*TypeSpec, error) {
 	return &typespec, nil
 }
 
+// newTypeSpecsSlice creates a new slice of TypeSpec from a generic map.
 func newTypeSpecsSlice(key, errPrefix string, m map[string]interface{}) ([]*TypeSpec, error) {
 	var err error
 	var s reflect.Value
