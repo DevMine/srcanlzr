@@ -12,9 +12,8 @@ import (
 type StructType struct {
 	ExprName string   `json:"expression_name"`
 	Doc      []string `json:"doc"`
-	Name     string   `json:"name"`
-	Type     Expr     `json:"type"`
-	Fields   []Field  `json:"fields"`
+	Name   *Ident   `json:"name,omitempty"`
+	Fields []*Field `json:"fields,omitempty"`
 }
 
 type Field struct {
@@ -42,11 +41,16 @@ func newStructType(m map[string]interface{}) (*StructType, error) {
 		return nil, addDebugInfo(err)
 	}
 
-	if strct.Type, err = extractStringValue("type", errPrefix, m); err != nil {
+	nameMap, err := extractMapValue("name", errPrefix, m)
+	if err != nil && isExist(err) {
 		return nil, addDebugInfo(err)
+	} else if err == nil {
+		if strct.Name, err = newIdent(nameMap); err != nil {
+			return nil, addDebugInfo(err)
+		}
 	}
 
-	if strct.Name, err = extractStringValue("name", errPrefix, m); err != nil {
+	if strct.Fields, err = newFieldsSlice("fields", errPrefix, m); err != nil && isExist(err) {
 		return nil, addDebugInfo(err)
 	}
 
