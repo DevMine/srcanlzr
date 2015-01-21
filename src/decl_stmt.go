@@ -33,11 +33,11 @@ func newDeclStmt(m map[string]interface{}) (*DeclStmt, error) {
 
 	declstmt.StmtName = DeclStmtName
 
-	if declstmt.Lhs, err = newExprsSlice("left_hand_side", errPrefix, m); err != nil {
+	if declstmt.LHS, err = newExprsSlice("left_hand_side", errPrefix, m); err != nil {
 		return nil, addDebugInfo(err)
 	}
 
-	if declstmt.Rhs, err = newExprsSlice("right_hand_side", errPrefix, m); err != nil {
+	if declstmt.RHS, err = newExprsSlice("right_hand_side", errPrefix, m); err != nil {
 		return nil, addDebugInfo(err)
 	}
 

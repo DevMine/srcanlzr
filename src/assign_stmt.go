@@ -8,8 +8,8 @@ import "fmt"
 
 type AssignStmt struct {
 	StmtName string `json:"statement_name"`
-	Lhs      []Expr `json:"left_hand_side"`
-	Rhs      []Expr `json:"right_hand_side"`
+	LHS      []Expr `json:"left_hand_side"`
+	RHS      []Expr `json:"right_hand_side"`
 	Line     int64  `json:"line"`
 }
 
@@ -29,11 +29,11 @@ func newAssignStmt(m map[string]interface{}) (*AssignStmt, error) {
 
 	assignstmt.StmtName = AssignStmtName
 
-	if assignstmt.Lhs, err = newExprsSlice("left_hand_side", errPrefix, m); err != nil {
+	if assignstmt.LHS, err = newExprsSlice("left_hand_side", errPrefix, m); err != nil {
 		return nil, addDebugInfo(err)
 	}
 
-	if assignstmt.Rhs, err = newExprsSlice("right_hand_side", errPrefix, m); err != nil {
+	if assignstmt.RHS, err = newExprsSlice("right_hand_side", errPrefix, m); err != nil {
 		return nil, addDebugInfo(err)
 	}
 
