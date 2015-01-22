@@ -14,6 +14,8 @@ test:
 
 deps:
 	 go get -u github.com/DevMine/repotool/model
+
+dev-deps:
 	 go get -u github.com/golang/lint/golint
 
 check:
