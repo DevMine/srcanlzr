@@ -3,6 +3,7 @@
 tags
 foo.json
 srcanlzr
+.DS_Store
 
 # files by extension
 *.swp
