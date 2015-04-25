@@ -5,6 +5,7 @@
 package anlzr
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/DevMine/srcanlzr/src"
@@ -23,230 +24,218 @@ type CommentRatios struct {
 	EnumComRatio   float32
 }
 
+type counters struct {
+	nbComType   int
+	nbType      int
+	nbComStruct int
+	nbStruct    int
+	nbComConst  int
+	nbConst     int
+	nbComVars   int
+	nbVars      int
+	nbComFunc   int
+	nbFunc      int
+	nbComInter  int
+	nbInter     int
+	nbComClas   int
+	nbClas      int
+	nbComAttr   int
+	nbAttr      int
+	nbComEnum   int
+	nbEnum      int
+	nbComFcts   int
+	nbFcts      int
+}
+
 func (dc CommentRatios) Analyze(p *src.Project, r *Result) error {
 
-	var nbComType int
-	var nbType int
-
-	var nbComStruct int
-	var nbStruct int
-
-	var nbComConst int
-	var nbConst int
-
-	var nbComVars int
-	var nbVars int
-
-	var nbComFunc int
-	var nbFunc int
-
-	var nbComInter int
-	var nbInter int
-
-	var nbComProto int
-	var nbProto int
-
-	var nbComClas int
-	var nbClas int
-
-	var nbComAttr int
-	var nbAttr int
-
-	var nbComEnum int
-	var nbEnum int
-
-	var nbComFcts int
-	var nbFcts int
+	cnt := counters{}
 
 	for _, pack := range p.Packages {
 		for _, srcFile := range pack.SrcFiles {
-			nbType += len(srcFile.TypeSpecs)
+			cnt.nbType += len(srcFile.TypeSpecs)
 			for _, typeSpec := range srcFile.TypeSpecs {
 				if hasComment(typeSpec.Doc) {
-					nbComType++
+					cnt.nbComType++
 				}
 			}
 
-			nbStruct += len(srcFile.Structs)
+			cnt.nbStruct += len(srcFile.Structs)
 			for _, structDecl := range srcFile.Structs {
 				if hasComment(structDecl.Doc) {
-					nbComStruct++
+					cnt.nbComStruct++
 				}
 			}
 
 			for _, constDecl := range srcFile.Constants {
 				if isVisible(constDecl.Visibility) {
-					nbConst++
+					cnt.nbConst++
 					if hasComment(constDecl.Doc) {
-						nbComConst++
+						cnt.nbComConst++
 					}
 				}
 			}
 
 			for _, varDecl := range srcFile.Vars {
 				if isVisible(varDecl.Visibility) {
-					nbVars++
+					cnt.nbVars++
 					if hasComment(varDecl.Doc) {
-						nbComVars++
+						cnt.nbComVars++
 					}
 				}
 			}
 
 			for _, funcDecl := range srcFile.Funcs {
 				if isVisible(funcDecl.Visibility) {
-					nbFunc++
+					cnt.nbFunc++
 					if hasComment(funcDecl.Doc) {
-						nbComFunc++
+						cnt.nbComFunc++
 					}
 				}
 			}
 
 			for _, interfaceDecl := range srcFile.Interfaces {
-				dc.interfaceCommentCovery(interfaceDecl, &nbComInter, &nbInter, &nbComProto, &nbProto)
+				cnt.interfaceCommentCoverage(interfaceDecl)
 			}
 
 			for _, classDecl := range srcFile.Classes {
-				dc.classesCommentCovery(classDecl, &nbComClas, &nbClas, &nbComAttr, &nbAttr, &nbComFcts, &nbFcts)
+				cnt.classesCommentCoverage(classDecl)
 			}
 
 			for _, enumDecl := range srcFile.Enums {
-				dc.enumCommentCovery(enumDecl, &nbComEnum, &nbEnum, &nbComAttr, &nbAttr, &nbComFcts, &nbFcts)
+				cnt.enumCommentCoverage(enumDecl)
 			}
 		}
 	}
 
-	if nbType != 0 {
-		dc.TypeComRatio = float32(nbComType) / float32(nbType)
+	if cnt.nbType != 0 {
+		dc.TypeComRatio = float32(cnt.nbComType) / float32(cnt.nbType)
 	}
-	if nbStruct != 0 {
-		dc.StructComRatio = float32(nbComStruct) / float32(nbStruct)
+	if cnt.nbStruct != 0 {
+		dc.StructComRatio = float32(cnt.nbComStruct) / float32(cnt.nbStruct)
 	}
-	if nbConst != 0 {
-		dc.ConstComRatio = float32(nbComConst) / float32(nbConst)
+	if cnt.nbConst != 0 {
+		dc.ConstComRatio = float32(cnt.nbComConst) / float32(cnt.nbConst)
 	}
-	if nbVars != 0 {
-		dc.VarsComRatio = float32(nbComVars) / float32(nbVars)
+	if cnt.nbVars != 0 {
+		dc.VarsComRatio = float32(cnt.nbComVars) / float32(cnt.nbVars)
 	}
-	if nbFunc != 0 {
-		dc.FuncComRatio = float32(nbComFunc) / float32(nbFunc)
+	if cnt.nbFunc != 0 {
+		dc.FuncComRatio = float32(cnt.nbComFunc) / float32(cnt.nbFunc)
 	}
-	if nbInter != 0 {
-		dc.InterComRatio = float32(nbComInter) / float32(nbInter)
+	if cnt.nbInter != 0 {
+		dc.InterComRatio = float32(cnt.nbComInter) / float32(cnt.nbInter)
 	}
-	if nbProto != 0 {
-		dc.MethComRatio = float32(nbComProto) / float32(nbProto)
+	if cnt.nbClas != 0 {
+		dc.ClassComRatio = float32(cnt.nbComClas) / float32(cnt.nbClas)
 	}
-	if nbClas != 0 {
-		dc.ClassComRatio = float32(nbComClas) / float32(nbClas)
+	if cnt.nbFcts != 0 {
+		dc.MethComRatio = float32(cnt.nbComFcts) / float32(cnt.nbFcts)
 	}
-	if nbAttr != 0 {
-		dc.AttrComRatio = float32(nbComAttr) / float32(nbAttr)
+	if cnt.nbAttr != 0 {
+		dc.AttrComRatio = float32(cnt.nbComAttr) / float32(cnt.nbAttr)
 	}
-	if nbEnum != 0 {
-		dc.EnumComRatio = float32(nbComEnum) / float32(nbEnum)
-	}
-	if nbAttr != 0 {
-		dc.AttrComRatio = float32(nbComAttr) / float32(nbAttr)
-	}
-	if nbFcts != 0 {
-		dc.MethComRatio = float32(nbComFcts) / float32(nbFcts)
+	if cnt.nbEnum != 0 {
+		dc.EnumComRatio = float32(cnt.nbComEnum) / float32(cnt.nbEnum)
 	}
 
-	r.DocCovery = dc
+	fmt.Println(cnt.nbType != 0, cnt.nbStruct != 0, cnt.nbConst != 0, cnt.nbVars != 0, cnt.nbFunc != 0, cnt.nbInter != 0, cnt.nbClas != 0, cnt.nbFcts != 0, cnt.nbAttr != 0, cnt.nbEnum != 0)
+
+	r.DocCoverage = dc
 
 	return nil
 }
 
-func (dc *CommentRatios) interfaceCommentCovery(interfaceDecl *src.Interface, nbComInter, nbInter, nbComProto, nbProto *int) {
+func (cnt *counters) interfaceCommentCoverage(interfaceDecl *src.Interface) {
 
 	if isVisible(interfaceDecl.Visibility) {
-		*nbInter++
+		cnt.nbInter++
 		if hasComment(interfaceDecl.Doc) {
-			*nbComInter++
+			cnt.nbComInter++
 		}
 	}
 
 	for _, proto := range interfaceDecl.Protos {
 		if isVisible(proto.Visibility) {
-			*nbProto++
+			cnt.nbFcts++
 			if hasComment(proto.Doc) {
-				*nbComProto++
+				cnt.nbComFcts++
 			}
 		}
 	}
 
 }
 
-func (dc *CommentRatios) classesCommentCovery(classDecl *src.ClassDecl, nbComClas, nbClas, nbComAttr, nbAttr, nbComFcts, nbFcts *int) {
+func (cnt *counters) classesCommentCoverage(classDecl *src.ClassDecl) {
 
 	if isVisible(classDecl.Visibility) {
-		*nbClas++
+		cnt.nbClas++
 		if hasComment(classDecl.Doc) {
-			*nbComClas++
+			cnt.nbComClas++
 		}
 	}
 
 	for _, attr := range classDecl.Attrs {
 		if isVisible(attr.Visibility) {
-			*nbAttr++
+			cnt.nbAttr++
 			if hasComment(attr.Doc) {
-				*nbComAttr++
+				cnt.nbComAttr++
 			}
 		}
 	}
 
-	dc.functionsCommentCovery(classDecl.Constructors, classDecl.Destructors, classDecl.Methods, nbComFcts, nbFcts)
+	cnt.functionsCommentCoverage(classDecl.Constructors, classDecl.Destructors, classDecl.Methods)
 
 	for _, class := range classDecl.NestedClasses {
-		dc.classesCommentCovery(class, nbComClas, nbClas, nbComAttr, nbAttr, nbComFcts, nbFcts)
+		cnt.classesCommentCoverage(class)
 	}
 
 }
 
-func (dc *CommentRatios) enumCommentCovery(enumDecl *src.EnumDecl, nbComEnum, nbEnum, nbComAttr, nbAttr, nbComFcts, nbFcts *int) {
+func (cnt *counters) enumCommentCoverage(enumDecl *src.EnumDecl) {
 
 	if isVisible(enumDecl.Visibility) {
-		*nbEnum++
+		cnt.nbEnum++
 		if hasComment(enumDecl.Doc) {
-			*nbComEnum++
+			cnt.nbComEnum++
 		}
 	}
 
 	for _, attr := range enumDecl.Attrs {
 		if isVisible(attr.Visibility) {
-			*nbAttr++
+			cnt.nbAttr++
 			if hasComment(attr.Doc) {
-				*nbComAttr++
+				cnt.nbComAttr++
 			}
 		}
 	}
 
-	dc.functionsCommentCovery(enumDecl.Constructors, enumDecl.Destructors, enumDecl.Methods, nbComFcts, nbFcts)
+	cnt.functionsCommentCoverage(enumDecl.Constructors, enumDecl.Destructors, enumDecl.Methods)
 }
 
-func (dc *CommentRatios) functionsCommentCovery(cstrs []*src.ConstructorDecl, dstrs []*src.DestructorDecl, mthds []*src.MethodDecl, nbComFcts, nbFcts *int) {
+func (cnt *counters) functionsCommentCoverage(cstrs []*src.ConstructorDecl, dstrs []*src.DestructorDecl, mthds []*src.MethodDecl) {
 
 	for _, fct := range cstrs {
 		if isVisible(fct.Visibility) {
-			*nbFcts++
+			cnt.nbFcts++
 			if hasComment(fct.Doc) {
-				*nbComFcts++
+				cnt.nbComFcts++
 			}
 		}
 	}
 	for _, fct := range dstrs {
 		if isVisible(fct.Visibility) {
-			*nbFcts++
+			cnt.nbFcts++
 			if hasComment(fct.Doc) {
-				*nbComFcts++
+				cnt.nbComFcts++
 			}
 		}
 	}
 	for _, fct := range mthds {
 		if isVisible(fct.Visibility) {
-			*nbFcts++
+			cnt.nbFcts++
 			if hasComment(fct.Doc) {
-				*nbComFcts++
+				cnt.nbComFcts++
 			}
 		}
 	}

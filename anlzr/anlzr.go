@@ -19,7 +19,7 @@ type Result struct {
 	MedianFuncLen  int64             `json:"median_function_length" xml:"median-function-length"`
 	TotalLoC       int64             `json:"total_loc" xml:"total-loc"`
 	Complexity     ComplexityMetrics `json:"complexity" xml:"complexity"`
-	DocCovery      CommentRatios     `json:"documentation_coverage" xml:"documentation-coverage"`
+	DocCoverage    CommentRatios     `json:"documentation_coverage" xml:"documentation-coverage"`
 }
 
 // CyclomaticComplexity metrics, also known as McCabe metric.
@@ -42,7 +42,7 @@ func RunAnalyzers(p *src.Project, a ...Analyzer) (*Result, error) {
 		MedianFuncLen:  -1,
 		TotalLoC:       -1,
 		Complexity:     ComplexityMetrics{AveragePerFunc: -1, AveragePerFile: -1},
-		DocCovery:      CommentRatios{},
+		DocCoverage:    CommentRatios{},
 	}
 
 	for _, anlzr := range a {
