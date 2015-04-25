@@ -36,8 +36,6 @@ package src
 
 import (
 	"encoding/json"
-	"errors"
-	"fmt"
 
 	"github.com/DevMine/repotool/model"
 	"github.com/DevMine/srcanlzr/src/ast"
@@ -253,7 +251,7 @@ type SrcFile struct {
 // It is required to use this function instead of json.Unmarshal because we use
 // an interface to abstract a Statement, thus json.Unmarshal is unable to
 // unmarshal the statements correctly.
-func Unmarshal(bs []byte) (*Project, error) {
+/*func Unmarshal(bs []byte) (*Project, error) {
 	genMap := map[string]interface{}{}
 	if err := json.Unmarshal(bs, &genMap); err != nil {
 		return nil, addDebugInfo(err)
@@ -265,7 +263,7 @@ func Unmarshal(bs []byte) (*Project, error) {
 	}
 
 	return prj, nil
-}
+}*/
 
 // Marshal returns the JSON encoding of src.Project p.
 // It is just a wrapper for json.Marshal. For more details, see:
@@ -313,7 +311,7 @@ func MarshalIndent(p *Project) ([]byte, error) {
 //
 // The merge only performs shallow copies, which means that if the field value
 // is a pointer it copies the memory address and not the value pointed.
-func MergeAll(ps ...*Project) (*Project, error) {
+/*func MergeAll(ps ...*Project) (*Project, error) {
 	if len(ps) == 0 {
 		return nil, addDebugInfo(errors.New("p cannot be nil"))
 	}
@@ -347,4 +345,4 @@ func MergeAll(ps ...*Project) (*Project, error) {
 // Merge merges two project. See MergeAll for more details.
 func Merge(p1, p2 *Project) (*Project, error) {
 	return mergeProjects(p1, p2)
-}
+}*/
