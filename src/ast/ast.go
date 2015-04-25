@@ -216,11 +216,6 @@ type InterfaceRef struct {
 	InterfaceName string `json:"interface_name"`
 }
 
-type InterfaceRef struct {
-	Namespace     string `json:"namespace"`
-	InterfaceName string `json:"interface_name"`
-}
-
 type ListLit struct {
 	Type *ListType `json:"type"`
 	Elts []Expr    `json:"elements"`
@@ -371,19 +366,6 @@ type TryStmt struct {
 type CatchClause struct {
 	Params []*Field `json:"params,omitempty"`
 	Body   []Stmt   `json:"body,omitempty"`
-}
-
-// TypeSpec represents a type declaration. Most of the object oriented languages
-// does not have such a node, they use classes and traits instead.
-//
-// In Go, a TypeSpec would be something of the form:
-//    type Foo struct {
-//       Bar string
-//    }
-type TypeSpec struct {
-	Doc  []string `json:"doc,omitempty"`  // associated documentation; or nil
-	Name *Ident   `json:"name"`           // type name (in the exemple, the name is "Foo")
-	Type Expr     `json:"type,omitempty"` // *Ident or any of the *XxxType; or nil
 }
 
 // TypeSpec represents a type declaration. Most of the object oriented languages
