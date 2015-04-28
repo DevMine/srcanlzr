@@ -91,6 +91,13 @@ func mergeProjects(p1, p2 *Project) (*Project, error) {
 		return nil, addDebugInfo(errors.New("p2 cannot be nil"))
 	}
 
+	if p1.Packages != nil && len(p1.Packages) == 0 {
+		return p2, nil
+	}
+	if p2.Packages != nil && len(p2.Packages) == 0 {
+		return p1, nil
+	}
+
 	newPrj := new(Project)
 	newPrj.Name = p1.Name
 

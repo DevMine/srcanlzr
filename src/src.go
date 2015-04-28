@@ -152,6 +152,10 @@ func MergeAll(ps ...*Project) (*Project, error) {
 		return nil, addDebugInfo(errors.New("p cannot be nil"))
 	}
 
+	if ps[0] == nil {
+		return nil, addDebugInfo(errors.New("p[0] cannot be nil"))
+	}
+
 	newPrj := &Project{
 		Name:     ps[0].Name,
 		Langs:    ps[0].Langs,

@@ -156,6 +156,13 @@ func mergePackageSlices(ps1, ps2 []*Package) ([]*Package, error) {
 
 	newPkgs := make([]*Package, 0)
 
+	if len(ps1) == 0 {
+		return ps2, nil
+	}
+	if len(ps2) == 0 {
+		return ps1, nil
+	}
+
 	var err error
 	for _, p2 := range ps2 {
 		var pkg *Package
