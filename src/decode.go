@@ -117,13 +117,32 @@ func (dec *decoder) decodeProject() error {
 	return nil
 }
 
-// TODO: implement
 func (dec *decoder) decodePackages() error {
+	dec.prj.Packages = make([]*Package, 0)
+	for {
+		_, tok, err := dec.scan.nextValue()
+		if err != nil {
+			return err
+		}
+		if tok == scanEndArray {
+			break
+		}
+		if tok != scanBeginObject {
+			return errors.New("expected an object")
+		}
+		if err := dec.decodePackage(); err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 
 // TODO: implement
 func (dec *decoder) decodePackage() error {
+	for {
+
+	}
 	return nil
 }
 
