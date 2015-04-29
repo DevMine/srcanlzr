@@ -11,6 +11,8 @@ import (
 	"os"
 	"reflect"
 	"strings"
+
+	"github.com/DevMine/repotool/model"
 )
 
 func Decode(r io.Reader) (*Project, error) {
@@ -31,11 +33,10 @@ type decoder struct {
 	scan *scanner
 	buf  []byte
 	err  error
-	prj  *Project
 }
 
 func newDecoder(r io.Reader) *decoder {
-	return &decoder{scan: newScanner(r), prj: &Project{}}
+	return &decoder{scan: newScanner(r)}
 }
 
 // TODO: implement
@@ -46,8 +47,9 @@ func (dec *decoder) decode() (*Project, error) {
 		return nil, dec.errorf("expected '{' as first character")
 	}
 
-	if err := dec.decodeProject(); err != nil {
-		return nil, dec.errorf(err)
+	prj := dec.decodeProject()
+	if dec.err != nil {
+		return nil, dec.errorf(dec.err)
 	}
 
 	if _, tok, err := dec.scan.nextValue(); err != nil {
@@ -56,15 +58,16 @@ func (dec *decoder) decode() (*Project, error) {
 		return nil, dec.errorf("expected '}' as last character")
 	}
 
-	return dec.prj, nil
+	return prj, nil
 }
 
 func (dec *decoder) errorf(v interface{}) error {
 	return fmt.Errorf("malformed json: %v", v)
 }
 
-func (dec *decoder) decodeProject() error {
-	pv := reflect.ValueOf(dec.prj)
+func (dec *decoder) decodeProject() *Project {
+	prj := &Project{}
+	pv := reflect.ValueOf(prj)
 
 	for {
 		key, err := dec.scan.nextKey()
@@ -72,92 +75,144 @@ func (dec *decoder) decodeProject() error {
 			if err == io.EOF {
 				break
 			}
-			return err
+			dec.err = err
+			return nil
 		}
 		if key == "" {
-			return errors.New("empty key")
+			dec.err = errors.New("empty key")
+			return nil
 		}
 
 		val, tok, err := dec.scan.nextValue()
 		if err != nil {
-			return err
+			dec.err = err
+			return nil
 		}
 
 		switch {
 		case key == "packages":
-			err = dec.decodePackages()
+			prj.Packages = dec.decodePackages()
 		case key == "languages":
-			err = dec.decodeLanguages()
+			prj.Langs = dec.decodeLanguages()
 		case key == "repository":
-			err = dec.decodeRepository()
+			prj.Repo = dec.decodeRepository()
 		case tok == scanIntLit:
 			var num int64
-			num, err := dec.unmarshalInt(val)
-			if err != nil {
-				return err
-			}
+			num, dec.err = dec.unmarshalInt(val)
 			f := pv.FieldByName(dec.tagToFieldName(key))
 			f.SetInt(num)
 		case tok == scanStringLit:
 			var str string
-			str, err := dec.unmarshalString(val)
-			if err != nil {
-				return err
-			}
+			str, dec.err = dec.unmarshalString(val)
 			f := pv.FieldByName(dec.tagToFieldName(key))
 			f.SetString(str)
 		default:
-			return errors.New("unexpected value for project object")
+			dec.err = errors.New("unexpected value for project object")
 		}
 
-		if err != nil {
-			return err
+		if dec.err != nil {
+			return nil
 		}
 	}
-	return nil
+	return prj
 }
 
-func (dec *decoder) decodePackages() error {
-	dec.prj.Packages = make([]*Package, 0)
+func (dec *decoder) decodePackages() []*Package {
+	pkgs := make([]*Package, 0)
 	for {
-		_, tok, err := dec.scan.nextValue()
-		if err != nil {
-			return err
+		if dec.err != nil {
+			return nil
+		}
+
+		var tok int
+		_, tok, dec.err = dec.scan.nextValue()
+		if dec.err != nil {
+			return nil
 		}
 		if tok == scanEndArray {
 			break
 		}
 		if tok != scanBeginObject {
-			return errors.New("expected an object")
+			dec.err = errors.New("expected an object")
 		}
-		if err := dec.decodePackage(); err != nil {
-			return err
-		}
+		pkgs = append(pkgs, dec.decodePackage())
 	}
 
 	return nil
 }
 
 // TODO: implement
-func (dec *decoder) decodePackage() error {
+func (dec *decoder) decodePackage() *Package {
+	pkg := &Package{}
+	pv := reflect.ValueOf(pkg)
 	for {
+		if dec.err != nil {
+			return nil
+		}
 
+		var key string
+		key, dec.err = dec.scan.nextKey()
+		if dec.err != nil {
+			return nil
+		}
+
+		val, tok, err := dec.scan.nextValue()
+		if err != nil {
+			dec.err = err
+			return nil
+		}
+
+		switch {
+		case key == "source_files":
+			pkg.SrcFiles = dec.decodeSrcFiles()
+		case key == "doc":
+			pkg.Doc = dec.decodeStringsList()
+		case tok == scanIntLit:
+			var num int64
+			num, dec.err = dec.unmarshalInt(val)
+			f := pv.FieldByName(dec.tagToFieldName(key))
+			f.SetInt(num)
+		case tok == scanStringLit:
+			var str string
+			str, dec.err = dec.unmarshalString(val)
+			if dec.err != nil {
+				return nil
+			}
+			f := pv.FieldByName(dec.tagToFieldName(key))
+			f.SetString(str)
+		default:
+			dec.err = errors.New("unexpected value for project object")
+		}
+
+		if dec.err != nil {
+			return nil
+		}
 	}
+	return pkg
+}
+
+// TODO: implement
+func (dec *decoder) decodeSrcFiles() []*SrcFile {
 	return nil
 }
 
 // TODO: implement
-func (dec *decoder) decodeLanguages() error {
+func (dec *decoder) decodeStringsList() []string {
 	return nil
 }
 
 // TODO: implement
-func (dec *decoder) decodeLanguage() error {
+func (dec *decoder) decodeLanguages() []*Language {
 	return nil
 }
 
 // TODO: implement
-func (dec *decoder) decodeRepository() error {
+func (dec *decoder) decodeLanguage() *Language {
+	return nil
+}
+
+// TODO: implement
+func (dec *decoder) decodeRepository() *model.Repository {
 	return nil
 }
 
