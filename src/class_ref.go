@@ -35,6 +35,9 @@ func newClassRefsSlice(key, errPrefix string, m map[string]interface{}) ([]*Clas
 	var s *reflect.Value
 
 	if s, err = reflectSliceValue(key, errPrefix, m); err != nil {
+		if !isExist(err) {
+			return []*ClassRef{}, nil
+		}
 		return nil, addDebugInfo(err)
 	}
 
