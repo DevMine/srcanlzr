@@ -5,7 +5,6 @@
 package anlzr
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/DevMine/srcanlzr/src"
@@ -138,8 +137,6 @@ func (dc CommentRatios) Analyze(p *src.Project, r *Result) error {
 	if cnt.nbEnum != 0 {
 		dc.EnumComRatio = float32(cnt.nbComEnum) / float32(cnt.nbEnum)
 	}
-
-	fmt.Println(cnt.nbType != 0, cnt.nbStruct != 0, cnt.nbConst != 0, cnt.nbVars != 0, cnt.nbFunc != 0, cnt.nbInter != 0, cnt.nbClas != 0, cnt.nbFcts != 0, cnt.nbAttr != 0, cnt.nbEnum != 0)
 
 	r.DocCoverage = dc
 
