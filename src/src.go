@@ -4,7 +4,7 @@
 
 /*
 	Package src provides a set of structures for representing a source code
-	indepently of the language. In other words, it provides a generic
+	independently of the language. In other words, it provides a generic
 	representation (abstraction) of a source code.
 
 	The number of real lines of code must be precomputed by the language
