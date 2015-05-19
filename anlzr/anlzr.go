@@ -7,10 +7,15 @@ package anlzr
 
 import "github.com/DevMine/srcanlzr/src"
 
+// An Analyzer represents a source code analyzer which extracts one or more
+// metrics from the structure defined by the src package.
 type Analyzer interface {
+	// Analyze performs an source code analysis on a project and adds the
+	// resulting metrics into r.
 	Analyze(p *src.Project, r *Result) error
 }
 
+// A Result holds all source code analysis metrics output by srcanlzr.
 type Result struct {
 	ProgLangs      []Language        `json:"programming_languages" xml:"programming-languages"`
 	AverageFuncLen float32           `json:"average_function_length" xml:"average-function-length"`
@@ -22,6 +27,7 @@ type Result struct {
 	DocCoverage    CommentRatios     `json:"documentation_coverage" xml:"documentation-coverage"`
 }
 
+// A Language represents a programming language used by the project.
 type Language struct {
 	src.Language
 	Lines int64 `json:"lines" xml:"lines"`
@@ -33,6 +39,7 @@ type ComplexityMetrics struct {
 	AveragePerFile float32 `json:"average_per_file" xml:"average-per-file"` // Average complexity per file.
 }
 
+// CommentRatios contains various ratios about documentation coverage.
 type CommentRatios struct {
 	TypeComRatio   float32 `json:"type_comment_ratio"`
 	StructComRatio float32 `json:"structure_comment_ratio"`
@@ -46,6 +53,7 @@ type CommentRatios struct {
 	EnumComRatio   float32 `json:"enumeration_comment_ratio"`
 }
 
+// RunAnalyzers runs several analyzers on a project.
 func RunAnalyzers(p *src.Project, a ...Analyzer) (*Result, error) {
 	r := &Result{
 		ProgLangs:      []Language{},
