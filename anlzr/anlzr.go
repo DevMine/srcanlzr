@@ -22,15 +22,28 @@ type Result struct {
 	DocCoverage    CommentRatios     `json:"documentation_coverage" xml:"documentation-coverage"`
 }
 
+type Language struct {
+	src.Language
+	Lines int64 `json:"lines" xml:"lines"`
+}
+
 // CyclomaticComplexity metrics, also known as McCabe metric.
 type ComplexityMetrics struct {
 	AveragePerFunc float32 `json:"average_per_func" xml:"average-per-func"` // Average complexity per function.
 	AveragePerFile float32 `json:"average_per_file" xml:"average-per-file"` // Average complexity per file.
 }
 
-type Language struct {
-	src.Language
-	Lines int64 `json:"lines" xml:"lines"`
+type CommentRatios struct {
+	TypeComRatio   float32 `json:"type_comment_ratio"`
+	StructComRatio float32 `json:"structure_comment_ratio"`
+	ConstComRatio  float32 `json:"constant_comment_ratio"`
+	VarsComRatio   float32 `json:"variable_comment_ratio"`
+	FuncComRatio   float32 `json:"function_comment_ratio"`
+	InterComRatio  float32 `json:"interface_comment_ratio"`
+	ClassComRatio  float32 `json:"class_comment_ratio"`
+	MethComRatio   float32 `json:"method_comment"`
+	AttrComRatio   float32 `json:"attribute_comment_ratio"`
+	EnumComRatio   float32 `json:"enumeration_comment_ratio"`
 }
 
 func RunAnalyzers(p *src.Project, a ...Analyzer) (*Result, error) {

@@ -10,19 +10,6 @@ import (
 	"github.com/DevMine/srcanlzr/src"
 )
 
-type CommentRatios struct {
-	TypeComRatio   float32 `json:"type_comment_ratio"`
-	StructComRatio float32 `json:"structure_comment_ratio"`
-	ConstComRatio  float32 `json:"constant_comment_ratio"`
-	VarsComRatio   float32 `json:"variable_comment_ratio"`
-	FuncComRatio   float32 `json:"function_comment_ratio"`
-	InterComRatio  float32 `json:"interface_comment_ratio"`
-	ClassComRatio  float32 `json:"class_comment_ratio"`
-	MethComRatio   float32 `json:"method_comment"`
-	AttrComRatio   float32 `json:"attribute_comment_ratio"`
-	EnumComRatio   float32 `json:"enumeration_comment_ratio"`
-}
-
 type counters struct {
 	nbComType   int
 	nbType      int
