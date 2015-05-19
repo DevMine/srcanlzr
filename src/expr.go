@@ -83,7 +83,7 @@ func newExpr(m map[string]interface{}) (Expr, error) {
 		return newIdent(m)
 	}
 
-	return nil, addDebugInfo(errors.New("unknown expression type"))
+	return nil, addDebugInfo(errors.New("unknown expression type: " + typ))
 }
 
 func newExprsSlice(key, errPrefix string, m map[string]interface{}) ([]Expr, error) {
