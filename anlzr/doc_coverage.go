@@ -216,7 +216,7 @@ func (cnt *counters) functionsCommentCoverage(cstrs []*src.ConstructorDecl, dstr
 		}
 	}
 	for _, fct := range mthds {
-		if isVisible(fct.Visibility) {
+		if isVisible(fct.Visibility) && !fct.Override {
 			cnt.nbFcts++
 			if hasComment(fct.Doc) {
 				cnt.nbComFcts++
