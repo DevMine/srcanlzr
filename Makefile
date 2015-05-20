@@ -13,7 +13,7 @@ test:
 	go test ${PKG}/...
 
 deps:
-	 go get -u github.com/DevMine/repotool/model
+	 go get -u -f github.com/DevMine/repotool/model
 
 dev-deps:
 	 go get -u github.com/golang/lint/golint
