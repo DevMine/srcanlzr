@@ -23,6 +23,7 @@ const (
 	scanBoolLit
 	scanNumberLit
 	scanNullVal
+	scanComma
 )
 
 type scanner struct {
@@ -127,6 +128,8 @@ func (scan *scanner) nextValue() (val []byte, tok int, err error) {
 		// TODO: read string
 	case c == 'n': // null
 		// TODO: read null
+	case c == ',':
+		return nil, scanComma, nil
 	}
 	return nil, scanIllegalToken, fmt.Errorf("illegal value '%c'", c)
 }
