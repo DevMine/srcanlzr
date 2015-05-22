@@ -196,9 +196,55 @@ func (dec *decoder) decodeSrcFiles() []*SrcFile {
 	return nil
 }
 
-// TODO: implement
 func (dec *decoder) decodeStringsList() []string {
-	return nil
+	_, tok, err := dec.scan.nextValue()
+	if err != nil {
+		dec.err = err
+		return nil
+	}
+	if tok != scanBeginArray {
+		// TODO: more informative error
+		dec.err = errors.New("expected array")
+		return nil
+	}
+
+	sl := []string{}
+	for {
+		val, tok, err := dec.scan.nextValue()
+		if err != nil {
+			dec.err = err
+			return nil
+		}
+		if tok == scanEndArray {
+			if len(sl) > 0 {
+				dec.err = errors.New("unexpected ']'")
+				return nil
+			}
+			// empty array
+			break
+		}
+		if tok != scanStringLit {
+			// TODO: more informative error
+			dec.err = errors.New("expected string")
+			return nil
+		}
+		sl = append(sl, string(val))
+
+		val, tok, err = dec.scan.nextValue()
+		if err != nil {
+			dec.err = err
+			return nil
+		}
+		if tok == scanEndArray {
+			// empty array
+			break
+		}
+		if tok != scanComma {
+			dec.err = fmt.Errorf("expected ',', found '%s'", val)
+			return nil
+		}
+	}
+	return sl
 }
 
 // TODO: implement
