@@ -34,11 +34,13 @@ type scanner struct {
 	col int64
 
 	buf []byte
-	pos int // position inside the buffer
+	pos int // position inside the buffer; must be -1 by default
+
+	eof bool // true when the reader has been reached
 }
 
 func newScanner(r io.Reader) *scanner {
-	return &scanner{r: r, buf: make([]byte, bufsize)}
+	return &scanner{r: r, buf: make([]byte, bufsize), pos: -1}
 }
 
 func (scan *scanner) nextKey() (string, error) {
@@ -145,15 +147,21 @@ func (scan *scanner) peek() (byte, error) {
 }
 
 func (scan *scanner) read() (byte, error) {
-	if scan.pos >= len(scan.buf)-1 {
+	if scan.pos == -1 || (scan.pos > len(scan.buf)-1 && !scan.eof) {
 		n, err := scan.r.Read(scan.buf)
 		if err != nil {
-			return 0, err
+			if err != io.EOF {
+				return 0, err
+			}
+			scan.eof = true
 		}
 		if n < bufsize {
 			scan.buf = scan.buf[:n]
 		}
 		scan.pos = 0
+	}
+	if scan.pos >= len(scan.buf) {
+		return 0, io.EOF
 	}
 	b := scan.buf[scan.pos]
 	scan.pos++
@@ -170,7 +178,11 @@ func (scan *scanner) back() {
 func (scan *scanner) ignoreWhitespaces() error {
 	var c byte
 	var err error
-	for c, err = scan.read(); err != nil || isWhitespace(c); {
+	// XXX: refactor when the tests pass
+	for {
+		if c, err = scan.read(); err != nil || !isWhitespace(c) {
+			break
+		}
 		// Nothing, we just skip whitespaces.
 	}
 
@@ -178,7 +190,10 @@ func (scan *scanner) ignoreWhitespaces() error {
 	// buffer so that it can be read again.
 	scan.back()
 
-	return err
+	if err != io.EOF {
+		return err
+	}
+	return nil
 }
 
 func isWhitespace(c byte) bool {
