@@ -118,6 +118,8 @@ func (scan *scanner) nextValue() (val []byte, tok int, err error) {
 	switch {
 	case isDigit(c):
 		// TODO: read digit
+	case c == 't' || c == 'f':
+		// TODO: read bool
 	case c == '{': // beginning of an object literal
 		return nil, scanBeginObject, nil
 	case c == '}': // ending of an object literal
