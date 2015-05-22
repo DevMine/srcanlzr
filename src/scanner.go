@@ -129,7 +129,8 @@ func (scan *scanner) nextValue() (val []byte, tok int, err error) {
 	case c == ']': // ending of an array literal
 		return nil, scanEndArray, nil
 	case c == '"': // beginning or ending of a string literal
-		// TODO: read string
+		str, err := scan.readString()
+		return str, scanStringLit, err
 	case c == 'n': // null
 		// TODO: read null
 	case c == ',':
@@ -168,6 +169,38 @@ func (scan *scanner) read() (byte, error) {
 	b := scan.buf[scan.pos]
 	scan.pos++
 	return b, nil
+}
+
+// readString reads a string literal.
+func (scan *scanner) readString() ([]byte, error) {
+	// length of the read string
+	// XXX: overflow?
+	var strLen int
+
+	buf := make([]byte, bufsize)
+	for {
+		c, err := scan.read()
+		if err != nil {
+			return nil, err
+		}
+		if c == '"' {
+			if strLen == 0 {
+				// empty string
+				return []byte{}, nil
+			}
+			if buf[strLen-1] != '\\' {
+				break
+			}
+		}
+		if strLen == len(buf) {
+			buf = append(buf, c)
+		} else {
+			buf[strLen] = c
+		}
+		strLen++
+	}
+
+	return buf[:strLen], nil
 }
 
 func (scan *scanner) back() {
