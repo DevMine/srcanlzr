@@ -4,14 +4,7 @@
 
 package src_test
 
-import (
-	"fmt"
-	"log"
-
-	"github.com/DevMine/srcanlzr/src"
-)
-
-func ExampleUnmarshal() {
+/*func ExampleUnmarshal() {
 	bs := []byte(`{"name": "foo", "languages": [], "packages": [], "loc": 0}`)
 	p, err := src.Unmarshal(bs)
 	if err != nil {
@@ -36,4 +29,4 @@ func ExampleMarshal() {
 	fmt.Println(string(bs))
 	// Output:
 	// {"name":"foo","repository":null,"languages":[],"packages":[],"loc":0}
-}
+}*/
