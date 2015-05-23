@@ -10,7 +10,7 @@ import (
 	"io"
 )
 
-const bufsize = 8192
+const bufsize = 32 * 1024
 
 const (
 	scanIllegalToken = iota
