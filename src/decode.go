@@ -11,6 +11,7 @@ import (
 	"os"
 
 	"github.com/DevMine/repotool/model"
+	"github.com/DevMine/srcanlzr/src/ast"
 )
 
 // Decode a JSON encoded src.Project read from r.
@@ -222,8 +223,176 @@ func (dec *decoder) decodePackage() *Package {
 	return &pkg
 }
 
-// TODO: implement
+// decodeSrcFiles decodes a list of source file objects.
 func (dec *decoder) decodeSrcFiles() []*SrcFile {
+	if !dec.assertNewArray() {
+		return nil
+	}
+
+	sf := []*SrcFile{}
+
+	if dec.isEmptyArray() {
+		return sf
+	}
+	if dec.err != nil {
+		return nil
+	}
+
+	for {
+		srcFile := dec.decodeSrcFile()
+		if dec.err != nil {
+			return nil
+		}
+
+		sf = append(sf, srcFile)
+
+		if dec.isEndArray() {
+			break
+		}
+		if dec.err != nil {
+			return nil
+		}
+	}
+
+	return sf
+}
+
+func (dec *decoder) decodeSrcFile() *SrcFile {
+	if !dec.assertNewObject() {
+		return nil
+	}
+
+	sf := SrcFile{}
+
+	if dec.isEmptyObject() {
+		return &sf
+	}
+	if dec.err != nil {
+		return nil
+	}
+
+	for {
+		key, err := dec.scan.nextKey()
+		if err != nil {
+			if err == io.EOF {
+				break
+			}
+			dec.err = err
+			return nil
+		}
+		if key == "" {
+			dec.err = errors.New("empty key")
+			return nil
+		}
+
+		val, tok, err := dec.scan.nextValue()
+		if err != nil {
+			dec.err = err
+			return nil
+		}
+
+		switch key {
+		case "path":
+			if tok != scanStringLit {
+				dec.err = fmt.Errorf("expected 'string literal', found '%v'", tok)
+			}
+			sf.Path, dec.err = dec.unmarshalString(val)
+		case "language":
+			dec.scan.back()
+			sf.Lang = dec.decodeLanguage()
+		case "imports":
+			dec.scan.back()
+			sf.Imports = dec.decodeStringsList()
+		case "type_specifiers":
+			dec.scan.back()
+			sf.TypeSpecs = dec.decodeTypeSpecs()
+		case "structs":
+			dec.scan.back()
+			sf.Structs = dec.decodeStructs()
+		case "constants":
+			dec.scan.back()
+			sf.Constants = dec.decodeGlobalDecls()
+		case "variables":
+			dec.scan.back()
+			sf.Vars = dec.decodeGlobalDecls()
+		case "functions":
+			dec.scan.back()
+			sf.Funcs = dec.decodeFuncs()
+		case "interfaces":
+			dec.scan.back()
+			sf.Interfaces = dec.decodeInterfaces()
+		case "clases":
+			dec.scan.back()
+			sf.Classes = dec.decodeClassDecls()
+		case "enums":
+			dec.scan.back()
+			sf.Enums = dec.decodeEnumDecls()
+		case "traits":
+			dec.scan.back()
+			sf.Traits = dec.decodeTraits()
+		case "loc":
+			if tok != scanIntLit {
+				dec.err = fmt.Errorf("expected integer literal, found %v", tok)
+				return nil
+			}
+			sf.LoC, dec.err = dec.unmarshalInt(val)
+		default:
+			dec.err = fmt.Errorf("unexpected value for the key '%s' of a language object", key)
+		}
+
+		if dec.err != nil {
+			return nil
+		}
+
+		if dec.isEndObject() {
+			break
+		}
+		if err != nil {
+			return nil
+		}
+
+	}
+
+	return &sf
+}
+
+// TODO: implement
+func (dec *decoder) decodeTypeSpecs() []*ast.TypeSpec {
+	return nil
+}
+
+// TODO: implement
+func (dec *decoder) decodeStructs() []*ast.StructType {
+	return nil
+}
+
+// TODO: implement
+func (dec *decoder) decodeGlobalDecls() []*ast.GlobalDecl {
+	return nil
+}
+
+// TODO: implement
+func (dec *decoder) decodeFuncs() []*ast.FuncDecl {
+	return nil
+}
+
+// TODO: implement
+func (dec *decoder) decodeInterfaces() []*ast.Interface {
+	return nil
+}
+
+// TODO: implement
+func (dec *decoder) decodeClassDecls() []*ast.ClassDecl {
+	return nil
+}
+
+// TODO: implement
+func (dec *decoder) decodeEnumDecls() []*ast.EnumDecl {
+	return nil
+}
+
+// TODO: implement
+func (dec *decoder) decodeTraits() []*ast.Trait {
 	return nil
 }
 
