@@ -12,6 +12,9 @@ build:
 test:
 	go test ${PKG}/...
 
+bench:
+	go test -bench=. -benchmem ${PKG}/...
+
 deps:
 	 go get -u github.com/DevMine/repotool/model
 
