@@ -6,6 +6,7 @@ package src
 
 import (
 	"bytes"
+	"errors"
 	"testing"
 )
 
@@ -48,6 +49,42 @@ func TestIsDigit(t *testing.T) {
 	for c = 'a'; c <= 'z'; c++ {
 		if isDigit(c) {
 			t.Errorf("'%s' should not be considered as a digit", c)
+		}
+	}
+}
+
+func TestNextKey(t *testing.T) {
+	validKeys := []string{
+		`"foo":`,
+		`"foo"  :`,
+	}
+	for _, keyInput := range validKeys {
+		buf := bytes.NewBufferString(keyInput)
+		scan := newScanner(buf)
+		key, err := scan.nextKey()
+		if err != nil {
+			t.Error(err)
+		}
+		if key != "foo" {
+			t.Errorf("nextKey: found '%s', expected 'foo'", key)
+		}
+	}
+
+	invalidKeys := map[string]error{
+		`"foo"`: errors.New("expected ':', found EOF"),
+		`"foo`:  errors.New("expected key, found EOF"),
+		`foo`:   errors.New("expected '\"', found 'f'"),
+	}
+	for keyInput, expectedErr := range invalidKeys {
+		buf := bytes.NewBufferString(keyInput)
+		scan := newScanner(buf)
+		_, err := scan.nextKey()
+		if err == nil {
+			t.Error("nextKey: '%s' is expected to return the error '%v'", keyInput, expectedErr)
+			continue
+		}
+		if err.Error() != expectedErr.Error() {
+			t.Errorf("nextKey: found error \"%v\", expected error \"%v\"", err, expectedErr)
 		}
 	}
 }
