@@ -79,7 +79,7 @@ func (scan *scanner) nextKey() (string, error) {
 		}
 	}
 
-	key += string(scan.buf[origPos:scan.pos])
+	key += string(scan.buf[origPos : scan.pos-1])
 
 	if err := scan.ignoreWhitespaces(); err != nil {
 		if err == io.EOF {
