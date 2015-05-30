@@ -116,6 +116,7 @@ func (dec *decoder) decodeProject() *Project {
 	return prj
 }
 
+// XXX: rewrite
 func (dec *decoder) decodePackages() []*Package {
 	pkgs := make([]*Package, 0)
 	for {
@@ -200,30 +201,24 @@ func (dec *decoder) decodeSrcFiles() []*SrcFile {
 }
 
 func (dec *decoder) decodeStringsList() []string {
-	_, tok, err := dec.scan.nextValue()
-	if err != nil {
-		dec.err = err
-		return nil
-	}
-	if tok != scanBeginArray {
-		dec.err = fmt.Errorf("expected array, found %v", tok)
+	if !dec.assertNewArray() {
 		return nil
 	}
 
 	sl := []string{}
+
+	if dec.isEmptyArray() {
+		return sl
+	}
+	if dec.err != nil {
+		return nil
+	}
+
 	for {
 		val, tok, err := dec.scan.nextValue()
 		if err != nil {
 			dec.err = err
 			return nil
-		}
-		if tok == scanEndArray {
-			if len(sl) > 0 {
-				dec.err = errors.New("unexpected ']'")
-				return nil
-			}
-			// empty array
-			break
 		}
 		if tok != scanStringLit {
 			dec.err = fmt.Errorf("expected string, found %v", tok)
@@ -231,17 +226,10 @@ func (dec *decoder) decodeStringsList() []string {
 		}
 		sl = append(sl, string(val))
 
-		val, tok, err = dec.scan.nextValue()
-		if err != nil {
-			dec.err = err
-			return nil
-		}
-		if tok == scanEndArray {
-			// empty array
+		if dec.isEndArray() {
 			break
 		}
-		if tok != scanComma {
-			dec.err = fmt.Errorf("expected ',', found '%s'", val)
+		if dec.err != nil {
 			return nil
 		}
 	}
@@ -250,40 +238,20 @@ func (dec *decoder) decodeStringsList() []string {
 
 // TODO: implement
 func (dec *decoder) decodeLanguages() []*Language {
-	_, tok, err := dec.scan.nextValue()
-	if err != nil {
-		dec.err = err
-		return nil
-	}
-	if tok != scanBeginArray {
-		dec.err = fmt.Errorf("expected array, found %v", tok)
+	if !dec.assertNewArray() {
 		return nil
 	}
 
 	ls := []*Language{}
+
+	if dec.isEmptyArray() {
+		return ls
+	}
+	if dec.err != nil {
+		return nil
+	}
+
 	for {
-		val, tok, err := dec.scan.nextValue()
-		if err != nil {
-			dec.err = err
-			return nil
-		}
-		if tok == scanEndArray {
-			if len(ls) > 0 {
-				dec.err = errors.New("unexpected ']'")
-				return nil
-			}
-			// empty array
-			break
-		}
-		if tok != scanBeginObject {
-			dec.err = fmt.Errorf("expected object, found %v", tok)
-			return nil
-		}
-
-		// Since we have consumed the opening '{', we need to go back
-		// before decoding the Language object.
-		dec.scan.back()
-
 		lang := dec.decodeLanguage()
 		if dec.err != nil {
 			return nil
@@ -291,49 +259,30 @@ func (dec *decoder) decodeLanguages() []*Language {
 
 		ls = append(ls, lang)
 
-		val, tok, err = dec.scan.nextValue()
-		if err != nil {
-			dec.err = err
-			return nil
-		}
-		if tok == scanEndArray {
-			// empty array
+		if dec.isEndArray() {
 			break
 		}
-		if tok != scanComma {
-			dec.err = fmt.Errorf("expected ',', found '%s'", val)
+		if dec.err != nil {
 			return nil
 		}
 	}
+
 	return ls
 }
 
 // decodeLanguage decode a src.Language object.
 func (dec *decoder) decodeLanguage() *Language {
-	// Since Language is a JSON Object, we expect to find a '{' character.
-	_, tok, err := dec.scan.nextValue()
-	if err != nil {
-		dec.err = err
-		return nil
-	}
-	if tok != scanBeginObject {
-		dec.err = fmt.Errorf("expected object, found %v", tok)
+	if !dec.assertNewObject() {
 		return nil
 	}
 
 	lang := Language{}
 
-	// The object can be empty, so we have to check for that and without
-	// consuming the next byte.
-	if b, err := dec.scan.peek(); err != nil {
-		if err == io.EOF {
-			dec.err = errors.New("unexpected EOF")
-		} else {
-			dec.err = err
-		}
-		return nil
-	} else if b == '}' {
+	if dec.isEmptyObject() {
 		return &lang
+	}
+	if dec.err != nil {
+		return nil
 	}
 
 	for {
@@ -376,17 +325,10 @@ func (dec *decoder) decodeLanguage() *Language {
 			return nil
 		}
 
-		// Next token can be either a '}' or a ','.
-		_, tok, err = dec.scan.nextValue()
-		if err != nil {
-			dec.err = err
-			return nil
-		}
-		if tok == scanEndObject {
+		if dec.isEndObject() {
 			break
 		}
-		if tok != scanComma {
-			dec.err = fmt.Errorf("expected comma, found %v", tok)
+		if err != nil {
 			return nil
 		}
 	}
@@ -409,4 +351,114 @@ func (dec *decoder) unmarshalString(data []byte) (string, error) {
 		return "", errors.New("unable to unmarshal string: data is nil")
 	}
 	return string(data), nil
+}
+
+// assertNewObject makes sure that the next value is a new object. In other
+// words, the next value must begin with a '{'. If it is not, it will set
+// dec.err and return false.
+func (dec *decoder) assertNewObject() bool {
+	// Since Language is a JSON Object, we expect to find a '{' character.
+	_, tok, err := dec.scan.nextValue()
+	if err != nil {
+		dec.err = err
+		return false
+	}
+	if tok != scanBeginObject {
+		dec.err = fmt.Errorf("expected object, found %v", tok)
+		return false
+	}
+	return true
+}
+
+// assertNewArray makes sure that the next value is a new array. In order
+// words, the next value must begin with a '['. If it is not, it will set
+// dec.err and return false.
+func (dec *decoder) assertNewArray() bool {
+	_, tok, err := dec.scan.nextValue()
+	if err != nil {
+		dec.err = err
+		return false
+	}
+	if tok != scanBeginArray {
+		dec.err = fmt.Errorf("expected array, found %v", tok)
+		return false
+	}
+	return true
+}
+
+// isEndObject returns true if the next value marks the end of the object
+// ('}') and false otherwise. If it is false, the next value must be a
+// comma. If not, it will set dec.err accordingly.
+func (dec *decoder) isEndObject() bool {
+	// Next token can be either a '}' or a ','.
+	_, tok, err := dec.scan.nextValue()
+	if err != nil {
+		dec.err = err
+		return false
+	}
+	if tok == scanEndObject {
+		return true
+	}
+	if tok != scanComma {
+		dec.err = fmt.Errorf("expected comma, found %v", tok)
+	}
+	return false
+}
+
+// isEndArray returns true if the next value marks the end of the array
+// (']') and false otherwise. If it is false, the next value must be a
+// comma. If not, it will set dec.err accordingly.
+func (dec *decoder) isEndArray() bool {
+	_, tok, err := dec.scan.nextValue()
+	if err != nil {
+		dec.err = err
+		return false
+	}
+	if tok == scanEndArray {
+		return true
+	}
+	if tok != scanComma {
+		dec.err = fmt.Errorf("expected ',', found '%s'", tok)
+	}
+	return false
+}
+
+// isEmptyObject tests if the object is empty (no key/value pairs inside).
+//
+// This method does not consume any byte.
+//
+// If an error occurs, it returns false and set dec.err.
+func (dec *decoder) isEmptyObject() bool {
+	// The object can be empty, so we have to check for that and without
+	// consuming the next byte.
+	if b, err := dec.scan.peek(); err != nil {
+		if err == io.EOF {
+			dec.err = errors.New("unexpected EOF")
+		} else {
+			dec.err = err
+		}
+		return false
+	} else if b == '}' {
+		return true
+	}
+	return false
+}
+
+// isEmptyArray tests if the object is empty (no values inside).
+//
+// This method does not consume any byte.
+//
+// If an error occurs, it returns false and set dec.err.
+func (dec *decoder) isEmptyArray() bool {
+	if b, err := dec.scan.peek(); err != nil {
+		if err == io.EOF {
+			dec.err = errors.New("unexpected EOF")
+		} else {
+			dec.err = err
+		}
+		return false
+	} else if b == ']' {
+		return true
+	}
+	return false
 }
