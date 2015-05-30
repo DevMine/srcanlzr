@@ -12,6 +12,7 @@ import (
 
 	"github.com/DevMine/repotool/model"
 	"github.com/DevMine/srcanlzr/src/ast"
+	"github.com/DevMine/srcanlzr/src/token"
 )
 
 // Decode a JSON encoded src.Project read from r.
@@ -488,9 +489,77 @@ func (dec *decoder) decodeTraits() []*ast.Trait {
 	return nil
 }
 
-// TODO: implement
+// decodeIdent decodes an identifier object.
 func (dec *decoder) decodeIdent() *ast.Ident {
-	return nil
+	if !dec.assertNewObject() {
+		return nil
+	}
+
+	ident := ast.Ident{}
+
+	if dec.isEmptyObject() {
+		return &ident
+	}
+	if dec.err != nil {
+		return nil
+	}
+
+	for {
+		key, err := dec.scan.nextKey()
+		if err != nil {
+			if err == io.EOF {
+				break
+			}
+			dec.err = err
+			return nil
+		}
+		if key == "" {
+			dec.err = errors.New("empty key")
+			return nil
+		}
+
+		val, tok, err := dec.scan.nextValue()
+		if err != nil {
+			dec.err = err
+			return nil
+		}
+
+		switch key {
+		case "expression_name":
+			if tok != scanStringLit {
+				dec.err = fmt.Errorf("expected 'string literal', found '%v'", tok)
+				return nil
+			}
+			ident.ExprName, dec.err = dec.unmarshalString(val)
+			// Ensure that expression name is correct.
+			if ident.ExprName != token.IdentName {
+				dec.err = fmt.Errorf("invalid expression_name: expected '%s', found '%v'",
+					token.IdentName, ident.ExprName)
+				return nil
+			}
+		case "name":
+			if tok != scanStringLit {
+				dec.err = fmt.Errorf("expected 'string literal', found '%v'", tok)
+				return nil
+			}
+			ident.Name, dec.err = dec.unmarshalString(val)
+		default:
+			dec.err = fmt.Errorf("unexpected value for the key '%s' of a ident object", key)
+		}
+
+		if dec.err != nil {
+			return nil
+		}
+
+		if dec.isEndObject() {
+			break
+		}
+		if err != nil {
+			return nil
+		}
+	}
+
+	return &ident
 }
 
 // TODO: implement

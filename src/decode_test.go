@@ -8,6 +8,9 @@ import (
 	"bytes"
 	"errors"
 	"testing"
+
+	"github.com/DevMine/srcanlzr/src/ast"
+	"github.com/DevMine/srcanlzr/src/token"
 )
 
 func TestDecodeStringsList(t *testing.T) {
@@ -80,6 +83,36 @@ func TestDecodeLanguage(t *testing.T) {
 		t.Fatal(dec.err)
 	}
 	compareLanguages(t, lang, expected)
+}
+
+func TestDecodeIdent(t *testing.T) {
+	expected := &ast.Ident{
+		ExprName: token.IdentName,
+		Name:     "foo",
+	}
+	buf := bytes.NewBufferString(`{"expression_name": "IDENT", "name": "foo"}`)
+	dec := newDecoder(buf)
+	ident := dec.decodeIdent()
+	if dec.err != nil {
+		t.Fatal(dec.err)
+	}
+	if ident.ExprName != expected.ExprName {
+		t.Errorf("decodeIdent: found '%s', found '%s'", ident.ExprName, expected.ExprName)
+	}
+	if ident.Name != expected.Name {
+		t.Errorf("decodeIdent: found '%s', found '%s'", ident.Name, expected.Name)
+	}
+
+	// expect failure
+	expectedErr := errors.New("invalid expression_name: expected 'IDENT', found 'FOO'")
+	buf = bytes.NewBufferString(`{"expression_name": "FOO", "name": "foo"}`)
+	dec = newDecoder(buf)
+	ident = dec.decodeIdent()
+	if dec.err == nil {
+		t.Errorf("decodeIdent: found no error, expected error \"%v\"", expectedErr)
+	} else if dec.err.Error() != expectedErr.Error() {
+		t.Errorf("decodeIdent: found error \"%v\", expected error \"%v\"", dec.err, expectedErr)
+	}
 }
 
 func TestUnmarshalString(t *testing.T) {
