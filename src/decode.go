@@ -337,7 +337,7 @@ func (dec *decoder) decodeSrcFile() *SrcFile {
 			}
 			sf.LoC, dec.err = dec.unmarshalInt(val)
 		default:
-			dec.err = fmt.Errorf("unexpected value for the key '%s' of a language object", key)
+			dec.err = fmt.Errorf("unexpected value for the key '%s' of a source file object", key)
 		}
 
 		if dec.err != nil {
@@ -356,9 +356,101 @@ func (dec *decoder) decodeSrcFile() *SrcFile {
 	return &sf
 }
 
-// TODO: implement
+// decodeTypeSpecs decodes a list of types specifiers objects.
 func (dec *decoder) decodeTypeSpecs() []*ast.TypeSpec {
-	return nil
+	if !dec.assertNewArray() {
+		return nil
+	}
+
+	ts := []*ast.TypeSpec{}
+
+	if dec.isEmptyArray() {
+		return ts
+	}
+	if dec.err != nil {
+		return nil
+	}
+
+	for {
+		typeSpec := dec.decodeTypeSpec()
+		if dec.err != nil {
+			return nil
+		}
+
+		ts = append(ts, typeSpec)
+
+		if dec.isEndArray() {
+			break
+		}
+		if dec.err != nil {
+			return nil
+		}
+	}
+
+	return ts
+}
+
+// decodeTypeSpec decodes a type specifier object.
+func (dec *decoder) decodeTypeSpec() *ast.TypeSpec {
+	if !dec.assertNewObject() {
+		return nil
+	}
+
+	typeSpec := ast.TypeSpec{}
+
+	if dec.isEmptyObject() {
+		return &typeSpec
+	}
+	if dec.err != nil {
+		return nil
+	}
+
+	for {
+		key, err := dec.scan.nextKey()
+		if err != nil {
+			if err == io.EOF {
+				break
+			}
+			dec.err = err
+			return nil
+		}
+		if key == "" {
+			dec.err = errors.New("empty key")
+			return nil
+		}
+
+		_, _, err = dec.scan.nextValue()
+		if err != nil {
+			dec.err = err
+			return nil
+		}
+
+		switch key {
+		case "doc":
+			dec.scan.back()
+			typeSpec.Doc = dec.decodeStringsList()
+		case "name":
+			dec.scan.back()
+			typeSpec.Name = dec.decodeIdent()
+		case "type":
+			dec.scan.back()
+			typeSpec.Type = dec.decodeExpr()
+		default:
+			dec.err = fmt.Errorf("unexpected value for the key '%s' of a type specifier object", key)
+		}
+
+		if dec.err != nil {
+			return nil
+		}
+
+		if dec.isEndObject() {
+			break
+		}
+		if err != nil {
+			return nil
+		}
+	}
+	return &typeSpec
 }
 
 // TODO: implement
@@ -393,6 +485,16 @@ func (dec *decoder) decodeEnumDecls() []*ast.EnumDecl {
 
 // TODO: implement
 func (dec *decoder) decodeTraits() []*ast.Trait {
+	return nil
+}
+
+// TODO: implement
+func (dec *decoder) decodeIdent() *ast.Ident {
+	return nil
+}
+
+// TODO: implement
+func (dec *decoder) decodeExpr() ast.Expr {
 	return nil
 }
 
