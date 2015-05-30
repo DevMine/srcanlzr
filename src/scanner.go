@@ -12,19 +12,42 @@ import (
 
 const bufsize = 32 * 1024
 
+type scanToken int
+
 const (
-	scanIllegalToken = iota
+	scanIllegalToken scanToken = iota
 	scanBeginObject
 	scanEndObject
 	scanBeginArray
 	scanEndArray
-	scanIntLit
 	scanStringLit
 	scanBoolLit
-	scanNumberLit
+	scanIntLit
+	scanFloatLit
 	scanNullVal
 	scanComma
 )
+
+var scanTokenToString = map[scanToken]string{
+	scanIllegalToken: "illegal token",
+	scanBeginObject:  "{",
+	scanEndObject:    "}",
+	scanBeginArray:   "[",
+	scanEndArray:     "]",
+	scanStringLit:    "string literal",
+	scanBoolLit:      "boolean literal",
+	scanIntLit:       "integer literal",
+	scanFloatLit:     "integer literal",
+	scanNullVal:      "null",
+	scanComma:        "comma",
+}
+
+func (tok scanToken) String() string {
+	if str, ok := scanTokenToString[tok]; ok {
+		return str
+	}
+	return "invalid scan token"
+}
 
 type scanner struct {
 	r   io.Reader
@@ -99,20 +122,20 @@ func (scan *scanner) nextKey() (string, error) {
 	return key, nil
 }
 
-func (scan *scanner) nextValue() (val []byte, tok int, err error) {
+func (scan *scanner) nextValue() ([]byte, scanToken, error) {
 	if err := scan.ignoreWhitespaces(); err != nil {
 		if err == io.EOF {
-			return nil, 0, errors.New("expected value, found EOF")
+			return nil, scanIllegalToken, errors.New("expected value, found EOF")
 		}
-		return nil, 0, err
+		return nil, scanIllegalToken, err
 	}
 
 	c, err := scan.read()
 	if err != nil {
 		if err == io.EOF {
-			return nil, 0, errors.New("expected value, found EOF")
+			return nil, scanIllegalToken, errors.New("expected value, found EOF")
 		}
-		return nil, 0, err
+		return nil, scanIllegalToken, err
 	}
 
 	switch {

@@ -124,7 +124,7 @@ func (dec *decoder) decodePackages() []*Package {
 			return nil
 		}
 
-		var tok int
+		var tok scanToken
 		_, tok, dec.err = dec.scan.nextValue()
 		if dec.err != nil {
 			return nil
