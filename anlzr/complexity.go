@@ -4,7 +4,10 @@
 
 package anlzr
 
-import "github.com/DevMine/srcanlzr/src"
+import (
+	"github.com/DevMine/srcanlzr/src"
+	"github.com/DevMine/srcanlzr/src/ast"
+)
 
 type Complexity struct{}
 
@@ -85,7 +88,7 @@ func (c Complexity) Analyze(p *src.Project, r *Result) error {
 	return nil
 }
 
-func functionCyclomaticComplexity(f *src.FuncDecl) int64 {
+func functionCyclomaticComplexity(f *ast.FuncDecl) int64 {
 	cc := int64(1) // cyclomatic complexity
 
 	for _, s := range f.Body {
@@ -95,7 +98,7 @@ func functionCyclomaticComplexity(f *src.FuncDecl) int64 {
 	return cc
 }
 
-func methodCyclomaticComplexity(m *src.MethodDecl) int64 {
+func methodCyclomaticComplexity(m *ast.MethodDecl) int64 {
 	cc := int64(1) // cyclomatic complexity
 
 	for _, s := range m.Body {
@@ -105,12 +108,12 @@ func methodCyclomaticComplexity(m *src.MethodDecl) int64 {
 	return cc
 }
 
-func exprComplexity(e src.Expr) int64 {
+func exprComplexity(e ast.Expr) int64 {
 	var c int64
 
 	switch e.(type) {
-	case *src.BinaryExpr:
-		be := e.(*src.BinaryExpr)
+	case *ast.BinaryExpr:
+		be := e.(*ast.BinaryExpr)
 		// TODO check the operator
 		c += exprComplexity(be.LeftExpr)
 		c += exprComplexity(be.RightExpr)
@@ -119,14 +122,14 @@ func exprComplexity(e src.Expr) int64 {
 	return c
 }
 
-func statementComplexity(s src.Stmt) int64 {
+func statementComplexity(s ast.Stmt) int64 {
 	var c int64
 
 	switch s.(type) {
-	case *src.IfStmt:
+	case *ast.IfStmt:
 		c++
 
-		is := s.(*src.IfStmt)
+		is := s.(*ast.IfStmt)
 
 		if is.Cond != nil {
 			c += exprComplexity(is.Cond)
@@ -141,10 +144,10 @@ func statementComplexity(s src.Stmt) int64 {
 				c += statementComplexity(s)
 			}
 		}
-	case *src.LoopStmt:
+	case *ast.LoopStmt:
 		c++
 
-		ls := s.(*src.LoopStmt)
+		ls := s.(*ast.LoopStmt)
 
 		if ls.Cond != nil {
 			c += exprComplexity(ls.Cond)
@@ -159,18 +162,18 @@ func statementComplexity(s src.Stmt) int64 {
 				c += statementComplexity(s)
 			}
 		}
-	case *src.RangeLoopStmt:
+	case *ast.RangeLoopStmt:
 		c++
 
-		rls := s.(*src.RangeLoopStmt)
+		rls := s.(*ast.RangeLoopStmt)
 
 		for _, s := range rls.Body {
 			c += statementComplexity(s)
 		}
-	case *src.SwitchStmt:
+	case *ast.SwitchStmt:
 		c++
 
-		ss := s.(*src.SwitchStmt)
+		ss := s.(*ast.SwitchStmt)
 
 		if ss.Cond != nil {
 			c += exprComplexity(ss.Cond)
