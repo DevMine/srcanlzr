@@ -13,11 +13,13 @@ import (
 	"github.com/DevMine/repotool/model"
 )
 
+// Decode a JSON encoded src.Project read from r.
 func Decode(r io.Reader) (*Project, error) {
 	dec := newDecoder(r)
 	return dec.decode()
 }
 
+// Decode a JSON encoded src.Project read from a given file.
 func DecodeFile(path string) (*Project, error) {
 	f, err := os.Open(path)
 	if err != nil {
@@ -33,11 +35,12 @@ type decoder struct {
 	err  error
 }
 
+// newDecoder creates a new JSON decoder that reads from r.
 func newDecoder(r io.Reader) *decoder {
 	return &decoder{scan: newScanner(r)}
 }
 
-// TODO: implement
+// decode decodes JSON input into a src.Project structure.
 func (dec *decoder) decode() (*Project, error) {
 	if _, tok, err := dec.scan.nextValue(); err != nil {
 		return nil, dec.errorf(err)
@@ -63,6 +66,7 @@ func (dec *decoder) errorf(v interface{}) error {
 	return fmt.Errorf("malformed json: %v", v)
 }
 
+// decodeProject decodes a project object.
 func (dec *decoder) decodeProject() *Project {
 	prj := &Project{}
 
@@ -222,6 +226,7 @@ func (dec *decoder) decodeSrcFiles() []*SrcFile {
 	return nil
 }
 
+// decoderStringsList decodes a list of strings.
 func (dec *decoder) decodeStringsList() []string {
 	if !dec.assertNewArray() {
 		return nil
@@ -258,7 +263,7 @@ func (dec *decoder) decodeStringsList() []string {
 	return sl
 }
 
-// TODO: implement
+// decodeLanguages decodes a list of languages.
 func (dec *decoder) decodeLanguages() []*Language {
 	if !dec.assertNewArray() {
 		return nil
