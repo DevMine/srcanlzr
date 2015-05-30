@@ -8,28 +8,11 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"os"
 
 	"github.com/DevMine/repotool/model"
 	"github.com/DevMine/srcanlzr/src/ast"
 	"github.com/DevMine/srcanlzr/src/token"
 )
-
-// Decode a JSON encoded src.Project read from r.
-func Decode(r io.Reader) (*Project, error) {
-	dec := newDecoder(r)
-	return dec.decode()
-}
-
-// Decode a JSON encoded src.Project read from a given file.
-func DecodeFile(path string) (*Project, error) {
-	f, err := os.Open(path)
-	if err != nil {
-		return nil, err
-	}
-	defer f.Close()
-	return Decode(f)
-}
 
 type decoder struct {
 	scan *scanner
