@@ -116,26 +116,34 @@ func (dec *decoder) decodeProject() *Project {
 	return prj
 }
 
-// XXX: rewrite
+// decodePackages decodes a list of package objects.
 func (dec *decoder) decodePackages() []*Package {
-	pkgs := make([]*Package, 0)
-	for {
-		if dec.err != nil {
-			return nil
-		}
+	if !dec.assertNewArray() {
+		return nil
+	}
 
-		var tok scanToken
-		_, tok, dec.err = dec.scan.nextValue()
+	pkgs := []*Package{}
+
+	if dec.isEmptyArray() {
+		return pkgs
+	}
+	if dec.err != nil {
+		return nil
+	}
+
+	for {
+		pkg := dec.decodePackage()
 		if dec.err != nil {
 			return nil
 		}
-		if tok == scanEndArray {
+		pkgs = append(pkgs, pkg)
+
+		if dec.isEndArray() {
 			break
 		}
-		if tok != scanBeginObject {
-			dec.err = fmt.Errorf("expected an object, found %v", tok)
+		if dec.err != nil {
+			return nil
 		}
-		pkgs = append(pkgs, dec.decodePackage())
 	}
 
 	return nil
@@ -143,13 +151,20 @@ func (dec *decoder) decodePackages() []*Package {
 
 // decoderPackage decodes a package object.
 func (dec *decoder) decodePackage() *Package {
+	if !dec.assertNewObject() {
+		return nil
+	}
+
 	pkg := Package{}
 
-	for {
-		if dec.err != nil {
-			return nil
-		}
+	if dec.isEmptyObject() {
+		return &pkg
+	}
+	if dec.err != nil {
+		return nil
+	}
 
+	for {
 		var key string
 		key, dec.err = dec.scan.nextKey()
 		if dec.err != nil {
@@ -188,6 +203,13 @@ func (dec *decoder) decodePackage() *Package {
 		}
 
 		if dec.err != nil {
+			return nil
+		}
+
+		if dec.isEndObject() {
+			break
+		}
+		if err != nil {
 			return nil
 		}
 	}
