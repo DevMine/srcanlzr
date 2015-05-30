@@ -341,7 +341,7 @@ func (dec *decoder) decodeLanguage() *Language {
 			lang.Paradigms = dec.decodeStringsList()
 		case "language":
 			if tok != scanStringLit {
-				dec.err = fmt.Errorf("expected string literal, found %v", tok)
+				dec.err = fmt.Errorf("expected 'string literal', found '%v'", tok)
 				return nil
 			}
 			lang.Lang, dec.err = dec.unmarshalString(val)
