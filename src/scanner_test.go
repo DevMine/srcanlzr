@@ -57,6 +57,7 @@ func TestNextKey(t *testing.T) {
 	validKeys := []string{
 		`"foo":`,
 		`"foo"  :`,
+		`"foo": "bar"`,
 	}
 	for _, keyInput := range validKeys {
 		buf := bytes.NewBufferString(keyInput)
