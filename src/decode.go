@@ -42,23 +42,10 @@ func newDecoder(r io.Reader) *decoder {
 
 // decode decodes JSON input into a src.Project structure.
 func (dec *decoder) decode() (*Project, error) {
-	if _, tok, err := dec.scan.nextValue(); err != nil {
-		return nil, dec.errorf(err)
-	} else if tok != scanBeginObject {
-		return nil, dec.errorf("expected '{' as first character")
-	}
-
 	prj := dec.decodeProject()
 	if dec.err != nil {
 		return nil, dec.errorf(dec.err)
 	}
-
-	if _, tok, err := dec.scan.nextValue(); err != nil {
-		return nil, dec.errorf(err)
-	} else if tok != scanEndObject {
-		return nil, dec.errorf("expected '}' as last character")
-	}
-
 	return prj, nil
 }
 
@@ -68,7 +55,18 @@ func (dec *decoder) errorf(v interface{}) error {
 
 // decodeProject decodes a project object.
 func (dec *decoder) decodeProject() *Project {
-	prj := &Project{}
+	if !dec.assertNewObject() {
+		return nil
+	}
+
+	prj := Project{}
+
+	if dec.isEmptyObject() {
+		return &prj
+	}
+	if dec.err != nil {
+		return nil
+	}
 
 	for {
 		key, err := dec.scan.nextKey()
@@ -116,8 +114,15 @@ func (dec *decoder) decodeProject() *Project {
 		if dec.err != nil {
 			return nil
 		}
+
+		if dec.isEndObject() {
+			break
+		}
+		if err != nil {
+			return nil
+		}
 	}
-	return prj
+	return &prj
 }
 
 // decodePackages decodes a list of package objects.
@@ -191,17 +196,13 @@ func (dec *decoder) decodePackage() *Package {
 				dec.err = fmt.Errorf("expected integer literal, found %v", tok)
 				return nil
 			}
-			if pkg.LoC, dec.err = dec.unmarshalInt(val); dec.err != nil {
-				return nil
-			}
+			pkg.LoC, dec.err = dec.unmarshalInt(val)
 		case "name":
 			if tok != scanStringLit {
 				dec.err = fmt.Errorf("expected string literal, found %v", tok)
 				return nil
 			}
-			if pkg.Name, dec.err = dec.unmarshalString(val); dec.err != nil {
-				return nil
-			}
+			pkg.Name, dec.err = dec.unmarshalString(val)
 		default:
 			dec.err = errors.New("unexpected value for project object")
 		}
