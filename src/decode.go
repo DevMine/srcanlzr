@@ -345,7 +345,7 @@ func (dec *decoder) unmarshalInt(data []byte) (int64, error) {
 	return 0, nil
 }
 
-// TODO: implement
+// unmarshalString unmarshals a bytes slice into a string.
 func (dec *decoder) unmarshalString(data []byte) (string, error) {
 	if data == nil {
 		return "", errors.New("unable to unmarshal string: data is nil")
@@ -364,7 +364,7 @@ func (dec *decoder) assertNewObject() bool {
 		return false
 	}
 	if tok != scanBeginObject {
-		dec.err = fmt.Errorf("expected object, found %v", tok)
+		dec.err = fmt.Errorf("expected object, found '%v'", tok)
 		return false
 	}
 	return true
@@ -380,7 +380,7 @@ func (dec *decoder) assertNewArray() bool {
 		return false
 	}
 	if tok != scanBeginArray {
-		dec.err = fmt.Errorf("expected array, found %v", tok)
+		dec.err = fmt.Errorf("expected array, found '%v'", tok)
 		return false
 	}
 	return true
@@ -390,7 +390,6 @@ func (dec *decoder) assertNewArray() bool {
 // ('}') and false otherwise. If it is false, the next value must be a
 // comma. If not, it will set dec.err accordingly.
 func (dec *decoder) isEndObject() bool {
-	// Next token can be either a '}' or a ','.
 	_, tok, err := dec.scan.nextValue()
 	if err != nil {
 		dec.err = err
@@ -400,7 +399,7 @@ func (dec *decoder) isEndObject() bool {
 		return true
 	}
 	if tok != scanComma {
-		dec.err = fmt.Errorf("expected comma, found %v", tok)
+		dec.err = fmt.Errorf("expected 'comma', found '%v'", tok)
 	}
 	return false
 }
@@ -418,7 +417,7 @@ func (dec *decoder) isEndArray() bool {
 		return true
 	}
 	if tok != scanComma {
-		dec.err = fmt.Errorf("expected ',', found '%s'", tok)
+		dec.err = fmt.Errorf("expected 'comma', found '%s'", tok)
 	}
 	return false
 }

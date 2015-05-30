@@ -141,6 +141,7 @@ func (scan *scanner) nextValue() ([]byte, scanToken, error) {
 	switch {
 	case isDigit(c):
 		// TODO: read digit
+		return []byte{c}, scanIntLit, nil
 	case c == 't' || c == 'f':
 		// TODO: read bool
 	case c == '{': // beginning of an object literal
