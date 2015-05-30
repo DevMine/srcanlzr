@@ -133,7 +133,7 @@ func (dec *decoder) decodePackages() []*Package {
 			break
 		}
 		if tok != scanBeginObject {
-			dec.err = errors.New("expected an object")
+			dec.err = fmt.Errorf("expected an object, found %v", tok)
 		}
 		pkgs = append(pkgs, dec.decodePackage())
 	}
@@ -223,8 +223,7 @@ func (dec *decoder) decodeStringsList() []string {
 			break
 		}
 		if tok != scanStringLit {
-			// TODO: more informative error
-			dec.err = errors.New("expected string")
+			dec.err = fmt.Errorf("expected string, found %v", tok)
 			return nil
 		}
 		sl = append(sl, string(val))
@@ -254,8 +253,7 @@ func (dec *decoder) decodeLanguages() []*Language {
 		return nil
 	}
 	if tok != scanBeginArray {
-		// TODO: more informative error
-		dec.err = errors.New("expected array")
+		dec.err = fmt.Errorf("expected array, found %v", tok)
 		return nil
 	}
 
@@ -275,8 +273,7 @@ func (dec *decoder) decodeLanguages() []*Language {
 			break
 		}
 		if tok != scanBeginObject {
-			// TODO: more informative error
-			dec.err = errors.New("expected object")
+			dec.err = fmt.Errorf("expected object, found %v", tok)
 			return nil
 		}
 
@@ -317,8 +314,7 @@ func (dec *decoder) decodeLanguage() *Language {
 		return nil
 	}
 	if tok != scanBeginObject {
-		// TODO: more informative error
-		dec.err = errors.New("expected object")
+		dec.err = fmt.Errorf("expected object, found %v", tok)
 		return nil
 	}
 
@@ -389,8 +385,7 @@ func (dec *decoder) decodeLanguage() *Language {
 			break
 		}
 		if tok != scanComma {
-			// TODO: more informative error
-			dec.err = errors.New("expected comma")
+			dec.err = fmt.Errorf("expected comma, found %v", tok)
 			return nil
 		}
 	}
