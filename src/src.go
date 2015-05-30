@@ -5,8 +5,6 @@
 package src
 
 import (
-	"encoding/json"
-
 	"github.com/DevMine/repotool/model"
 	"github.com/DevMine/srcanlzr/src/ast"
 )
@@ -132,10 +130,7 @@ type Project struct {
 	// src.Unmarshal itself but by the standard json.Unmarshal function.
 	// To do so, its unmarshalling is defered using json.RawMessage.
 	// See the RepoRaw field.
-	Repo *model.Repository `json:"-"`
-
-	// RepoRaw is only used to defer the unmarshalling of a model.Repository.
-	RepoRaw json.RawMessage `json:"repository,omitempty"`
+	Repo *model.Repository `json:"repository"`
 
 	// The list of all programming languages used by the project. Each language
 	// must be added by the corresponding language parsers if and only if the

@@ -28,42 +28,23 @@ func DecodeFile(path string) (*Project, error) {
 // MergeAll merges a list of projects.
 //
 // There must be at least one project. In this case, it just returns a copy of
-// the project.
+// the project. Moreover, the projects must be distinct.
 //
 // The merge only performs shallow copies, which means that if the field value
 // is a pointer it copies the memory address and not the value pointed.
-/*func MergeAll(ps ...*Project) (*Project, error) {
-	if len(ps) == 0 {
-		return nil, addDebugInfo(errors.New("p cannot be nil"))
-	}
-
-	newPrj := &Project{
-		Name:     ps[0].Name,
-		Langs:    ps[0].Langs,
-		Packages: ps[0].Packages,
-		LoC:      ps[0].LoC,
-	}
-
-	if len(ps) == 1 {
-		return newPrj, nil
-	}
-
-	var err error
-	for i := 1; i < len(ps); i++ {
-		curr := ps[i]
-		if curr == nil {
-			return nil, addDebugInfo(fmt.Errorf("p[%d] is nil", i))
-		}
-
-		if newPrj, err = Merge(newPrj, curr); err != nil {
-			return nil, addDebugInfo(err)
-		}
-	}
-
-	return newPrj, nil
+func MergeAll(ps ...*Project) (*Project, error) {
+	return mergeAll(ps...)
 }
 
 // Merge merges two project. See MergeAll for more details.
-func Merge(p1, p2 *Project) (*Project, error) {
-	return mergeProjects(p1, p2)
-}*/
+func Merge(p1, p2 *Project) *Project {
+	// merge() merges p2 into p1, therefore we need to copy p1 before merging.
+	newPrj := &Project{
+		Name:     p1.Name,
+		Langs:    p1.Langs,
+		Packages: p1.Packages,
+		LoC:      p1.LoC,
+	}
+	merge(newPrj, p2)
+	return newPrj
+}
