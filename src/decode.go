@@ -203,8 +203,7 @@ func (dec *decoder) decodeStringsList() []string {
 		return nil
 	}
 	if tok != scanBeginArray {
-		// TODO: more informative error
-		dec.err = errors.New("expected array")
+		dec.err = fmt.Errorf("expected array, found %v", tok)
 		return nil
 	}
 
@@ -249,12 +248,153 @@ func (dec *decoder) decodeStringsList() []string {
 
 // TODO: implement
 func (dec *decoder) decodeLanguages() []*Language {
-	return nil
+	_, tok, err := dec.scan.nextValue()
+	if err != nil {
+		dec.err = err
+		return nil
+	}
+	if tok != scanBeginArray {
+		// TODO: more informative error
+		dec.err = errors.New("expected array")
+		return nil
+	}
+
+	ls := []*Language{}
+	for {
+		val, tok, err := dec.scan.nextValue()
+		if err != nil {
+			dec.err = err
+			return nil
+		}
+		if tok == scanEndArray {
+			if len(ls) > 0 {
+				dec.err = errors.New("unexpected ']'")
+				return nil
+			}
+			// empty array
+			break
+		}
+		if tok != scanBeginObject {
+			// TODO: more informative error
+			dec.err = errors.New("expected object")
+			return nil
+		}
+
+		// Since we have consumed the opening '{', we need to go back
+		// before decoding the Language object.
+		dec.scan.back()
+
+		lang := dec.decodeLanguage()
+		if dec.err != nil {
+			return nil
+		}
+
+		ls = append(ls, lang)
+
+		val, tok, err = dec.scan.nextValue()
+		if err != nil {
+			dec.err = err
+			return nil
+		}
+		if tok == scanEndArray {
+			// empty array
+			break
+		}
+		if tok != scanComma {
+			dec.err = fmt.Errorf("expected ',', found '%s'", val)
+			return nil
+		}
+	}
+	return ls
 }
 
-// TODO: implement
+// decodeLanguage decode a src.Language object.
 func (dec *decoder) decodeLanguage() *Language {
-	return nil
+	// Since Language is a JSON Object, we expect to find a '{' character.
+	_, tok, err := dec.scan.nextValue()
+	if err != nil {
+		dec.err = err
+		return nil
+	}
+	if tok != scanBeginObject {
+		// TODO: more informative error
+		dec.err = errors.New("expected object")
+		return nil
+	}
+
+	lang := Language{}
+
+	// The object can be empty, so we have to check for that and without
+	// consuming the next byte.
+	if b, err := dec.scan.peek(); err != nil {
+		if err == io.EOF {
+			dec.err = errors.New("unexpected EOF")
+		} else {
+			dec.err = err
+		}
+		return nil
+	} else if b == '}' {
+		return &lang
+	}
+
+	for {
+		key, err := dec.scan.nextKey()
+		if err != nil {
+			if err == io.EOF {
+				break
+			}
+			dec.err = err
+			return nil
+		}
+		if key == "" {
+			dec.err = errors.New("empty key")
+			return nil
+		}
+
+		val, tok, err := dec.scan.nextValue()
+		if err != nil {
+			dec.err = err
+			return nil
+		}
+
+		switch {
+		case key == "paradigms":
+			// Since the '[' character has been consumed, we need to step back
+			// brefore calling decodeStringsList.
+			dec.scan.back()
+			lang.Paradigms = dec.decodeStringsList()
+		case key == "language":
+			if tok != scanStringLit {
+				dec.err = fmt.Errorf("expected string literal, found %v", tok)
+				return nil
+			}
+			if lang.Lang, dec.err = dec.unmarshalString(val); dec.err != nil {
+				return nil
+			}
+		default:
+			dec.err = fmt.Errorf("unexpected value for the key '%s' of a language object", key)
+		}
+
+		if dec.err != nil {
+			return nil
+		}
+
+		// Next token can be either a '}' or a ','.
+		_, tok, err = dec.scan.nextValue()
+		if err != nil {
+			dec.err = err
+			return nil
+		}
+		if tok == scanEndObject {
+			break
+		}
+		if tok != scanComma {
+			// TODO: more informative error
+			dec.err = errors.New("expected comma")
+			return nil
+		}
+	}
+	return &lang
 }
 
 // TODO: implement
@@ -269,7 +409,10 @@ func (dec *decoder) unmarshalInt(data []byte) (int64, error) {
 
 // TODO: implement
 func (dec *decoder) unmarshalString(data []byte) (string, error) {
-	return "", nil
+	if data == nil {
+		return "", errors.New("unable to unmarshal string: data is nil")
+	}
+	return string(data), nil
 }
 
 // TODO: implement
