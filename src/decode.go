@@ -9,8 +9,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"reflect"
-	"strings"
 
 	"github.com/DevMine/repotool/model"
 )
@@ -67,7 +65,6 @@ func (dec *decoder) errorf(v interface{}) error {
 
 func (dec *decoder) decodeProject() *Project {
 	prj := &Project{}
-	pv := reflect.ValueOf(prj)
 
 	for {
 		key, err := dec.scan.nextKey()
@@ -89,23 +86,25 @@ func (dec *decoder) decodeProject() *Project {
 			return nil
 		}
 
-		switch {
-		case key == "packages":
+		switch key {
+		case "packages":
 			prj.Packages = dec.decodePackages()
-		case key == "languages":
+		case "languages":
 			prj.Langs = dec.decodeLanguages()
-		case key == "repository":
+		case "repository":
 			prj.Repo = dec.decodeRepository()
-		case tok == scanIntLit:
-			var num int64
-			num, dec.err = dec.unmarshalInt(val)
-			f := pv.FieldByName(dec.tagToFieldName(key))
-			f.SetInt(num)
-		case tok == scanStringLit:
-			var str string
-			str, dec.err = dec.unmarshalString(val)
-			f := pv.FieldByName(dec.tagToFieldName(key))
-			f.SetString(str)
+		case "loc":
+			if tok != scanIntLit {
+				dec.err = fmt.Errorf("expected integer literal, found %v", tok)
+				return nil
+			}
+			prj.LoC, dec.err = dec.unmarshalInt(val)
+		case "name":
+			if tok != scanStringLit {
+				dec.err = fmt.Errorf("expected string literal, found %v", tok)
+				return nil
+			}
+			prj.Name, dec.err = dec.unmarshalString(val)
 		default:
 			dec.err = errors.New("unexpected value for project object")
 		}
@@ -141,10 +140,10 @@ func (dec *decoder) decodePackages() []*Package {
 	return nil
 }
 
-// TODO: implement
+// decoderPackage decodes a package object.
 func (dec *decoder) decodePackage() *Package {
-	pkg := &Package{}
-	pv := reflect.ValueOf(pkg)
+	pkg := Package{}
+
 	for {
 		if dec.err != nil {
 			return nil
@@ -162,24 +161,27 @@ func (dec *decoder) decodePackage() *Package {
 			return nil
 		}
 
-		switch {
-		case key == "source_files":
+		switch key {
+		case "source_files":
 			pkg.SrcFiles = dec.decodeSrcFiles()
-		case key == "doc":
+		case "doc":
 			pkg.Doc = dec.decodeStringsList()
-		case tok == scanIntLit:
-			var num int64
-			num, dec.err = dec.unmarshalInt(val)
-			f := pv.FieldByName(dec.tagToFieldName(key))
-			f.SetInt(num)
-		case tok == scanStringLit:
-			var str string
-			str, dec.err = dec.unmarshalString(val)
-			if dec.err != nil {
+		case "loc":
+			if tok != scanIntLit {
+				dec.err = fmt.Errorf("expected integer literal, found %v", tok)
 				return nil
 			}
-			f := pv.FieldByName(dec.tagToFieldName(key))
-			f.SetString(str)
+			if pkg.LoC, dec.err = dec.unmarshalInt(val); dec.err != nil {
+				return nil
+			}
+		case "name":
+			if tok != scanStringLit {
+				dec.err = fmt.Errorf("expected string literal, found %v", tok)
+				return nil
+			}
+			if pkg.Name, dec.err = dec.unmarshalString(val); dec.err != nil {
+				return nil
+			}
 		default:
 			dec.err = errors.New("unexpected value for project object")
 		}
@@ -188,7 +190,8 @@ func (dec *decoder) decodePackage() *Package {
 			return nil
 		}
 	}
-	return pkg
+
+	return &pkg
 }
 
 // TODO: implement
@@ -353,20 +356,18 @@ func (dec *decoder) decodeLanguage() *Language {
 			return nil
 		}
 
-		switch {
-		case key == "paradigms":
+		switch key {
+		case "paradigms":
 			// Since the '[' character has been consumed, we need to step back
 			// brefore calling decodeStringsList.
 			dec.scan.back()
 			lang.Paradigms = dec.decodeStringsList()
-		case key == "language":
+		case "language":
 			if tok != scanStringLit {
 				dec.err = fmt.Errorf("expected string literal, found %v", tok)
 				return nil
 			}
-			if lang.Lang, dec.err = dec.unmarshalString(val); dec.err != nil {
-				return nil
-			}
+			lang.Lang, dec.err = dec.unmarshalString(val)
 		default:
 			dec.err = fmt.Errorf("unexpected value for the key '%s' of a language object", key)
 		}
@@ -408,19 +409,4 @@ func (dec *decoder) unmarshalString(data []byte) (string, error) {
 		return "", errors.New("unable to unmarshal string: data is nil")
 	}
 	return string(data), nil
-}
-
-// TODO: implement
-func (dec *decoder) tagToFieldName(tag string) string {
-	var field string
-	for _, seg := range strings.Split(tag, "_") {
-		if len(seg) == 0 {
-			return ""
-		}
-		field += strings.ToUpper(string(seg[0]))
-		if len(seg) > 1 {
-			field += seg[1:]
-		}
-	}
-	return field
 }
