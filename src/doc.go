@@ -62,7 +62,7 @@
 	We only count statements and declarations as a line of code. Comments,
 	package declaration, imports, expression, etc. must not be taken into
 	account. Since an exemple is worth more than a thousand words, let's
-	condider the following snippet:
+	consider the following snippet:
 
 	   // Package doc (does not count as a line of code)
 	   package main // does not count as a line of code
