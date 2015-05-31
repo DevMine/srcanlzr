@@ -785,9 +785,58 @@ func (dec *decoder) decodeBinaryExpr() *ast.BinaryExpr {
 	return dec.decodeBinaryExprAttrs()
 }
 
-// TODO: implement
+// decodeBinaryExprAttrs decodes binary expression attributes.
 func (dec *decoder) decodeBinaryExprAttrs() *ast.BinaryExpr {
-	return nil
+	binExpr := ast.BinaryExpr{ExprName: token.BinaryExprName}
+	for {
+		key, err := dec.scan.nextKey()
+		if err != nil {
+			if err == io.EOF {
+				break
+			}
+			dec.err = err
+			return nil
+		}
+		if key == "" {
+			dec.err = errors.New("empty key")
+			return nil
+		}
+
+		val, tok, err := dec.scan.nextValue()
+		if err != nil {
+			dec.err = err
+			return nil
+		}
+
+		switch key {
+		case "left_expression":
+			dec.scan.back()
+			binExpr.LeftExpr = dec.decodeExpr()
+		case "operator":
+			if tok != scanStringLit {
+				dec.err = fmt.Errorf("expected 'string literal', found '%v'", tok)
+				return nil
+			}
+			binExpr.Op, dec.err = dec.unmarshalString(val)
+		case "right_expression":
+			dec.scan.back()
+			binExpr.RightExpr = dec.decodeExpr()
+		default:
+			dec.err = fmt.Errorf("unexpected value for the key '%s' of a binary expression object", key)
+		}
+
+		if dec.err != nil {
+			return nil
+		}
+
+		if dec.isEndObject() {
+			break
+		}
+		if err != nil {
+			return nil
+		}
+	}
+	return &binExpr
 }
 
 // decodeTernaryExpr decodes ternary expression object.
@@ -848,9 +897,51 @@ func (dec *decoder) decodeCallExpr() *ast.CallExpr {
 	return dec.decodeCallExprAttrs()
 }
 
-// TODO: implement
+// decodeCallExprAttrs decodes call expression attributes.
 func (dec *decoder) decodeCallExprAttrs() *ast.CallExpr {
-	return nil
+	callExpr := ast.CallExpr{ExprName: token.CallExprName}
+	for {
+		key, err := dec.scan.nextKey()
+		if err != nil {
+			if err == io.EOF {
+				break
+			}
+			dec.err = err
+			return nil
+		}
+		if key == "" {
+			dec.err = errors.New("empty key")
+			return nil
+		}
+
+		_, _, err = dec.scan.nextValue()
+		if err != nil {
+			dec.err = err
+			return nil
+		}
+
+		switch key {
+		case "function":
+			dec.scan.back()
+		case "arguments":
+			dec.scan.back()
+			callExpr.Args = dec.decodeExprs()
+		default:
+			dec.err = fmt.Errorf("unexpected value for the key '%s' of a call expression object", key)
+		}
+
+		if dec.err != nil {
+			return nil
+		}
+
+		if dec.isEndObject() {
+			break
+		}
+		if err != nil {
+			return nil
+		}
+	}
+	return &callExpr
 }
 
 // decodeConstructorCallExpr decodes a constructor call expression object.
@@ -907,24 +998,18 @@ func (dec *decoder) decodeArrayExprAttrs() *ast.ArrayExpr {
 			return nil
 		}
 
-		val, tok, err := dec.scan.nextValue()
+		_, _, err = dec.scan.nextValue()
 		if err != nil {
 			dec.err = err
 			return nil
 		}
 
 		switch key {
-		case "paradigms":
+		case "type":
 			dec.scan.back()
-			lang.Paradigms = dec.decodeStringsList()
-		case "language":
-			if tok != scanStringLit {
-				dec.err = fmt.Errorf("expected 'string literal', found '%v'", tok)
-				return nil
-			}
-			lang.Lang, dec.err = dec.unmarshalString(val)
+			arrayExpr.Type = dec.decodeArrayType()
 		default:
-			dec.err = fmt.Errorf("unexpected value for the key '%s' of a language object", key)
+			dec.err = fmt.Errorf("unexpected value for the key '%s' of an array expression object", key)
 		}
 
 		if dec.err != nil {
@@ -939,6 +1024,11 @@ func (dec *decoder) decodeArrayExprAttrs() *ast.ArrayExpr {
 		}
 	}
 	return &arrayExpr
+}
+
+// TODO: implement
+func (dec *decoder) decodeArrayType() *ast.ArrayType {
+	return nil
 }
 
 // decodeIndexExpr decodes an index expression object.
@@ -978,9 +1068,58 @@ func (dec *decoder) decodeBasicLit() *ast.BasicLit {
 	return dec.decodeBasicLitAttrs()
 }
 
-// TODO: implement
+// decodeBasicLitAttrs decodes basic literal attributes.
 func (dec *decoder) decodeBasicLitAttrs() *ast.BasicLit {
-	return nil
+	basicLit := ast.BasicLit{ExprName: token.BasicLitName}
+	for {
+		key, err := dec.scan.nextKey()
+		if err != nil {
+			if err == io.EOF {
+				break
+			}
+			dec.err = err
+			return nil
+		}
+		if key == "" {
+			dec.err = errors.New("empty key")
+			return nil
+		}
+
+		val, tok, err := dec.scan.nextValue()
+		if err != nil {
+			dec.err = err
+			return nil
+		}
+
+		switch key {
+		case "kind":
+			if tok != scanStringLit {
+				dec.err = fmt.Errorf("expected 'string literal', found '%v'", tok)
+				return nil
+			}
+			basicLit.Kind, dec.err = dec.unmarshalString(val)
+		case "value":
+			if tok != scanStringLit {
+				dec.err = fmt.Errorf("expected 'string literal', found '%v'", tok)
+				return nil
+			}
+			basicLit.Value, dec.err = dec.unmarshalString(val)
+		default:
+			dec.err = fmt.Errorf("unexpected value for the key '%s' of a basic literal object", key)
+		}
+
+		if dec.err != nil {
+			return nil
+		}
+
+		if dec.isEndObject() {
+			break
+		}
+		if err != nil {
+			return nil
+		}
+	}
+	return &basicLit
 }
 
 // decodeFuncLit decodes a function literal object.
@@ -1020,8 +1159,93 @@ func (dec *decoder) decodeClassLit() *ast.ClassLit {
 	return dec.decodeClassLitAttrs()
 }
 
-// TODO: implement
+// decodeClassLitAttrs decodes class literal attributes.
 func (dec *decoder) decodeClassLitAttrs() *ast.ClassLit {
+	classLit := ast.ClassLit{ExprName: token.ClassLitName}
+	for {
+		key, err := dec.scan.nextKey()
+		if err != nil {
+			if err == io.EOF {
+				break
+			}
+			dec.err = err
+			return nil
+		}
+		if key == "" {
+			dec.err = errors.New("empty key")
+			return nil
+		}
+
+		_, _, err = dec.scan.nextValue()
+		if err != nil {
+			dec.err = err
+			return nil
+		}
+
+		switch key {
+		case "extended_classes":
+			dec.scan.back()
+			classLit.ExtendedClasses = dec.decodeClassRefs()
+		case "implemented_interfaces":
+			dec.scan.back()
+			classLit.ImplementedInterfaces = dec.decodeInterfaceRefs()
+		case "attributes":
+			dec.scan.back()
+			classLit.Attrs = dec.decodeAttrs()
+		case "constructors":
+			dec.scan.back()
+			classLit.Constructors = dec.decodeConstructorDecls()
+		case "destructors":
+			dec.scan.back()
+			classLit.Destructors = dec.decodeDestructorDecls()
+		case "methods":
+			dec.scan.back()
+			classLit.Methods = dec.decodeMethodDecls()
+		default:
+			dec.err = fmt.Errorf("unexpected value for the key '%s' of a class literal object", key)
+		}
+
+		if dec.err != nil {
+			return nil
+		}
+
+		if dec.isEndObject() {
+			break
+		}
+		if err != nil {
+			return nil
+		}
+	}
+	return &classLit
+}
+
+// TODO: implement
+func (dec *decoder) decodeClassRefs() []*ast.ClassRef {
+	return nil
+}
+
+// TODO: implement
+func (dec *decoder) decodeInterfaceRefs() []*ast.InterfaceRef {
+	return nil
+}
+
+// TODO: implement
+func (dec *decoder) decodeAttrs() []*ast.Attr {
+	return nil
+}
+
+// TODO: implement
+func (dec *decoder) decodeConstructorDecls() []*ast.ConstructorDecl {
+	return nil
+}
+
+// TODO: implement
+func (dec *decoder) decodeDestructorDecls() []*ast.DestructorDecl {
+	return nil
+}
+
+// TODO: implement
+func (dec *decoder) decodeMethodDecls() []*ast.MethodDecl {
 	return nil
 }
 
@@ -1041,9 +1265,52 @@ func (dec *decoder) decodeArrayLit() *ast.ArrayLit {
 	return dec.decodeArrayLitAttrs()
 }
 
-// TODO: implement
+// decodeArrayLitAttrs decodes array literal attributes.
 func (dec *decoder) decodeArrayLitAttrs() *ast.ArrayLit {
-	return nil
+	arrayLit := ast.ArrayLit{ExprName: token.ArrayLitName}
+	for {
+		key, err := dec.scan.nextKey()
+		if err != nil {
+			if err == io.EOF {
+				break
+			}
+			dec.err = err
+			return nil
+		}
+		if key == "" {
+			dec.err = errors.New("empty key")
+			return nil
+		}
+
+		_, _, err = dec.scan.nextValue()
+		if err != nil {
+			dec.err = err
+			return nil
+		}
+
+		switch key {
+		case "type":
+			dec.scan.back()
+			arrayLit.Type = dec.decodeArrayType()
+		case "elements":
+			dec.scan.back()
+			arrayLit.Elts = dec.decodeExprs()
+		default:
+			dec.err = fmt.Errorf("unexpected value for the key '%s' of an array literal object", key)
+		}
+
+		if dec.err != nil {
+			return nil
+		}
+
+		if dec.isEndObject() {
+			break
+		}
+		if err != nil {
+			return nil
+		}
+	}
+	return &arrayLit
 }
 
 // decodeStructType decodes a struct type object.
@@ -1136,9 +1403,49 @@ func (dec *decoder) decodeAttrRef() *ast.AttrRef {
 	return dec.decodeAttrRefAttrs()
 }
 
-// TODO: implement
+// decodeAttrRefAttrs decodes attribute reference attributes.
 func (dec *decoder) decodeAttrRefAttrs() *ast.AttrRef {
-	return nil
+	attrRef := ast.AttrRef{ExprName: token.AttrRefName}
+	for {
+		key, err := dec.scan.nextKey()
+		if err != nil {
+			if err == io.EOF {
+				break
+			}
+			dec.err = err
+			return nil
+		}
+		if key == "" {
+			dec.err = errors.New("empty key")
+			return nil
+		}
+
+		_, _, err = dec.scan.nextValue()
+		if err != nil {
+			dec.err = err
+			return nil
+		}
+
+		switch key {
+		case "name":
+			dec.scan.back()
+			attrRef.Name = dec.decodeIdent()
+		default:
+			dec.err = fmt.Errorf("unexpected value for the key '%s' of an attribute reference object", key)
+		}
+
+		if dec.err != nil {
+			return nil
+		}
+
+		if dec.isEndObject() {
+			break
+		}
+		if err != nil {
+			return nil
+		}
+	}
+	return &attrRef
 }
 
 // decodeValueSpec decodes a value specifier object.
