@@ -198,7 +198,7 @@ func (p *Project) Encode(w io.Writer) error {
 	return enc.Encode(p)
 }
 
-// Encode writes JSON representation of the project into a file located at path.
+// EncodeToFile writes JSON representation of the project into a file located at path.
 func (p *Project) EncodeToFile(path string) error {
 	f, err := os.Create(path)
 	if err != nil {

@@ -9,13 +9,13 @@ import (
 	"os"
 )
 
-// Decode a JSON encoded src.Project read from r.
+// Decode decodes a JSON encoded src.Project read from r.
 func Decode(r io.Reader) (*Project, error) {
 	dec := newDecoder(r)
 	return dec.decode()
 }
 
-// Decode a JSON encoded src.Project read from a given file.
+// DecodeFile decodes a JSON encoded src.Project read from a given file.
 func DecodeFile(path string) (*Project, error) {
 	f, err := os.Open(path)
 	if err != nil {
