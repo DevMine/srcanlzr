@@ -8,7 +8,7 @@
 	representation (abstraction) of a source code.
 
 
-	Lines of Code Counting
+	Lines of Code counting
 
 	The number of real lines of code must be precomputed by the language
 	parsers. This is the only "feature" that must be precomputed because it may
