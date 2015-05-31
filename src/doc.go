@@ -3,9 +3,41 @@
 // license that can be found in the LICENSE file.
 
 /*
-	Package src provides a set of structures for representing a source code
-	indepently of the language. In other words, it provides a generic
-	representation (abstraction) of a source code.
+	Package src provides a set of structures for representing a project with its
+	related source code independently of the language. In other words, it
+	provides a generic representation (abstraction) of a source code.
+
+
+	Goal
+
+	The goal of this package is to provide a generic representation of a project
+	that can be analyzed by the anlzr package as well as an API for
+	encoding/decoding it to/from JSON.
+
+
+	Usage
+
+	There are two kinds of program that interact with a src.Project: language
+	parsers and VCS support tools. The former visits all source files inside
+	the project folder and parse every source file in order to fill the
+	src.Project.Packages field (and few others). The latter read the VCS folder
+	that contains VCS data and fill the src.Project.Repo structure. The next
+	two chapters treat about them more in details.
+
+
+	Language parsers
+
+	TODO
+
+
+	VCS support tools
+
+	TODO
+
+
+	Example
+
+	TODO
 
 
 	Lines of Code counting
