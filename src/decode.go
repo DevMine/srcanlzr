@@ -649,11 +649,6 @@ func (dec *decoder) decodeIdent() *ast.Ident {
 	return &ident
 }
 
-// TODO: implement
-func (dec *decoder) decodeExpr() ast.Expr {
-	return nil
-}
-
 // decoderStringsList decodes a list of strings.
 func (dec *decoder) decodeStringsList() []string {
 	if !dec.assertNewArray() {
@@ -793,6 +788,219 @@ func (dec *decoder) decodeLanguage() *Language {
 // TODO: implement
 func (dec *decoder) decodeRepository() *model.Repository {
 	return nil
+}
+
+// decodeExprs decodes a list of expression objects.
+func (dec *decoder) decodeExprs() []ast.Expr {
+	if !dec.assertNewArray() {
+		return nil
+	}
+
+	exprs := []ast.Expr{}
+
+	if dec.isEmptyArray() {
+		return exprs
+	}
+	if dec.err != nil {
+		return nil
+	}
+
+	for {
+		expr := dec.decodeExpr()
+		if dec.err != nil {
+			return nil
+		}
+
+		exprs = append(exprs, expr)
+
+		if dec.isEndArray() {
+			break
+		}
+		if dec.err != nil {
+			return nil
+		}
+	}
+
+	return exprs
+}
+
+func (dec *decoder) decodeExpr() ast.Expr {
+	if !dec.assertNewObject() {
+		return nil
+	}
+
+	// Expression cannot be an empty object because ast.Expr is an interface
+	// and we need the value corresponding to the "expression_name" to allocate
+	// the appropriate type.
+	if dec.isEmptyObject() {
+		dec.err = errors.New("expression object cannot be empty")
+		return nil
+	}
+	if dec.err != nil {
+		return nil
+	}
+	exprName := dec.extractFirstKey("expression_name")
+	if dec.err != nil {
+		return nil
+	}
+
+	// Since the beginning of the object has already been consumed, we need
+	// special methods for only decoding the attributes.
+
+	var expr ast.Expr
+	switch exprName {
+	case token.UnaryExprName:
+		expr = dec.decodeUnaryExprAttrs()
+	case token.BinaryExprName:
+		expr = dec.decodeBinaryExprAttrs()
+	case token.TernaryExprName:
+		expr = dec.decodeTernaryExprAttrs()
+	case token.IncDecExprName:
+		expr = dec.decodeIncDecExprAttrs()
+	case token.CallExprName:
+		expr = dec.decodeCallExprAttrs()
+	case token.ConstructorCallExprName:
+		expr = dec.decodeConstructorCallExprAttrs()
+	case token.ArrayExprName:
+		expr = dec.decodeArrayExprAttrs()
+	case token.IndexExprName:
+		expr = dec.decodeIndexExprAttrs()
+	case token.BasicLitName:
+		expr = dec.decodeBasicLitAttrs()
+	case token.FuncLitName:
+		expr = dec.decodeFuncLitAttrs()
+	case token.ClassLitName:
+		expr = dec.decodeClassLitAttrs()
+	case token.ArrayLitName:
+		expr = dec.decodeArrayLitAttrs()
+	case token.StructTypeName:
+		expr = dec.decodeStructTypeAttrs()
+	case token.AttrRefName:
+		expr = dec.decodeAttrRefAttrs()
+	case token.ValueSpecName:
+		expr = dec.decodeValueSpecAttrs()
+	case token.IdentName:
+		expr = dec.decodeIdentAttrs()
+	default:
+		dec.err = fmt.Errorf("unknown expression '%s'", exprName)
+		return nil
+	}
+	if dec.err != nil {
+		return nil
+	}
+	return expr
+}
+
+// TODO: implement
+func (dec *decoder) decodeUnaryExprAttrs() *ast.UnaryExpr {
+	return nil
+}
+
+// TODO: implement
+func (dec *decoder) decodeBinaryExprAttrs() *ast.BinaryExpr {
+	return nil
+}
+
+// TODO: implement
+func (dec *decoder) decodeTernaryExprAttrs() *ast.TernaryExpr {
+	return nil
+}
+
+// TODO: implement
+func (dec *decoder) decodeIncDecExprAttrs() *ast.IncDecExpr {
+	return nil
+}
+
+// TODO: implement
+func (dec *decoder) decodeCallExprAttrs() *ast.CallExpr {
+	return nil
+}
+
+// TODO: implement
+func (dec *decoder) decodeConstructorCallExprAttrs() *ast.ConstructorCallExpr {
+	return nil
+}
+
+// TODO: implement
+func (dec *decoder) decodeArrayExprAttrs() *ast.ArrayExpr {
+	return nil
+}
+
+// TODO: implement
+func (dec *decoder) decodeIndexExprAttrs() *ast.IndexExpr {
+	return nil
+}
+
+// TODO: implement
+func (dec *decoder) decodeBasicLitAttrs() *ast.BasicLit {
+	return nil
+}
+
+// TODO: implement
+func (dec *decoder) decodeFuncLitAttrs() *ast.FuncLit {
+	return nil
+}
+
+// TODO: implement
+func (dec *decoder) decodeClassLitAttrs() *ast.ClassLit {
+	return nil
+}
+
+// TODO: implement
+func (dec *decoder) decodeArrayLitAttrs() *ast.ArrayLit {
+	return nil
+}
+
+// TODO: implement
+func (dec *decoder) decodeStructTypeAttrs() *ast.StructType {
+	return nil
+}
+
+// TODO: implement
+func (dec *decoder) decodeAttrRefAttrs() *ast.AttrRef {
+	return nil
+}
+
+// TODO: implement
+func (dec *decoder) decodeValueSpecAttrs() *ast.ValueSpec {
+	return nil
+}
+
+// TODO: implement
+func (dec *decoder) decodeIdentAttrs() *ast.Ident {
+	return nil
+}
+
+// extractExprName looks for the first key of an object, which must be
+// match the given key, and returns its value. The '{' character must have been
+// previously consumed and value corresponding to the key must be a string.
+//
+// Errors are reported in dec.err and value corresponding to the key must be a string.
+func (dec *decoder) extractFirstKey(key string) string {
+	k, err := dec.scan.nextKey()
+	if err != nil {
+		if err == io.EOF {
+			dec.err = errors.New("unexpected EOF")
+			return ""
+		}
+		dec.err = err
+		return ""
+	}
+	if k != key {
+		dec.err = fmt.Errorf("expected key to be '%s', found '%s'", key, k)
+		return ""
+	}
+
+	val, tok, err := dec.scan.nextValue()
+	if err != nil {
+		dec.err = err
+		return ""
+	}
+	if tok != scanStringLit {
+		dec.err = fmt.Errorf("expected 'string literal', found '%v'", tok)
+		return ""
+	}
+	return string(val)
 }
 
 // TODO: implement

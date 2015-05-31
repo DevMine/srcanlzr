@@ -115,6 +115,47 @@ func TestDecodeIdent(t *testing.T) {
 	}
 }
 
+func TestExtractFirstKey(t *testing.T) {
+	// test success
+	buf := bytes.NewBufferString(`"expression_name": "IDENT"`)
+	dec := newDecoder(buf)
+	if val := dec.extractFirstKey("expression_name"); val != "IDENT" {
+		t.Errorf("extractFirstKey 'expression_name': found '%s', expected 'IDENT'", val)
+	}
+	if dec.err != nil {
+		t.Error(dec.err)
+	}
+
+	// test failure
+
+	buf = bytes.NewBufferString(``)
+	dec = newDecoder(buf)
+	expectedErr := errors.New("unexpected EOF")
+	_ = dec.extractFirstKey("expression_name")
+	if dec.err.Error() != expectedErr.Error() {
+		t.Errorf("extractFirstKey 'expression_name': found error \"%v\", expected error \"%v\"",
+			dec.err, expectedErr)
+	}
+
+	buf = bytes.NewBufferString(`"foo": "bar"`)
+	dec = newDecoder(buf)
+	expectedErr = errors.New("expected key to be 'expression_name', found 'foo'")
+	_ = dec.extractFirstKey("expression_name")
+	if dec.err.Error() != expectedErr.Error() {
+		t.Errorf("extractFirstKey 'expression_name': found error \"%v\", expected error \"%v\"",
+			dec.err, expectedErr)
+	}
+
+	buf = bytes.NewBufferString(`"expression_name": 42`)
+	dec = newDecoder(buf)
+	expectedErr = errors.New("expected 'string literal', found 'integer literal'")
+	_ = dec.extractFirstKey("expression_name")
+	if dec.err.Error() != expectedErr.Error() {
+		t.Errorf("extractFirstKey 'expression_name': found error \"%v\", expected error \"%v\"",
+			dec.err, expectedErr)
+	}
+}
+
 func TestUnmarshalString(t *testing.T) {
 	dec := newDecoder(new(bytes.Buffer))
 	if str, err := dec.unmarshalString([]byte("foo")); err != nil {
