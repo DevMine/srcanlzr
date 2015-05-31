@@ -15,9 +15,13 @@
 	have multiple usages:
 
 	1. Eliminate empty projects
+
 	2. Evalutate project size
+
 	3. Verify that the decoding is correct
+
 	4. Normalize various counts
+
 	5. ...
 
 	Therefore, this count must be accurate and strictly follow the following
