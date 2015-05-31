@@ -437,8 +437,112 @@ func (dec *decoder) decodeTypeSpec() *ast.TypeSpec {
 	return &typeSpec
 }
 
-// TODO: implement
+// decodeStructs decodes a list of struct objects.
 func (dec *decoder) decodeStructs() []*ast.StructType {
+	if !dec.assertNewArray() {
+		return nil
+	}
+
+	ss := []*ast.StructType{}
+
+	if dec.isEmptyArray() {
+		return ss
+	}
+	if dec.err != nil {
+		return nil
+	}
+
+	for {
+		structType := dec.decodeStructType()
+		if dec.err != nil {
+			return nil
+		}
+
+		ss = append(ss, structType)
+
+		if dec.isEndArray() {
+			break
+		}
+		if dec.err != nil {
+			return nil
+		}
+	}
+
+	return ss
+}
+
+// decodeStructType decodes a struct object.
+func (dec *decoder) decodeStructType() *ast.StructType {
+	if !dec.assertNewObject() {
+		return nil
+	}
+
+	structType := ast.StructType{}
+
+	if dec.isEmptyObject() {
+		return &structType
+	}
+	if dec.err != nil {
+		return nil
+	}
+
+	for {
+		key, err := dec.scan.nextKey()
+		if err != nil {
+			if err == io.EOF {
+				break
+			}
+			dec.err = err
+			return nil
+		}
+		if key == "" {
+			dec.err = errors.New("empty key")
+			return nil
+		}
+
+		val, tok, err := dec.scan.nextValue()
+		if err != nil {
+			dec.err = err
+			return nil
+		}
+
+		switch key {
+		case "expression_name":
+			if tok != scanStringLit {
+				dec.err = fmt.Errorf("expected 'string literal', found '%v'", tok)
+				return nil
+			}
+			structType.ExprName, dec.err = dec.unmarshalString(val)
+		case "doc":
+			dec.scan.back()
+			structType.Doc = dec.decodeStringsList()
+		case "name":
+			dec.scan.back()
+			structType.Name = dec.decodeIdent()
+		case "fields":
+			dec.scan.back()
+			structType.Fields = dec.decodeFields()
+		default:
+			dec.err = fmt.Errorf("unexpected value for the key '%s' of struct type object", key)
+		}
+
+		if dec.err != nil {
+			return nil
+		}
+
+		if dec.isEndObject() {
+			break
+		}
+		if err != nil {
+			return nil
+		}
+	}
+
+	return &structType
+}
+
+// TODO: implement
+func (dec *decoder) decodeFields() []*ast.Field {
 	return nil
 }
 
