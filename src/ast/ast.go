@@ -58,7 +58,6 @@ type CallExpr struct {
 	ExprName string   `json:"expression_name"`
 	Fun      *FuncRef `json:"function"`  // Reference to the function
 	Args     []Expr   `json:"arguments"` // function arguments
-	Line     int64    `json:"line"`      // Line number of the statement relatively to the function.
 }
 
 type ClassDecl struct {

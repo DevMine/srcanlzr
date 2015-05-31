@@ -890,9 +890,55 @@ func (dec *decoder) decodeArrayExpr() *ast.ArrayExpr {
 	return dec.decodeArrayExprAttrs()
 }
 
-// TODO: implement
+// decodeArrayExprAttrs decodes array expression attributes.
 func (dec *decoder) decodeArrayExprAttrs() *ast.ArrayExpr {
-	return nil
+	arrayExpr := ast.ArrayExpr{ExprName: token.ArrayExprName}
+	for {
+		key, err := dec.scan.nextKey()
+		if err != nil {
+			if err == io.EOF {
+				break
+			}
+			dec.err = err
+			return nil
+		}
+		if key == "" {
+			dec.err = errors.New("empty key")
+			return nil
+		}
+
+		val, tok, err := dec.scan.nextValue()
+		if err != nil {
+			dec.err = err
+			return nil
+		}
+
+		switch key {
+		case "paradigms":
+			dec.scan.back()
+			lang.Paradigms = dec.decodeStringsList()
+		case "language":
+			if tok != scanStringLit {
+				dec.err = fmt.Errorf("expected 'string literal', found '%v'", tok)
+				return nil
+			}
+			lang.Lang, dec.err = dec.unmarshalString(val)
+		default:
+			dec.err = fmt.Errorf("unexpected value for the key '%s' of a language object", key)
+		}
+
+		if dec.err != nil {
+			return nil
+		}
+
+		if dec.isEndObject() {
+			break
+		}
+		if err != nil {
+			return nil
+		}
+	}
+	return &arrayExpr
 }
 
 // decodeIndexExpr decodes an index expression object.
