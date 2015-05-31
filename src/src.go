@@ -30,31 +30,6 @@ var suppVCS = []string{
 	CVS,
 }
 
-// Supported visiblities
-const (
-	PublicVisibility    = "public"
-	PackageVisibility   = "package"
-	ProtectedVisibility = "protected"
-	PrivateVisibility   = "private"
-)
-
-var suppVisibility = []string{
-	PublicVisibility,
-	PackageVisibility,
-	ProtectedVisibility,
-	PrivateVisibility,
-}
-
-// Type names
-const (
-	TypeMapName         = "MAP"
-	TypeStructName      = "STRUCT"
-	TypeArrayName       = "ARRAY"
-	TypeFuncName        = "FUNC"
-	TypeInterfaceName   = "INTERFACE"
-	TypeUnsupportedName = "UNSUPPORTED"
-)
-
 // Supported programming languages
 const (
 	Go     = "go"
