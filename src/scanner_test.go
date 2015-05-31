@@ -25,14 +25,14 @@ func TestIsWhitespace(t *testing.T) {
 	ws := []byte{' ', '\n', '\t', '\r'}
 	for _, c := range ws {
 		if !isWhitespace(c) {
-			t.Errorf("'%s' should be considered as a whitespace", c)
+			t.Errorf("'%c' should be considered as a whitespace", c)
 		}
 	}
 
 	nows := []byte{'a', ',', ';', ':', '0', '\v'}
 	for _, c := range nows {
 		if isWhitespace(c) {
-			t.Errorf("'%s' should not be considered as a whitespace", c)
+			t.Errorf("'%c' should not be considered as a whitespace", c)
 		}
 	}
 }
@@ -41,14 +41,14 @@ func TestIsDigit(t *testing.T) {
 	digits := []byte{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'}
 	for _, c := range digits {
 		if !isDigit(c) {
-			t.Errorf("'%s' should be considered as a digit", c)
+			t.Errorf("'%c' should be considered as a digit", c)
 		}
 	}
 
 	var c byte
 	for c = 'a'; c <= 'z'; c++ {
 		if isDigit(c) {
-			t.Errorf("'%s' should not be considered as a digit", c)
+			t.Errorf("'%c' should not be considered as a digit", c)
 		}
 	}
 }
@@ -81,7 +81,7 @@ func TestNextKey(t *testing.T) {
 		scan := newScanner(buf)
 		_, err := scan.nextKey()
 		if err == nil {
-			t.Error("nextKey: '%s' is expected to return the error '%v'", keyInput, expectedErr)
+			t.Errorf("nextKey: '%s' is expected to return the error '%v'", keyInput, expectedErr)
 			continue
 		}
 		if err.Error() != expectedErr.Error() {
