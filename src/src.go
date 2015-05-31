@@ -5,6 +5,10 @@
 package src
 
 import (
+	"encoding/json"
+	"io"
+	"os"
+
 	"github.com/DevMine/repotool/model"
 	"github.com/DevMine/srcanlzr/src/ast"
 )
@@ -111,41 +115,6 @@ type Language struct {
 	Paradigms []string `json:"paradigms"`
 }
 
-// Project is the root of the src API and therefore it must be at the root of
-// the JSON.
-//
-// It contains the metadata of a project and the list of all packages.
-type Project struct {
-	// The name of the project. Since it may be something really difficult to
-	// guess, it should generally be the name of the folder containing the
-	// project.
-	Name string `json:"name"`
-
-	// The repository in which the project is hosted, or nil. This field is not
-	// meant to be filled by one of the language parsers. Only repotool should
-	// take care of it. For more details, see:
-	//    https://github.com/DevMine/repotool
-	//
-	// Since this field uses an external type, it is not unmarshalled by
-	// src.Unmarshal itself but by the standard json.Unmarshal function.
-	// To do so, its unmarshalling is defered using json.RawMessage.
-	// See the RepoRaw field.
-	Repo *model.Repository `json:"repository"`
-
-	// The list of all programming languages used by the project. Each language
-	// must be added by the corresponding language parsers if and only if the
-	// project contains at least one line of code written in this language.
-	Langs []*Language `json:"languages"`
-
-	// List of all packages of the project. We call "package" every folder that
-	// contains at least one source file.
-	Packages []*Package `json:"packages"`
-
-	// The total number of lines of code in the whole project, independently of
-	// the language.
-	LoC int64 `json:"loc"`
-}
-
 // Package holds information about a package, which is, basically, just a
 // folder that contains at least one source file.
 type Package struct {
@@ -209,4 +178,57 @@ type SrcFile struct {
 
 	// The total number of lines of code.
 	LoC int64 `json:"loc"`
+}
+
+// Project is the root of the src API and therefore it must be at the root of
+// the JSON.
+//
+// It contains the metadata of a project and the list of all packages.
+type Project struct {
+	// The name of the project. Since it may be something really difficult to
+	// guess, it should generally be the name of the folder containing the
+	// project.
+	Name string `json:"name"`
+
+	// The repository in which the project is hosted, or nil. This field is not
+	// meant to be filled by one of the language parsers. Only repotool should
+	// take care of it. For more details, see:
+	//    https://github.com/DevMine/repotool
+	//
+	// Since this field uses an external type, it is not unmarshalled by
+	// src.Unmarshal itself but by the standard json.Unmarshal function.
+	// To do so, its unmarshalling is defered using json.RawMessage.
+	// See the RepoRaw field.
+	Repo *model.Repository `json:"repository"`
+
+	// The list of all programming languages used by the project. Each language
+	// must be added by the corresponding language parsers if and only if the
+	// project contains at least one line of code written in this language.
+	Langs []*Language `json:"languages"`
+
+	// List of all packages of the project. We call "package" every folder that
+	// contains at least one source file.
+	Packages []*Package `json:"packages"`
+
+	// The total number of lines of code in the whole project, independently of
+	// the language.
+	LoC int64 `json:"loc"`
+}
+
+// Encode writes JSON representation of the project into w.
+//
+// For now, encoding still make use of the json package of the standard libary.
+func (p *Project) Encode(w io.Writer) error {
+	enc := json.NewEncoder(w)
+	return enc.Encode(p)
+}
+
+// Encode writes JSON representation of the project into a file located at path.
+func (p *Project) EncodeToFile(path string) error {
+	f, err := os.Create(path)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	return p.Encode(f)
 }
