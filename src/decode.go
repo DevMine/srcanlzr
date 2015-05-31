@@ -1544,8 +1544,6 @@ func (dec *decoder) decodeIdentAttrs() *ast.Ident {
 	}
 
 	return &ident
-
-	return nil
 }
 
 // extractExprName looks for the first key of an object, which must be
