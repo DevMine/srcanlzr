@@ -471,76 +471,6 @@ func (dec *decoder) decodeStructs() []*ast.StructType {
 	return ss
 }
 
-// decodeStructType decodes a struct object.
-func (dec *decoder) decodeStructType() *ast.StructType {
-	if !dec.assertNewObject() {
-		return nil
-	}
-
-	structType := ast.StructType{}
-
-	if dec.isEmptyObject() {
-		return &structType
-	}
-	if dec.err != nil {
-		return nil
-	}
-
-	for {
-		key, err := dec.scan.nextKey()
-		if err != nil {
-			if err == io.EOF {
-				break
-			}
-			dec.err = err
-			return nil
-		}
-		if key == "" {
-			dec.err = errors.New("empty key")
-			return nil
-		}
-
-		val, tok, err := dec.scan.nextValue()
-		if err != nil {
-			dec.err = err
-			return nil
-		}
-
-		switch key {
-		case "expression_name":
-			if tok != scanStringLit {
-				dec.err = fmt.Errorf("expected 'string literal', found '%v'", tok)
-				return nil
-			}
-			structType.ExprName, dec.err = dec.unmarshalString(val)
-		case "doc":
-			dec.scan.back()
-			structType.Doc = dec.decodeStringsList()
-		case "name":
-			dec.scan.back()
-			structType.Name = dec.decodeIdent()
-		case "fields":
-			dec.scan.back()
-			structType.Fields = dec.decodeFields()
-		default:
-			dec.err = fmt.Errorf("unexpected value for the key '%s' of struct type object", key)
-		}
-
-		if dec.err != nil {
-			return nil
-		}
-
-		if dec.isEndObject() {
-			break
-		}
-		if err != nil {
-			return nil
-		}
-	}
-
-	return &structType
-}
-
 // TODO: implement
 func (dec *decoder) decodeFields() []*ast.Field {
 	return nil
@@ -574,79 +504,6 @@ func (dec *decoder) decodeEnumDecls() []*ast.EnumDecl {
 // TODO: implement
 func (dec *decoder) decodeTraits() []*ast.Trait {
 	return nil
-}
-
-// decodeIdent decodes an identifier object.
-func (dec *decoder) decodeIdent() *ast.Ident {
-	if !dec.assertNewObject() {
-		return nil
-	}
-
-	ident := ast.Ident{}
-
-	if dec.isEmptyObject() {
-		return &ident
-	}
-	if dec.err != nil {
-		return nil
-	}
-
-	for {
-		key, err := dec.scan.nextKey()
-		if err != nil {
-			if err == io.EOF {
-				break
-			}
-			dec.err = err
-			return nil
-		}
-		if key == "" {
-			dec.err = errors.New("empty key")
-			return nil
-		}
-
-		val, tok, err := dec.scan.nextValue()
-		if err != nil {
-			dec.err = err
-			return nil
-		}
-
-		switch key {
-		case "expression_name":
-			if tok != scanStringLit {
-				dec.err = fmt.Errorf("expected 'string literal', found '%v'", tok)
-				return nil
-			}
-			ident.ExprName, dec.err = dec.unmarshalString(val)
-			// Ensure that expression name is correct.
-			if ident.ExprName != token.IdentName {
-				dec.err = fmt.Errorf("invalid expression_name: expected '%s', found '%v'",
-					token.IdentName, ident.ExprName)
-				return nil
-			}
-		case "name":
-			if tok != scanStringLit {
-				dec.err = fmt.Errorf("expected 'string literal', found '%v'", tok)
-				return nil
-			}
-			ident.Name, dec.err = dec.unmarshalString(val)
-		default:
-			dec.err = fmt.Errorf("unexpected value for the key '%s' of a ident object", key)
-		}
-
-		if dec.err != nil {
-			return nil
-		}
-
-		if dec.isEndObject() {
-			break
-		}
-		if err != nil {
-			return nil
-		}
-	}
-
-	return &ident
 }
 
 // decoderStringsList decodes a list of strings.
@@ -891,9 +748,41 @@ func (dec *decoder) decodeExpr() ast.Expr {
 	return expr
 }
 
+// decodeUnaryExpr decodes unary expression object.
+func (dec *decoder) decodeUnaryExpr() *ast.UnaryExpr {
+	if !dec.assertNewObject() {
+		return nil
+	}
+
+	if dec.isEmptyObject() {
+		dec.err = errors.New("unary expression object cannot be empty")
+		return nil
+	}
+	if dec.err != nil {
+		return nil
+	}
+	return dec.decodeUnaryExprAttrs()
+}
+
 // TODO: implement
 func (dec *decoder) decodeUnaryExprAttrs() *ast.UnaryExpr {
 	return nil
+}
+
+// decodeBinaryExpr decodes binary expression object.
+func (dec *decoder) decodeBinaryExpr() *ast.BinaryExpr {
+	if !dec.assertNewObject() {
+		return nil
+	}
+
+	if dec.isEmptyObject() {
+		dec.err = errors.New("binary expression object cannot be empty")
+		return nil
+	}
+	if dec.err != nil {
+		return nil
+	}
+	return dec.decodeBinaryExprAttrs()
 }
 
 // TODO: implement
@@ -901,9 +790,41 @@ func (dec *decoder) decodeBinaryExprAttrs() *ast.BinaryExpr {
 	return nil
 }
 
+// decodeTernaryExpr decodes ternary expression object.
+func (dec *decoder) decodeTernaryExpr() *ast.TernaryExpr {
+	if !dec.assertNewObject() {
+		return nil
+	}
+
+	if dec.isEmptyObject() {
+		dec.err = errors.New("ternary expression object cannot be empty")
+		return nil
+	}
+	if dec.err != nil {
+		return nil
+	}
+	return dec.decodeTernaryExprAttrs()
+}
+
 // TODO: implement
 func (dec *decoder) decodeTernaryExprAttrs() *ast.TernaryExpr {
 	return nil
+}
+
+// decodeIncDecExpr decodes increment/decrement expression object.
+func (dec *decoder) decodeIncDecExpr() *ast.IncDecExpr {
+	if !dec.assertNewObject() {
+		return nil
+	}
+
+	if dec.isEmptyObject() {
+		dec.err = errors.New("increment/decrement expression object cannot be empty")
+		return nil
+	}
+	if dec.err != nil {
+		return nil
+	}
+	return dec.decodeIncDecExprAttrs()
 }
 
 // TODO: implement
@@ -911,9 +832,41 @@ func (dec *decoder) decodeIncDecExprAttrs() *ast.IncDecExpr {
 	return nil
 }
 
+// decodeCallExpr decodes a call expression object.
+func (dec *decoder) decodeCallExpr() *ast.CallExpr {
+	if !dec.assertNewObject() {
+		return nil
+	}
+
+	if dec.isEmptyObject() {
+		dec.err = errors.New("call expression object cannot be empty")
+		return nil
+	}
+	if dec.err != nil {
+		return nil
+	}
+	return dec.decodeCallExprAttrs()
+}
+
 // TODO: implement
 func (dec *decoder) decodeCallExprAttrs() *ast.CallExpr {
 	return nil
+}
+
+// decodeConstructorCallExpr decodes a constructor call expression object.
+func (dec *decoder) decodeConstructorCallExpr() *ast.ConstructorCallExpr {
+	if !dec.assertNewObject() {
+		return nil
+	}
+
+	if dec.isEmptyObject() {
+		dec.err = errors.New("constructor call expression object cannot be empty")
+		return nil
+	}
+	if dec.err != nil {
+		return nil
+	}
+	return dec.decodeConstructorCallExprAttrs()
 }
 
 // TODO: implement
@@ -921,9 +874,41 @@ func (dec *decoder) decodeConstructorCallExprAttrs() *ast.ConstructorCallExpr {
 	return nil
 }
 
+// decodeArrayExpr decodes an array expression object.
+func (dec *decoder) decodeArrayExpr() *ast.ArrayExpr {
+	if !dec.assertNewObject() {
+		return nil
+	}
+
+	if dec.isEmptyObject() {
+		dec.err = errors.New("array expression object cannot be empty")
+		return nil
+	}
+	if dec.err != nil {
+		return nil
+	}
+	return dec.decodeArrayExprAttrs()
+}
+
 // TODO: implement
 func (dec *decoder) decodeArrayExprAttrs() *ast.ArrayExpr {
 	return nil
+}
+
+// decodeIndexExpr decodes an index expression object.
+func (dec *decoder) decodeIndexExpr() *ast.IndexExpr {
+	if !dec.assertNewObject() {
+		return nil
+	}
+
+	if dec.isEmptyObject() {
+		dec.err = errors.New("index expression object cannot be empty")
+		return nil
+	}
+	if dec.err != nil {
+		return nil
+	}
+	return dec.decodeIndexExprAttrs()
 }
 
 // TODO: implement
@@ -931,9 +916,41 @@ func (dec *decoder) decodeIndexExprAttrs() *ast.IndexExpr {
 	return nil
 }
 
+// decodeBasicLit decodes a basic literal object.
+func (dec *decoder) decodeBasicLit() *ast.BasicLit {
+	if !dec.assertNewObject() {
+		return nil
+	}
+
+	if dec.isEmptyObject() {
+		dec.err = errors.New("basic literal object cannot be empty")
+		return nil
+	}
+	if dec.err != nil {
+		return nil
+	}
+	return dec.decodeBasicLitAttrs()
+}
+
 // TODO: implement
 func (dec *decoder) decodeBasicLitAttrs() *ast.BasicLit {
 	return nil
+}
+
+// decodeFuncLit decodes a function literal object.
+func (dec *decoder) decodeFuncLit() *ast.FuncLit {
+	if !dec.assertNewObject() {
+		return nil
+	}
+
+	if dec.isEmptyObject() {
+		dec.err = errors.New("function literal object cannot be empty")
+		return nil
+	}
+	if dec.err != nil {
+		return nil
+	}
+	return dec.decodeFuncLitAttrs()
 }
 
 // TODO: implement
@@ -941,9 +958,41 @@ func (dec *decoder) decodeFuncLitAttrs() *ast.FuncLit {
 	return nil
 }
 
+// decodeClassLit decodes a class literal object.
+func (dec *decoder) decodeClassLit() *ast.ClassLit {
+	if !dec.assertNewObject() {
+		return nil
+	}
+
+	if dec.isEmptyObject() {
+		dec.err = errors.New("class literal object cannot be empty")
+		return nil
+	}
+	if dec.err != nil {
+		return nil
+	}
+	return dec.decodeClassLitAttrs()
+}
+
 // TODO: implement
 func (dec *decoder) decodeClassLitAttrs() *ast.ClassLit {
 	return nil
+}
+
+// decodeArrayLit decodes an array literal object.
+func (dec *decoder) decodeArrayLit() *ast.ArrayLit {
+	if !dec.assertNewObject() {
+		return nil
+	}
+
+	if dec.isEmptyObject() {
+		dec.err = errors.New("array literal object cannot be empty")
+		return nil
+	}
+	if dec.err != nil {
+		return nil
+	}
+	return dec.decodeArrayLitAttrs()
 }
 
 // TODO: implement
@@ -951,9 +1000,94 @@ func (dec *decoder) decodeArrayLitAttrs() *ast.ArrayLit {
 	return nil
 }
 
+// decodeStructType decodes a struct type object.
+func (dec *decoder) decodeStructType() *ast.StructType {
+	if !dec.assertNewObject() {
+		return nil
+	}
+
+	if dec.isEmptyObject() {
+		dec.err = errors.New("struct type object cannot be empty")
+		return nil
+	}
+	if dec.err != nil {
+		return nil
+	}
+	return dec.decodeStructTypeAttrs()
+}
+
 // TODO: implement
 func (dec *decoder) decodeStructTypeAttrs() *ast.StructType {
-	return nil
+	structType := ast.StructType{ExprName: token.StructTypeName}
+	for {
+		key, err := dec.scan.nextKey()
+		if err != nil {
+			if err == io.EOF {
+				break
+			}
+			dec.err = err
+			return nil
+		}
+		if key == "" {
+			dec.err = errors.New("empty key")
+			return nil
+		}
+
+		val, tok, err := dec.scan.nextValue()
+		if err != nil {
+			dec.err = err
+			return nil
+		}
+
+		switch key {
+		case "expression_name":
+			if tok != scanStringLit {
+				dec.err = fmt.Errorf("expected 'string literal', found '%v'", tok)
+				return nil
+			}
+			structType.ExprName, dec.err = dec.unmarshalString(val)
+		case "doc":
+			dec.scan.back()
+			structType.Doc = dec.decodeStringsList()
+		case "name":
+			dec.scan.back()
+			structType.Name = dec.decodeIdent()
+		case "fields":
+			dec.scan.back()
+			structType.Fields = dec.decodeFields()
+		default:
+			dec.err = fmt.Errorf("unexpected value for the key '%s' of struct type object", key)
+		}
+
+		if dec.err != nil {
+			return nil
+		}
+
+		if dec.isEndObject() {
+			break
+		}
+		if err != nil {
+			return nil
+		}
+	}
+
+	return &structType
+}
+
+// decodeAttrRef decodes an attribute reference object.
+func (dec *decoder) decodeAttrRef() *ast.AttrRef {
+	if !dec.assertNewObject() {
+		return nil
+	}
+
+	if dec.isEmptyObject() {
+		dec.err = errors.New("attribute reference object cannot be empty")
+		return nil
+	}
+	if dec.err != nil {
+		return nil
+	}
+	return dec.decodeAttrRefAttrs()
 }
 
 // TODO: implement
@@ -961,13 +1095,103 @@ func (dec *decoder) decodeAttrRefAttrs() *ast.AttrRef {
 	return nil
 }
 
+// decodeValueSpec decodes a value specifier object.
+func (dec *decoder) decodeValueSpec() *ast.ValueSpec {
+	if !dec.assertNewObject() {
+		return nil
+	}
+
+	if dec.isEmptyObject() {
+		dec.err = errors.New("value specifier object cannot be empty")
+		return nil
+	}
+	if dec.err != nil {
+		return nil
+	}
+	return dec.decodeValueSpecAttrs()
+}
+
 // TODO: implement
 func (dec *decoder) decodeValueSpecAttrs() *ast.ValueSpec {
 	return nil
 }
 
-// TODO: implement
+// decodeValueSpec decodes a value specifier object.
+func (dec *decoder) decodeIdent() *ast.Ident {
+	if !dec.assertNewObject() {
+		return nil
+	}
+
+	if dec.isEmptyObject() {
+		dec.err = errors.New("identifier object cannot be empty")
+		return nil
+	}
+	if dec.err != nil {
+		return nil
+	}
+	return dec.decodeIdentAttrs()
+}
+
+// decodeIdentAttrs decodes ident attributes.
 func (dec *decoder) decodeIdentAttrs() *ast.Ident {
+	ident := ast.Ident{}
+	for {
+		key, err := dec.scan.nextKey()
+		if err != nil {
+			if err == io.EOF {
+				break
+			}
+			dec.err = err
+			return nil
+		}
+		if key == "" {
+			dec.err = errors.New("empty key")
+			return nil
+		}
+
+		val, tok, err := dec.scan.nextValue()
+		if err != nil {
+			dec.err = err
+			return nil
+		}
+
+		switch key {
+		case "expression_name":
+			if tok != scanStringLit {
+				dec.err = fmt.Errorf("expected 'string literal', found '%v'", tok)
+				return nil
+			}
+			ident.ExprName, dec.err = dec.unmarshalString(val)
+			// Ensure that expression name is correct.
+			if ident.ExprName != token.IdentName {
+				dec.err = fmt.Errorf("invalid expression_name: expected '%s', found '%v'",
+					token.IdentName, ident.ExprName)
+				return nil
+			}
+		case "name":
+			if tok != scanStringLit {
+				dec.err = fmt.Errorf("expected 'string literal', found '%v'", tok)
+				return nil
+			}
+			ident.Name, dec.err = dec.unmarshalString(val)
+		default:
+			dec.err = fmt.Errorf("unexpected value for the key '%s' of a ident object", key)
+		}
+
+		if dec.err != nil {
+			return nil
+		}
+
+		if dec.isEndObject() {
+			break
+		}
+		if err != nil {
+			return nil
+		}
+	}
+
+	return &ident
+
 	return nil
 }
 
