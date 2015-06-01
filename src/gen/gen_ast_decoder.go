@@ -238,10 +238,6 @@ func fatalf(format string, a ...interface{}) {
 func main() {
 	flag.Parse()
 
-	if n := flag.NArg(); n != 1 {
-		fatalf("invalid # or arguments: expected 1, found %d", n)
-	}
-
 	out, err := os.Create(outputPath)
 	if err != nil {
 		fatal(err)
@@ -253,7 +249,7 @@ func main() {
 
 	fset := token.NewFileSet()
 
-	f, err := parser.ParseFile(fset, flag.Arg(0), nil, 0)
+	f, err := parser.ParseFile(fset, "./ast/ast.go", nil, 0)
 	if err != nil {
 		fatal(err)
 	}
@@ -325,5 +321,4 @@ func main() {
 	if err := genStmts(out, stmts); err != nil {
 		fatal(err)
 	}
-	fmt.Println("Done.")
 }
