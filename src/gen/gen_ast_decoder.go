@@ -5,16 +5,20 @@
 package main
 
 import (
+	"bytes"
 	"flag"
 	"fmt"
 	"go/ast"
 	"go/parser"
 	"go/token"
 	"io"
+	"io/ioutil"
 	"os"
 	"regexp"
 	"strings"
 	"text/template"
+
+	"golang.org/x/tools/imports"
 )
 
 // kind of AST node
@@ -243,15 +247,6 @@ func fatalf(format string, a ...interface{}) {
 func main() {
 	flag.Parse()
 
-	out, err := os.Create(outputPath)
-	if err != nil {
-		fatal(err)
-	}
-	defer out.Close()
-
-	// write file header
-	out.WriteString(header)
-
 	fset := token.NewFileSet()
 
 	f, err := parser.ParseFile(fset, "./ast/ast.go", nil, 0)
@@ -316,14 +311,25 @@ func main() {
 		}
 	}
 
+	buf := bytes.NewBufferString(header)
+
 	// generate code
-	if err := genExprs(out, exprs); err != nil {
+	if err := genExprs(buf, exprs); err != nil {
 		fatal(err)
 	}
-	if err := genStmts(out, stmts); err != nil {
+	if err := genStmts(buf, stmts); err != nil {
 		fatal(err)
 	}
-	if err := genStmts(out, stmts); err != nil {
+	if err := genOthers(buf, stmts); err != nil {
+		fatal(err)
+	}
+
+	// format and write final source file
+	bs, err := imports.Process(outputPath, buf.Bytes(), nil)
+	if err != nil {
+		fatal(err)
+	}
+	if err := ioutil.WriteFile(outputPath, bs, 0644); err != nil {
 		fatal(err)
 	}
 }
