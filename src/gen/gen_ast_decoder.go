@@ -41,10 +41,195 @@ import (
 	"github.com/DevMine/srcanlzr/src/token"
 )
 
+// decodeExprs decodes a list of expression objects.
+func (dec *decoder) decodeExprs() []ast.Expr {
+	if !dec.assertNewArray() {
+		return nil
+	}
+
+	exprs := []ast.Expr{}
+
+	if dec.isEmptyArray() {
+		return exprs
+	}
+	if dec.err != nil {
+		return nil
+	}
+
+	for {
+		expr := dec.decodeExpr()
+		if dec.err != nil {
+			return nil
+		}
+
+		exprs = append(exprs, expr)
+
+		if dec.isEndArray() {
+			break
+		}
+		if dec.err != nil {
+			return nil
+		}
+	}
+
+	return exprs
+}
+
+// decodeStmts decodes a list of expression objects.
+func (dec *decoder) decodeStmts() []ast.Stmt{
+	if !dec.assertNewArray() {
+		return nil
+	}
+
+	stmts := []ast.Stmt{}
+
+	if dec.isEmptyArray() {
+		return exprs
+	}
+	if dec.err != nil {
+		return nil
+	}
+
+	for {
+		stmt := dec.decodeStmt()
+		if dec.err != nil {
+			return nil
+		}
+
+		stmts = append(stmts, stmt)
+
+		if dec.isEndArray() {
+			break
+		}
+		if dec.err != nil {
+			return nil
+		}
+	}
+
+	return stmts
+}
+
 `
 
-// template for expression
-const tmplExpr = `
+const tmplGenericExpr = `
+func (dec *decoder) decodeExpr() ast.Expr {
+	if !dec.assertNewObject() {
+		return nil
+	}
+
+	// Expression cannot be an empty object because ast.Expr is an interface
+	// and we need the value corresponding to the "expression_name" to allocate
+	// the appropriate type.
+	if dec.isEmptyObject() {
+		dec.err = errors.New("expression object cannot be empty")
+		return nil
+	}
+	if dec.err != nil {
+		return nil
+	}
+	exprName := dec.extractFirstKey("expression_name")
+	if dec.err != nil {
+		return nil
+	}
+
+	// Since the beginning of the object has already been consumed, we need
+	// special methods for only decoding the attributes.
+
+	var expr ast.Expr
+	switch exprName {
+	case "":
+		{{ range $index, $expr := . }}
+		expr = dec.decode{{ $expr.Name }}Attrs()
+		{{ end }}
+	default:
+		dec.err = fmt.Errorf("unknown expression '%s'", exprName)
+		return nil
+	}
+	if dec.err != nil {
+		return nil
+	}
+	return expr
+}
+`
+
+const tmplGenericStmt = `
+func (dec *decoder) decodeStmt() ast.Stmt {
+	if !dec.assertNewObject() {
+		return nil
+	}
+
+	// Expression cannot be an empty object because ast.Stmt is an interface
+	// and we need the value corresponding to the "statement_name" to allocate
+	// the appropriate type.
+	if dec.isEmptyObject() {
+		dec.err = errors.New("statement object cannot be empty")
+		return nil
+	}
+	if dec.err != nil {
+		return nil
+	}
+	exprName := dec.extractFirstKey("statement_name")
+	if dec.err != nil {
+		return nil
+	}
+
+	// Since the beginning of the object has already been consumed, we need
+	// special methods for only decoding the attributes.
+
+	var stmt ast.Stmt
+	switch stmtName {
+	case "":
+		{{ range $index, $stmt := . }}
+		stmt = dec.decode{{ $stmt.Name }}Attrs()
+		{{ end }}
+	default:
+		dec.err = fmt.Errorf("unknown expression '%s'", stmtName)
+		return nil
+	}
+	if dec.err != nil {
+		return nil
+	}
+	return stmt
+}
+`
+
+const tmplArray = `
+func (dec *decoder) decode{{ .Name }}s() []*{{ .Name }} {
+	if !dec.assertNewArray() {
+		return nil
+	}
+
+	a := []*{{ .Name }}{}
+
+	if dec.isEmptyArray() {
+		return a
+	}
+	if dec.err != nil {
+		return nil
+	}
+
+	for {
+		elt := dec.decode{{ .Name }}()
+		if dec.err != nil {
+			return nil
+		}
+
+		a = append(a, elt)
+
+		if dec.isEndArray() {
+			break
+		}
+		if dec.err != nil {
+			return nil
+		}
+	}
+
+	return a
+}
+`
+
+// template for expression and statements
+const tmplExprStmt = `
 func (dec *decoder) decode{{ .Name }}() *ast.{{ .Name }} {
 	if !dec.assertNewObject() {
 		return nil
@@ -124,9 +309,6 @@ func (dec *decoder) decode{{ .Name }}Attrs() *ast.{{ .Name }} {
 
 `
 
-// template for statements
-const tmplStmt = ``
-
 // template for "normal" types
 const tmplOther = ``
 
@@ -154,21 +336,55 @@ type Field struct {
 	Array     bool
 }
 
+func genArray(w io.Writer, dec []DecoderTmpl) error {
+	if len(dec) == 0 {
+		return nil
+	}
+
+	t := template.Must(template.New("array").Parse(tmplArray))
+
+	for _, elt := range dec {
+		if err := t.Execute(w, elt); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func genGenericExpr(w io.Writer, exprs []DecoderTmpl) error {
+	if len(exprs) == 0 {
+		return nil
+	}
+
+	t := template.Must(template.New("expression").Parse(tmplGenericExpr))
+	return t.Execute(w, exprs)
+}
+
 func genExprs(w io.Writer, exprs []DecoderTmpl) error {
 	if len(exprs) == 0 {
 		return nil
 	}
 
-	// TODO generate decodeExpr
+	if err := genGenericExpr(w, exprs); err != nil {
+		return err
+	}
 
-	t := template.Must(template.New("expressions").Parse(tmplExpr))
-
+	t := template.Must(template.New("expressions").Parse(tmplExprStmt))
 	for _, expr := range exprs {
 		if err := t.Execute(w, expr); err != nil {
 			return err
 		}
 	}
-	return nil
+	return genArray(w, exprs)
+}
+
+func genGenericStmt(w io.Writer, stmts []DecoderTmpl) error {
+	if len(stmts) == 0 {
+		return nil
+	}
+
+	t := template.Must(template.New("statement").Parse(tmplGenericStmt))
+	return t.Execute(w, stmts)
 }
 
 func genStmts(w io.Writer, stmts []DecoderTmpl) error {
@@ -176,7 +392,17 @@ func genStmts(w io.Writer, stmts []DecoderTmpl) error {
 		return nil
 	}
 
-	return nil
+	if err := genGenericStmt(w, stmts); err != nil {
+		return err
+	}
+
+	t := template.Must(template.New("statements").Parse(tmplExprStmt))
+	for _, stmt := range stmts {
+		if err := t.Execute(w, stmt); err != nil {
+			return err
+		}
+	}
+	return genArray(w, stmts)
 }
 
 func genOthers(w io.Writer, others []DecoderTmpl) error {
@@ -184,7 +410,7 @@ func genOthers(w io.Writer, others []DecoderTmpl) error {
 		return nil
 	}
 
-	return nil
+	return genArray(w, others)
 }
 
 func extractType(field *ast.Field) (typ string, array bool, basicType bool) {
