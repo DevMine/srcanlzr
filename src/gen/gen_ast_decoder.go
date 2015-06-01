@@ -32,6 +32,11 @@ const header = `// Copyright 2014-2015 The project AUTHORS. All rights reserved.
 
 package src
 
+import (
+	"github.com/DevMine/srcanlzr/src/ast"
+	"github.com/DevMine/srcanlzr/src/token"
+)
+
 `
 
 // template for expression
