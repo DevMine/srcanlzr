@@ -25,6 +25,7 @@ import (
 const (
 	Expression = iota
 	Statement
+	Other
 )
 
 // go source file header
@@ -84,7 +85,7 @@ func (dec *decoder) decodeStmts() []ast.Stmt{
 	stmts := []ast.Stmt{}
 
 	if dec.isEmptyArray() {
-		return exprs
+		return stmts
 	}
 	if dec.err != nil {
 		return nil
@@ -137,10 +138,10 @@ func (dec *decoder) decodeExpr() ast.Expr {
 
 	var expr ast.Expr
 	switch exprName {
-	case "":
-		{{ range $index, $expr := . }}
-		expr = dec.decode{{ $expr.Name }}Attrs()
-		{{ end }}
+	{{ range $index, $expr := . }}
+		case token.{{ $expr.Name }}Name:
+			expr = dec.decode{{ $expr.Name }}Attrs()
+	{{ end }}
 	default:
 		dec.err = fmt.Errorf("unknown expression '%s'", exprName)
 		return nil
@@ -178,10 +179,10 @@ func (dec *decoder) decodeStmt() ast.Stmt {
 
 	var stmt ast.Stmt
 	switch stmtName {
-	case "":
-		{{ range $index, $stmt := . }}
-		stmt = dec.decode{{ $stmt.Name }}Attrs()
-		{{ end }}
+	{{ range $index, $stmt := . }}
+		case token.{{ $stmt.Name }}Name:
+			stmt = dec.decode{{ $stmt.Name }}Attrs()
+	{{ end }}
 	default:
 		dec.err = fmt.Errorf("unknown expression '%s'", stmtName)
 		return nil
@@ -194,12 +195,12 @@ func (dec *decoder) decodeStmt() ast.Stmt {
 `
 
 const tmplArray = `
-func (dec *decoder) decode{{ .Name }}s() []*{{ .Name }} {
+func (dec *decoder) decode{{ .Name }}s() []*ast.{{ .Name }} {
 	if !dec.assertNewArray() {
 		return nil
 	}
 
-	a := []*{{ .Name }}{}
+	a := []*ast.{{ .Name }}{}
 
 	if dec.isEmptyArray() {
 		return a
@@ -228,8 +229,8 @@ func (dec *decoder) decode{{ .Name }}s() []*{{ .Name }} {
 }
 `
 
-// template for expression and statements
-const tmplExprStmt = `
+// template for expressions
+const tmplExpr = `
 func (dec *decoder) decode{{ .Name }}() *ast.{{ .Name }} {
 	if !dec.assertNewObject() {
 		return nil
@@ -309,10 +310,166 @@ func (dec *decoder) decode{{ .Name }}Attrs() *ast.{{ .Name }} {
 
 `
 
-// template for "normal" types
-const tmplOther = ``
+// template for statements
+const tmplStmt = `
+func (dec *decoder) decode{{ .Name }}() *ast.{{ .Name }} {
+	if !dec.assertNewObject() {
+		return nil
+	}
+	if dec.isEmptyObject() {
+		dec.err = errors.New("{{ .Name }} object cannot be empty")
+		return nil
+	}
+	if dec.err != nil {
+		return nil
+	}
+	return dec.decode{{ .Name }}Attrs()
+}
 
-const outputPath = "decode_gen.go"
+func (dec *decoder) decode{{ .Name }}Attrs() *ast.{{ .Name }} {
+	stmt := ast.{{ .Name }}{StmtName: token.{{ .Name }}Name}
+	for {
+		key, err := dec.scan.nextKey()
+		if err != nil {
+			if err == io.EOF {
+				break
+			}
+			dec.err = err
+			return nil
+		}
+		if key == "" {
+			dec.err = errors.New("empty key")
+			return nil
+		}
+
+		{{ if .HasBasicType }}
+		val, tok, err := dec.scan.nextValue()
+		{{ else }}
+		_, _, err = dec.scan.nextValue()
+		{{ end }}
+		if err != nil {
+			dec.err = err
+			return nil
+		}
+
+		switch key {
+		{{ range $index, $field := .Fields }}
+		case "{{ $field.JSONName }}":
+			{{ if $field.BasicType }}
+				if tok != scan{{ $field.Type }}Lit {
+					dec.err = fmt.Errorf("expected '{{ $field.Type }} literal', found '%v'", tok)
+					return nil
+				}
+				expr.{{ $field.Name }}, dec.err = dec.unmarshal{{ $field.Type }}(val)
+			{{ else }}
+				{{ if $field.Array }}
+					dec.scan.back()
+					stmt.{{ $field.Name }} = dec.decode{{ $field.Type }}s()
+				{{ else }}
+					dec.scan.back()
+					stmt.{{ $field.Name }} = dec.decode{{ $field.Type }}s()
+				{{ end }}
+			{{ end }}
+		{{ end }}
+		default:
+			dec.err = fmt.Errorf("unexpected value for the key '%s' of a {{.Name}} object", key)
+		}
+
+		if dec.err != nil {
+			return nil
+		}
+
+		if dec.isEndObject() {
+			break
+		}
+		if err != nil {
+			return nil
+		}
+	}
+	return &stmt
+}
+
+`
+
+// template for other structures
+const tmplOther = `
+func (dec *decoder) decode{{ .Name }}() *ast.{{ .Name }} {
+	if !dec.assertNewObject() {
+		return nil
+	}
+	if dec.isEmptyObject() {
+		dec.err = errors.New("{{ .Name }} object cannot be empty")
+		return nil
+	}
+	if dec.err != nil {
+		return nil
+	}
+
+	any := ast.{{ .Name }}{}
+	for {
+		key, err := dec.scan.nextKey()
+		if err != nil {
+			if err == io.EOF {
+				break
+			}
+			dec.err = err
+			return nil
+		}
+		if key == "" {
+			dec.err = errors.New("empty key")
+			return nil
+		}
+
+		{{ if .HasBasicType }}
+		val, tok, err := dec.scan.nextValue()
+		{{ else }}
+		_, _, err = dec.scan.nextValue()
+		{{ end }}
+		if err != nil {
+			dec.err = err
+			return nil
+		}
+
+		switch key {
+		{{ range $index, $field := .Fields }}
+		case "{{ $field.JSONName }}":
+			{{ if $field.BasicType }}
+				if tok != scan{{ $field.Type }}Lit {
+					dec.err = fmt.Errorf("expected '{{ $field.Type }} literal', found '%v'", tok)
+					return nil
+				}
+				any.{{ $field.Name }}, dec.err = dec.unmarshal{{ $field.Type }}(val)
+			{{ else }}
+				{{ if $field.Array }}
+					dec.scan.back()
+					any.{{ $field.Name }} = dec.decode{{ $field.Type }}s()
+				{{ else }}
+					dec.scan.back()
+					any.{{ $field.Name }} = dec.decode{{ $field.Type }}s()
+				{{ end }}
+			{{ end }}
+		{{ end }}
+		default:
+			dec.err = fmt.Errorf("unexpected value for the key '%s' of a {{.Name}} object", key)
+		}
+
+		if dec.err != nil {
+			return nil
+		}
+
+		if dec.isEndObject() {
+			break
+		}
+		if err != nil {
+			return nil
+		}
+	}
+	return &any
+}
+
+`
+
+const outputPath = "decode_ast.gen.go"
 
 type DecoderTmpl struct {
 	Name   string
@@ -369,7 +526,7 @@ func genExprs(w io.Writer, exprs []DecoderTmpl) error {
 		return err
 	}
 
-	t := template.Must(template.New("expressions").Parse(tmplExprStmt))
+	t := template.Must(template.New("expressions").Parse(tmplExpr))
 	for _, expr := range exprs {
 		if err := t.Execute(w, expr); err != nil {
 			return err
@@ -396,7 +553,7 @@ func genStmts(w io.Writer, stmts []DecoderTmpl) error {
 		return err
 	}
 
-	t := template.Must(template.New("statements").Parse(tmplExprStmt))
+	t := template.Must(template.New("statements").Parse(tmplStmt))
 	for _, stmt := range stmts {
 		if err := t.Execute(w, stmt); err != nil {
 			return err
@@ -410,6 +567,12 @@ func genOthers(w io.Writer, others []DecoderTmpl) error {
 		return nil
 	}
 
+	t := template.Must(template.New("others").Parse(tmplOther))
+	for _, other := range others {
+		if err := t.Execute(w, other); err != nil {
+			return err
+		}
+	}
 	return genArray(w, others)
 }
 
@@ -504,7 +667,7 @@ func main() {
 			if structType, ok = typeSpec.Type.(*ast.StructType); !ok {
 				continue
 			}
-			var kind int
+			kind := Other
 			for _, field := range structType.Fields.List {
 				fieldTmpl := Field{}
 				// XXX: handle compositions
@@ -546,7 +709,7 @@ func main() {
 	if err := genStmts(buf, stmts); err != nil {
 		fatal(err)
 	}
-	if err := genOthers(buf, stmts); err != nil {
+	if err := genOthers(buf, others); err != nil {
 		fatal(err)
 	}
 
