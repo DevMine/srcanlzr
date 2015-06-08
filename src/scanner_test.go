@@ -89,3 +89,116 @@ func TestNextKey(t *testing.T) {
 		}
 	}
 }
+
+func TestReadNumber(t *testing.T) {
+	// test int64
+	buf := bytes.NewBufferString("42}")
+	scan := newScanner(buf)
+	val, tok, err := scan.readNumber()
+	if err != nil {
+		t.Fatal("readNumber '42}': ", err)
+	}
+	if tok != scanInt64Lit {
+		t.Errorf("readNumber '42}': found token '%v', expected '%v'", tok, scanInt64Lit)
+	}
+	if s := string(val); s != "42" {
+		t.Errorf("readNumber '42': found '%s', expected '42'", s)
+	}
+
+	// test float 64
+	buf = bytes.NewBufferString("42.24}")
+	scan = newScanner(buf)
+	val, tok, err = scan.readNumber()
+	if err != nil {
+		t.Fatal("readNumber '42.24}': ", err)
+	}
+	if tok != scanFloat64Lit {
+		t.Errorf("readNumber '42.24}': found token '%v', expected '%v'", tok, scanFloat64Lit)
+	}
+	if s := string(val); s != "42.24" {
+		t.Errorf("readNumber '42.24}': found '%s', expected '42.24'", s)
+	}
+
+	// test empty number
+	expectedErr := errors.New("expected number, found nothing")
+	buf = bytes.NewBufferString(", foo")
+	scan = newScanner(buf)
+	val, tok, err = scan.readNumber()
+	if err == nil {
+		t.Fatalf("readNumber ', foo': found no error, expected \"%v\"", expectedErr)
+	}
+	if tok != scanIllegalToken {
+		t.Errorf("readNumber ', foo': found token '%v', expected '%v'", tok, scanIllegalToken)
+	}
+	if val != nil {
+		t.Errorf("readNumber ', foo': found '%s', expected 'nil'", string(val))
+	}
+
+	// TODO: test other errors
+}
+func TestReadNull(t *testing.T) {
+	// test 'null'
+	buf := bytes.NewBufferString("ull")
+	scan := newScanner(buf)
+	tok, err := scan.readNull()
+	if err != nil {
+		t.Fatal("readNull 'ull': ", err)
+	}
+	if tok != scanNullVal {
+		t.Errorf("readNull 'ull': found '%v', expected '%v'", tok, scanNullVal)
+	}
+
+	// test error
+	expectedErr := errors.New("invalid null value: found 'f', expected 'u'")
+	buf = bytes.NewBufferString("foo")
+	scan = newScanner(buf)
+	tok, err = scan.readNull()
+	if err == nil {
+		t.Fatalf("readNull 'foo': found no error, expected \"%v\"", expectedErr)
+	}
+	if err.Error() != expectedErr.Error() {
+		t.Fatalf("readNull 'foo': found \"%v\", expected \"%v\"", err, expectedErr)
+	}
+	if tok != scanIllegalToken {
+		t.Errorf("readNull 'foo': found '%v', expected '%v'", tok, scanIllegalToken)
+	}
+}
+
+func TestReadBool(t *testing.T) {
+	// test 'true'
+	buf := bytes.NewBufferString("rue")
+	scan := newScanner(buf)
+	val, err := scan.readBool('t')
+	if err != nil {
+		t.Fatal("readBool 'rue': ", err)
+	}
+	if s := string(val); s != "true" {
+		t.Errorf("readBool 'rue': found '%s', expected 'true'", s)
+	}
+
+	// test 'false'
+	buf = bytes.NewBufferString("alse")
+	scan = newScanner(buf)
+	val, err = scan.readBool('f')
+	if err != nil {
+		t.Fatal("readBool 'alse': ", err)
+	}
+	if s := string(val); s != "false" {
+		t.Errorf("readBool 'alse': found '%s', expected 'false'", s)
+	}
+
+	// test error
+	expectedErr := errors.New("invalid boolean value: found 'o', expected 'a'")
+	buf = bytes.NewBufferString("oo")
+	scan = newScanner(buf)
+	val, err = scan.readBool('f')
+	if err == nil {
+		t.Fatal("readBool 'oo': found no error, expected \"%v\"", expectedErr)
+	}
+	if err.Error() != expectedErr.Error() {
+		t.Fatalf("readBool 'oo': found \"%v\", expected \"%v\"", err, expectedErr)
+	}
+	if val != nil {
+		t.Errorf("readBool 'oo': found '%s', expected 'nil'", string(val))
+	}
+}

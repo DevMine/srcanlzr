@@ -17,7 +17,7 @@ func TestDecodeStringsList(t *testing.T) {
 	expected := []string{"foo", "bar"}
 	buf := bytes.NewBufferString(`["foo","bar"]`)
 	dec := newDecoder(buf)
-	sl := dec.decodeStringsList()
+	sl := dec.decodeStrings()
 	if dec.err != nil {
 		t.Fatal(dec.err)
 	}
@@ -102,17 +102,6 @@ func TestDecodeIdent(t *testing.T) {
 	if ident.Name != expected.Name {
 		t.Errorf("decodeIdent: found '%s', found '%s'", ident.Name, expected.Name)
 	}
-
-	// expect failure
-	expectedErr := errors.New("invalid expression_name: expected 'IDENT', found 'FOO'")
-	buf = bytes.NewBufferString(`{"expression_name": "FOO", "name": "foo"}`)
-	dec = newDecoder(buf)
-	ident = dec.decodeIdent()
-	if dec.err == nil {
-		t.Errorf("decodeIdent: found no error, expected error \"%v\"", expectedErr)
-	} else if dec.err.Error() != expectedErr.Error() {
-		t.Errorf("decodeIdent: found error \"%v\", expected error \"%v\"", dec.err, expectedErr)
-	}
 }
 
 func TestExtractFirstKey(t *testing.T) {
@@ -146,7 +135,7 @@ func TestExtractFirstKey(t *testing.T) {
 			dec.err, expectedErr)
 	}
 
-	buf = bytes.NewBufferString(`"expression_name": 42`)
+	buf = bytes.NewBufferString(`"expression_name": 42}`)
 	dec = newDecoder(buf)
 	expectedErr = errors.New("expected 'string literal', found 'integer literal'")
 	_ = dec.extractFirstKey("expression_name")
@@ -169,6 +158,50 @@ func TestUnmarshalString(t *testing.T) {
 		t.Errorf("unmarshalString nil: found no error, expected \"%v\"", expectedErr)
 	} else if err.Error() != expectedErr.Error() {
 		t.Errorf("unmarshalString nil: found error \"%v\", expected \"%v\"", err, expectedErr)
+	}
+}
+
+func TestUnmarshalInt64(t *testing.T) {
+	dec := newDecoder(new(bytes.Buffer))
+	if num, err := dec.unmarshalInt64([]byte("42")); err != nil {
+		t.Error(err)
+	} else if num != 42 {
+		t.Errorf("unmarshalInt64 '42': found %d, expected 42", num)
+	}
+}
+
+func TestUnmarshalFloat64(t *testing.T) {
+	dec := newDecoder(new(bytes.Buffer))
+	if num, err := dec.unmarshalFloat64([]byte("42.42")); err != nil {
+		t.Error(err)
+	} else if num-42.42 > 0.0001 {
+		t.Errorf("unmarshalFloat64 '42.42': found %f, expected 42.42", num)
+	}
+}
+
+func TestUnmarshalBool(t *testing.T) {
+	dec := newDecoder(new(bytes.Buffer))
+	if num, err := dec.unmarshalBool([]byte("true")); err != nil {
+		t.Error(err)
+	} else if !num {
+		t.Error("unmarshalBool 'true': found 'false', expected 'true'")
+	}
+
+	dec = newDecoder(new(bytes.Buffer))
+	if num, err := dec.unmarshalBool([]byte("false")); err != nil {
+		t.Error(err)
+	} else if num {
+		t.Error("unmarshalBool 'false': found 'true', expected 'false'")
+	}
+
+	expectedErr := errors.New("unable to unmarshal boolean: value 'none' is not a boolean")
+	dec = newDecoder(new(bytes.Buffer))
+	if num, err := dec.unmarshalBool([]byte("none")); err == nil {
+		t.Errorf("unmarshalBool 'none': found no error, expected \"%v\"", expectedErr)
+	} else if err.Error() != expectedErr.Error() {
+		t.Errorf("unmarshalBool 'none': found \"%v\", expected \"%v\"", err, expectedErr)
+	} else if num {
+		t.Error("unmarshalBool 'none': found 'true', expected 'false'")
 	}
 }
 
@@ -224,9 +257,9 @@ func TestIsEndObject(t *testing.T) {
 		err    error
 	}
 	input := map[string]returnStatus{
-		"}":  returnStatus{true, nil},
-		",":  returnStatus{false, nil},
-		"42": returnStatus{false, errors.New("expected 'comma', found 'integer literal'")},
+		"}":   returnStatus{true, nil},
+		",":   returnStatus{false, nil},
+		"42}": returnStatus{false, errors.New("expected 'comma', found 'integer literal'")},
 	}
 
 	for in, ret := range input {
@@ -247,9 +280,9 @@ func TestIsEndArray(t *testing.T) {
 		err    error
 	}
 	input := map[string]returnStatus{
-		"]":  returnStatus{true, nil},
-		",":  returnStatus{false, nil},
-		"42": returnStatus{false, errors.New("expected 'comma', found 'integer literal'")},
+		"]":   returnStatus{true, nil},
+		",":   returnStatus{false, nil},
+		"42}": returnStatus{false, errors.New("expected 'comma', found 'integer literal'")},
 	}
 
 	for in, ret := range input {
