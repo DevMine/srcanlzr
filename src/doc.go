@@ -104,6 +104,15 @@
 	convention to decode generic ast.Expr and ast.Stmt without reading the whole
 	JSON object.
 
+	Besides, we restrict the supported JSON types to:
+	   string
+	   int64
+	   float64
+	   bool
+	   object
+	   array
+
+	And the only official supported encoding is UTF-8.
 
 	Further improvements
 
