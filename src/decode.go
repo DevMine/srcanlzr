@@ -10,6 +10,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"strconv"
 
 	"github.com/DevMine/repotool/model"
 )
@@ -81,11 +82,11 @@ func (dec *decoder) decodeProject() *Project {
 		case "repository":
 			prj.Repo = dec.decodeRepository()
 		case "loc":
-			if tok != scanIntLit {
+			if tok != scanInt64Lit {
 				dec.err = fmt.Errorf("expected integer literal, found %v", tok)
 				return nil
 			}
-			prj.LoC, dec.err = dec.unmarshalInt(val)
+			prj.LoC, dec.err = dec.unmarshalInt64(val)
 		case "name":
 			if tok != scanStringLit {
 				dec.err = fmt.Errorf("expected string literal, found %v", tok)
@@ -175,13 +176,13 @@ func (dec *decoder) decodePackage() *Package {
 		case "source_files":
 			pkg.SrcFiles = dec.decodeSrcFiles()
 		case "doc":
-			pkg.Doc = dec.decodeStringsList()
+			pkg.Doc = dec.decodeStrings()
 		case "loc":
-			if tok != scanIntLit {
+			if tok != scanInt64Lit {
 				dec.err = fmt.Errorf("expected integer literal, found %v", tok)
 				return nil
 			}
-			pkg.LoC, dec.err = dec.unmarshalInt(val)
+			pkg.LoC, dec.err = dec.unmarshalInt64(val)
 		case "name":
 			if tok != scanStringLit {
 				dec.err = fmt.Errorf("expected string literal, found %v", tok)
@@ -286,7 +287,7 @@ func (dec *decoder) decodeSrcFile() *SrcFile {
 			sf.Lang = dec.decodeLanguage()
 		case "imports":
 			dec.scan.back()
-			sf.Imports = dec.decodeStringsList()
+			sf.Imports = dec.decodeStrings()
 		case "type_specifiers":
 			dec.scan.back()
 			sf.TypeSpecs = dec.decodeTypeSpecs()
@@ -315,11 +316,11 @@ func (dec *decoder) decodeSrcFile() *SrcFile {
 			dec.scan.back()
 			sf.Traits = dec.decodeTraits()
 		case "loc":
-			if tok != scanIntLit {
+			if tok != scanInt64Lit {
 				dec.err = fmt.Errorf("expected integer literal, found %v", tok)
 				return nil
 			}
-			sf.LoC, dec.err = dec.unmarshalInt(val)
+			sf.LoC, dec.err = dec.unmarshalInt64(val)
 		default:
 			dec.err = fmt.Errorf("unexpected value for the key '%s' of a source file object", key)
 		}
@@ -340,8 +341,8 @@ func (dec *decoder) decodeSrcFile() *SrcFile {
 	return &sf
 }
 
-// decoderStringsList decodes a list of strings.
-func (dec *decoder) decodeStringsList() []string {
+// decoderStrings decodes a list of strings.
+func (dec *decoder) decodeStrings() []string {
 	if !dec.assertNewArray() {
 		return nil
 	}
@@ -365,7 +366,13 @@ func (dec *decoder) decodeStringsList() []string {
 			dec.err = fmt.Errorf("expected string, found %v", tok)
 			return nil
 		}
-		sl = append(sl, string(val))
+
+		str, err := dec.unmarshalString(val)
+		if err != nil {
+			dec.err = err
+			return nil
+		}
+		sl = append(sl, str)
 
 		if dec.isEndArray() {
 			break
@@ -375,6 +382,48 @@ func (dec *decoder) decodeStringsList() []string {
 		}
 	}
 	return sl
+}
+
+// decoderInt64s decodes a list of int 64.
+func (dec *decoder) decodeInt64s() []int64 {
+	if !dec.assertNewArray() {
+		return nil
+	}
+
+	il := []int64{}
+
+	if dec.isEmptyArray() {
+		return il
+	}
+	if dec.err != nil {
+		return nil
+	}
+
+	for {
+		val, tok, err := dec.scan.nextValue()
+		if err != nil {
+			dec.err = err
+			return nil
+		}
+		if tok != scanInt64Lit {
+			dec.err = fmt.Errorf("expected integer, found %v", tok)
+			return nil
+		}
+		num, err := dec.unmarshalInt64(val)
+		if err != nil {
+			dec.err = err
+			return nil
+		}
+		il = append(il, num)
+
+		if dec.isEndArray() {
+			break
+		}
+		if dec.err != nil {
+			return nil
+		}
+	}
+	return il
 }
 
 // decodeLanguages decodes a list of languages.
@@ -451,7 +500,7 @@ func (dec *decoder) decodeLanguage() *Language {
 			// Since the '[' character has been consumed, we need to step back
 			// brefore calling decodeStringsList.
 			dec.scan.back()
-			lang.Paradigms = dec.decodeStringsList()
+			lang.Paradigms = dec.decodeStrings()
 		case "language":
 			if tok != scanStringLit {
 				dec.err = fmt.Errorf("expected 'string literal', found '%v'", tok)
@@ -513,9 +562,22 @@ func (dec *decoder) extractFirstKey(key string) string {
 	return string(val)
 }
 
-// TODO: implement
-func (dec *decoder) unmarshalInt(data []byte) (int64, error) {
-	return 0, nil
+// unmarshalInt unmarshal integer value into an int 64.
+func (dec *decoder) unmarshalInt64(data []byte) (int64, error) {
+	num, err := strconv.ParseInt(string(data), 10, 64)
+	if err != nil {
+		return 0, err
+	}
+	return num, nil
+}
+
+// unmarshalFloat unmarshal floating point number into a float 64.
+func (dec *decoder) unmarshalFloat64(data []byte) (float64, error) {
+	num, err := strconv.ParseFloat(string(data), 64)
+	if err != nil {
+		return 0.0, err
+	}
+	return num, nil
 }
 
 // unmarshalString unmarshals a bytes slice into a string.
@@ -524,6 +586,21 @@ func (dec *decoder) unmarshalString(data []byte) (string, error) {
 		return "", errors.New("unable to unmarshal string: data is nil")
 	}
 	return string(data), nil
+}
+
+// unmarshalBool unmarshals a bytes slice into a boolean.
+func (dec *decoder) unmarshalBool(data []byte) (bool, error) {
+	if data == nil {
+		return false, errors.New("unable to unmarshal boolean: data is nil")
+	}
+	switch str := string(data); str {
+	case "true":
+		return true, nil
+	case "false":
+		return false, nil
+	default:
+		return false, fmt.Errorf("unable to unmarshal boolean: value '%s' is not a boolean", str)
+	}
 }
 
 // assertNewObject makes sure that the next value is a new object. In other

@@ -169,7 +169,7 @@ func (dec *decoder) decodeStmt() ast.Stmt {
 	if dec.err != nil {
 		return nil
 	}
-	exprName := dec.extractFirstKey("statement_name")
+	stmtName := dec.extractFirstKey("statement_name")
 	if dec.err != nil {
 		return nil
 	}
@@ -281,12 +281,11 @@ func (dec *decoder) decode{{ .Name }}Attrs() *ast.{{ .Name }} {
 				}
 				expr.{{ $field.Name }}, dec.err = dec.unmarshal{{ $field.Type }}(val)
 			{{ else }}
+				dec.scan.back()
 				{{ if $field.Array }}
-					dec.scan.back()
 					expr.{{ $field.Name }} = dec.decode{{ $field.Type }}s()
 				{{ else }}
-					dec.scan.back()
-					expr.{{ $field.Name }} = dec.decode{{ $field.Type }}s()
+					expr.{{ $field.Name }} = dec.decode{{ $field.Type }}()
 				{{ end }}
 			{{ end }}
 		{{ end }}
@@ -360,14 +359,13 @@ func (dec *decoder) decode{{ .Name }}Attrs() *ast.{{ .Name }} {
 					dec.err = fmt.Errorf("expected '{{ $field.Type }} literal', found '%v'", tok)
 					return nil
 				}
-				expr.{{ $field.Name }}, dec.err = dec.unmarshal{{ $field.Type }}(val)
+				stmt.{{ $field.Name }}, dec.err = dec.unmarshal{{ $field.Type }}(val)
 			{{ else }}
+				dec.scan.back()
 				{{ if $field.Array }}
-					dec.scan.back()
 					stmt.{{ $field.Name }} = dec.decode{{ $field.Type }}s()
 				{{ else }}
-					dec.scan.back()
-					stmt.{{ $field.Name }} = dec.decode{{ $field.Type }}s()
+					stmt.{{ $field.Name }} = dec.decode{{ $field.Type }}()
 				{{ end }}
 			{{ end }}
 		{{ end }}
@@ -440,12 +438,11 @@ func (dec *decoder) decode{{ .Name }}() *ast.{{ .Name }} {
 				}
 				any.{{ $field.Name }}, dec.err = dec.unmarshal{{ $field.Type }}(val)
 			{{ else }}
+				dec.scan.back()
 				{{ if $field.Array }}
-					dec.scan.back()
 					any.{{ $field.Name }} = dec.decode{{ $field.Type }}s()
 				{{ else }}
-					dec.scan.back()
-					any.{{ $field.Name }} = dec.decode{{ $field.Type }}s()
+					any.{{ $field.Name }} = dec.decode{{ $field.Type }}()
 				{{ end }}
 			{{ end }}
 		{{ end }}
@@ -590,15 +587,16 @@ func extractType(field *ast.Field) (typ string, array bool, basicType bool) {
 				array = true
 			}
 		case *ast.Ident:
-			typ = elt.String()
+			tmp := elt.String()
+			typ = strings.ToUpper(string(tmp[0])) + tmp[1:]
 			array = true
 		}
 	case *ast.Ident:
-		typ = s.String()
-		typ = strings.ToUpper(string(typ[0])) + typ[1:]
+		tmp := s.String()
+		typ = strings.ToUpper(string(tmp[0])) + tmp[1:]
 
 		switch typ {
-		case "String", "Integer", "Float":
+		case "String", "Int64", "Float64", "Bool":
 			basicType = true
 		}
 	}

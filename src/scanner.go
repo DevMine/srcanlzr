@@ -22,8 +22,8 @@ const (
 	scanEndArray
 	scanStringLit
 	scanBoolLit
-	scanIntLit
-	scanFloatLit
+	scanInt64Lit
+	scanFloat64Lit
 	scanNullVal
 	scanComma
 )
@@ -36,8 +36,8 @@ var scanTokenToString = map[scanToken]string{
 	scanEndArray:     "]",
 	scanStringLit:    "string literal",
 	scanBoolLit:      "boolean literal",
-	scanIntLit:       "integer literal",
-	scanFloatLit:     "integer literal",
+	scanInt64Lit:     "integer literal",
+	scanFloat64Lit:   "float literal",
 	scanNullVal:      "null",
 	scanComma:        "comma",
 }
@@ -52,9 +52,6 @@ func (tok scanToken) String() string {
 type scanner struct {
 	r   io.Reader
 	err error
-
-	row int64
-	col int64
 
 	buf []byte
 	pos int // position inside the buffer; must be -1 by default
@@ -140,10 +137,11 @@ func (scan *scanner) nextValue() ([]byte, scanToken, error) {
 
 	switch {
 	case isDigit(c):
-		// TODO: read digit
-		return []byte{c}, scanIntLit, nil
+		scan.back()
+		return scan.readNumber()
 	case c == 't' || c == 'f':
-		// TODO: read bool
+		b, err := scan.readBool(c)
+		return b, scanBoolLit, err
 	case c == '{': // beginning of an object literal
 		return nil, scanBeginObject, nil
 	case c == '}': // ending of an object literal
@@ -156,7 +154,8 @@ func (scan *scanner) nextValue() ([]byte, scanToken, error) {
 		str, err := scan.readString()
 		return str, scanStringLit, err
 	case c == 'n': // null
-		// TODO: read null
+		tok, err := scan.readNull()
+		return nil, tok, err
 	case c == ',':
 		return nil, scanComma, nil
 	}
@@ -227,6 +226,109 @@ func (scan *scanner) readString() ([]byte, error) {
 	return buf[:strLen], nil
 }
 
+// readNumber reads either an int 64 or f float 64.
+func (scan *scanner) readNumber() ([]byte, scanToken, error) {
+	tok := scanInt64Lit
+	numLen := 0
+	buf := make([]byte, bufsize, bufsize)
+	for {
+		c, err := scan.read()
+		if err != nil {
+			return nil, scanIllegalToken, err
+		}
+		if c == ',' || c == '}' || c == ']' {
+			if numLen == 0 {
+				return nil, scanIllegalToken, errors.New("expected number, found nothing")
+			}
+			break
+		}
+		if c == '.' {
+			// "." cannot be at the first place in a floating point number
+			if !isDigit(buf[0]) {
+				return nil, scanIllegalToken, errors.New("expected digit, found '.'")
+			}
+			// floating point number can only contain one "."
+			if tok == scanFloat64Lit {
+				return nil, scanIllegalToken, errors.New("unexpected character '.'")
+			}
+			tok = scanFloat64Lit
+		} else {
+			if !isDigit(c) {
+				return nil, scanIllegalToken, fmt.Errorf("expected digit, found '%c'", c)
+			}
+		}
+		// bufsize is already bigger that the maximum possible size for a number,
+		// therefore, if the numLen is bigger than the busize, we return an
+		// error.
+		if numLen > bufsize {
+			return nil, scanIllegalToken, errors.New("number too long")
+		}
+		buf[numLen] = c
+		numLen++
+	}
+	return buf[:numLen], tok, nil
+}
+
+// readNull reads a null value.
+func (scan *scanner) readNull() (scanToken, error) {
+	var err error
+	step := func(expected byte) {
+		if err != nil {
+			return
+		}
+		var c byte
+		if c, err = scan.read(); err != nil {
+			return
+		}
+		if c != expected {
+			err = fmt.Errorf("invalid null value: found '%c', expected '%c'", c, expected)
+		}
+	}
+	// 'n' has already been consumed
+	step('u')
+	step('l')
+	step('l')
+	if err != nil {
+		return scanIllegalToken, err
+	}
+	return scanNullVal, nil
+}
+
+// readBool reads a boolean value.
+func (scan *scanner) readBool(first byte) ([]byte, error) {
+	var err error
+	step := func(expected byte) {
+		if err != nil {
+			return
+		}
+		var c byte
+		if c, err = scan.read(); err != nil {
+			return
+		}
+		if c != expected {
+			err = fmt.Errorf("invalid boolean value: found '%c', expected '%c'", c, expected)
+		}
+	}
+	// first character ('t' or 'f') has already been consumed
+	var val []byte
+	if first == 't' {
+		step('r')
+		step('u')
+		step('e')
+		val = []byte("true")
+	} else {
+		step('a')
+		step('l')
+		step('s')
+		step('e')
+		val = []byte("false")
+	}
+	if err != nil {
+		return nil, err
+	}
+	return val, nil
+}
+
 func (scan *scanner) back() {
 	if scan.pos > 0 {
 		scan.pos--
@@ -261,9 +363,4 @@ func isWhitespace(c byte) bool {
 
 func isDigit(c byte) bool {
 	return c >= '0' && c <= '9'
-}
-
-// TODO: implement
-func isUnicodeChar(c byte) bool {
-	return false
 }
