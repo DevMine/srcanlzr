@@ -1,5 +1,7 @@
 PKG  = github.com/DevMine/srcanlzr
 EXEC = srcanlzr
+VERSION = 0.0b
+DIR = ${EXEC}-${VERSION}
 
 all: check test build
 
@@ -11,6 +13,13 @@ build:
 
 test:
 	go test ${PKG}/...
+
+package: clean deps build
+	test -d ${DIR} || mkdir ${DIR}
+	cp ${EXEC} ${DIR}/
+	cp README.md ${DIR}/
+	tar czvf ${DIR}.tar.gz ${DIR}
+	rm -rf ${DIR}
 
 deps:
 	 go get -u -f github.com/DevMine/repotool/model
