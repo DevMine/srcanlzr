@@ -132,6 +132,10 @@ func (dec *decoder) decodeExpr() ast.Expr {
 	if dec.err != nil {
 		return nil
 	}
+	if dec.isEndObject() {
+		dec.err = errors.New("expression object cannot be empty")
+		return nil
+	}
 
 	// Since the beginning of the object has already been consumed, we need
 	// special methods for only decoding the attributes.
@@ -171,6 +175,10 @@ func (dec *decoder) decodeStmt() ast.Stmt {
 	}
 	stmtName := dec.extractFirstKey("statement_name")
 	if dec.err != nil {
+		return nil
+	}
+	if dec.isEndObject() {
+		dec.err = errors.New("statement object cannot be empty")
 		return nil
 	}
 

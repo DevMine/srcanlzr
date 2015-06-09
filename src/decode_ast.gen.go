@@ -102,6 +102,10 @@ func (dec *decoder) decodeExpr() ast.Expr {
 	if dec.err != nil {
 		return nil
 	}
+	if dec.isEndObject() {
+		dec.err = errors.New("expression object cannot be empty")
+		return nil
+	}
 
 	// Since the beginning of the object has already been consumed, we need
 	// special methods for only decoding the attributes.
@@ -607,6 +611,14 @@ func (dec *decoder) decodeCallExprAttrs() *ast.CallExpr {
 			dec.scan.back()
 
 			expr.Args = dec.decodeExprs()
+
+		case "line":
+
+			if tok != scanInt64Lit {
+				dec.err = fmt.Errorf("expected 'Int64 literal', found '%v'", tok)
+				return nil
+			}
+			expr.Line, dec.err = dec.unmarshalInt64(val)
 
 		default:
 			dec.err = fmt.Errorf("unexpected key '%s' for CallExpr object", key)
@@ -1883,6 +1895,10 @@ func (dec *decoder) decodeStmt() ast.Stmt {
 	}
 	stmtName := dec.extractFirstKey("statement_name")
 	if dec.err != nil {
+		return nil
+	}
+	if dec.isEndObject() {
+		dec.err = errors.New("statement object cannot be empty")
 		return nil
 	}
 
