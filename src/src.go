@@ -174,7 +174,7 @@ type Project struct {
 	// src.Unmarshal itself but by the standard json.Unmarshal function.
 	// To do so, its unmarshalling is defered using json.RawMessage.
 	// See the RepoRaw field.
-	Repo *model.Repository `json:"repository"`
+	Repo *model.Repository `json:"repository,omitempty"`
 
 	// The list of all programming languages used by the project. Each language
 	// must be added by the corresponding language parsers if and only if the
