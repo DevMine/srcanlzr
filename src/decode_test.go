@@ -343,6 +343,22 @@ func TestIsEmptyArray(t *testing.T) {
 	}
 }
 
+func TestIsNull(t *testing.T) {
+	input := map[string]bool{
+		"null":  true,
+		"nan":   false,
+		`"foo"`: false,
+	}
+
+	for in, expected := range input {
+		buf := bytes.NewBufferString(in)
+		dec := newDecoder(buf)
+		if b := dec.isNull(); b != expected {
+			t.Errorf("isNull '%s': found '%v', expected '%v'", in, b, expected)
+		}
+	}
+}
+
 func compareLanguages(t *testing.T, found, expected *Language) {
 	if found == nil {
 		t.Fatal("decodeLanguage: should not be nil")

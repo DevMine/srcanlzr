@@ -144,7 +144,7 @@ func (dec *decoder) decodePackages() []*Package {
 		}
 	}
 
-	return nil
+	return pkgs
 }
 
 // decoderPackage decodes a package object.
@@ -726,6 +726,37 @@ func (dec *decoder) isEmptyArray() bool {
 		// We need to read the next byte here because if the caller accept empty
 		// array, it will continue the decoding and won't expect to find a ']'.
 		_, dec.err = dec.scan.read()
+		return true
+	}
+	return false
+}
+
+// isNull tests if the next value is null.
+//
+// If the next value is null, it consumes it.
+//
+// It returns true if the next value is null, false otherwise.
+// If an error occurs, it returns false and set dec.err.
+func (dec *decoder) isNull() bool {
+	if b, err := dec.scan.peek(); err != nil {
+		if err == io.EOF {
+			dec.err = errors.New("unexpected EOF")
+		} else {
+			dec.err = err
+		}
+		return false
+	} else if b == 'n' {
+		_, tok, err := dec.scan.nextValue()
+		if err != nil {
+			dec.err = err
+			return false
+		}
+		if tok != scanNullVal {
+			if dec.err != nil {
+				dec.err = fmt.Errorf("expected 'null', found '%v'", tok)
+				return false
+			}
+		}
 		return true
 	}
 	return false

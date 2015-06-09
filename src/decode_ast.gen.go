@@ -205,24 +205,26 @@ func (dec *decoder) decodeArrayExprAttrs() *ast.ArrayExpr {
 			return nil
 		}
 
-		switch key {
+		if tok == scanNullVal {
+			switch key {
 
-		case "expression_name":
+			case "expression_name":
 
-			if tok != scanStringLit {
-				dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
-				return nil
+				if tok != scanStringLit {
+					dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
+					return nil
+				}
+				expr.ExprName, dec.err = dec.unmarshalString(val)
+
+			case "type":
+
+				dec.scan.back()
+
+				expr.Type = dec.decodeArrayType()
+
+			default:
+				dec.err = fmt.Errorf("unexpected key '%s' for ArrayExpr object", key)
 			}
-			expr.ExprName, dec.err = dec.unmarshalString(val)
-
-		case "type":
-
-			dec.scan.back()
-
-			expr.Type = dec.decodeArrayType()
-
-		default:
-			dec.err = fmt.Errorf("unexpected key '%s' for ArrayExpr object", key)
 		}
 
 		if dec.err != nil {
@@ -276,30 +278,32 @@ func (dec *decoder) decodeArrayLitAttrs() *ast.ArrayLit {
 			return nil
 		}
 
-		switch key {
+		if tok == scanNullVal {
+			switch key {
 
-		case "expression_name":
+			case "expression_name":
 
-			if tok != scanStringLit {
-				dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
-				return nil
+				if tok != scanStringLit {
+					dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
+					return nil
+				}
+				expr.ExprName, dec.err = dec.unmarshalString(val)
+
+			case "type":
+
+				dec.scan.back()
+
+				expr.Type = dec.decodeArrayType()
+
+			case "elements":
+
+				dec.scan.back()
+
+				expr.Elts = dec.decodeExprs()
+
+			default:
+				dec.err = fmt.Errorf("unexpected key '%s' for ArrayLit object", key)
 			}
-			expr.ExprName, dec.err = dec.unmarshalString(val)
-
-		case "type":
-
-			dec.scan.back()
-
-			expr.Type = dec.decodeArrayType()
-
-		case "elements":
-
-			dec.scan.back()
-
-			expr.Elts = dec.decodeExprs()
-
-		default:
-			dec.err = fmt.Errorf("unexpected key '%s' for ArrayLit object", key)
 		}
 
 		if dec.err != nil {
@@ -353,24 +357,26 @@ func (dec *decoder) decodeAttrRefAttrs() *ast.AttrRef {
 			return nil
 		}
 
-		switch key {
+		if tok == scanNullVal {
+			switch key {
 
-		case "expression_name":
+			case "expression_name":
 
-			if tok != scanStringLit {
-				dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
-				return nil
+				if tok != scanStringLit {
+					dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
+					return nil
+				}
+				expr.ExprName, dec.err = dec.unmarshalString(val)
+
+			case "name":
+
+				dec.scan.back()
+
+				expr.Name = dec.decodeIdent()
+
+			default:
+				dec.err = fmt.Errorf("unexpected key '%s' for AttrRef object", key)
 			}
-			expr.ExprName, dec.err = dec.unmarshalString(val)
-
-		case "name":
-
-			dec.scan.back()
-
-			expr.Name = dec.decodeIdent()
-
-		default:
-			dec.err = fmt.Errorf("unexpected key '%s' for AttrRef object", key)
 		}
 
 		if dec.err != nil {
@@ -424,34 +430,36 @@ func (dec *decoder) decodeBasicLitAttrs() *ast.BasicLit {
 			return nil
 		}
 
-		switch key {
+		if tok == scanNullVal {
+			switch key {
 
-		case "expression_name":
+			case "expression_name":
 
-			if tok != scanStringLit {
-				dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
-				return nil
+				if tok != scanStringLit {
+					dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
+					return nil
+				}
+				expr.ExprName, dec.err = dec.unmarshalString(val)
+
+			case "kind":
+
+				if tok != scanStringLit {
+					dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
+					return nil
+				}
+				expr.Kind, dec.err = dec.unmarshalString(val)
+
+			case "value":
+
+				if tok != scanStringLit {
+					dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
+					return nil
+				}
+				expr.Value, dec.err = dec.unmarshalString(val)
+
+			default:
+				dec.err = fmt.Errorf("unexpected key '%s' for BasicLit object", key)
 			}
-			expr.ExprName, dec.err = dec.unmarshalString(val)
-
-		case "kind":
-
-			if tok != scanStringLit {
-				dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
-				return nil
-			}
-			expr.Kind, dec.err = dec.unmarshalString(val)
-
-		case "value":
-
-			if tok != scanStringLit {
-				dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
-				return nil
-			}
-			expr.Value, dec.err = dec.unmarshalString(val)
-
-		default:
-			dec.err = fmt.Errorf("unexpected key '%s' for BasicLit object", key)
 		}
 
 		if dec.err != nil {
@@ -505,38 +513,40 @@ func (dec *decoder) decodeBinaryExprAttrs() *ast.BinaryExpr {
 			return nil
 		}
 
-		switch key {
+		if tok == scanNullVal {
+			switch key {
 
-		case "expression_name":
+			case "expression_name":
 
-			if tok != scanStringLit {
-				dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
-				return nil
+				if tok != scanStringLit {
+					dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
+					return nil
+				}
+				expr.ExprName, dec.err = dec.unmarshalString(val)
+
+			case "left_expression":
+
+				dec.scan.back()
+
+				expr.LeftExpr = dec.decodeExpr()
+
+			case "operator":
+
+				if tok != scanStringLit {
+					dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
+					return nil
+				}
+				expr.Op, dec.err = dec.unmarshalString(val)
+
+			case "right_expression":
+
+				dec.scan.back()
+
+				expr.RightExpr = dec.decodeExpr()
+
+			default:
+				dec.err = fmt.Errorf("unexpected key '%s' for BinaryExpr object", key)
 			}
-			expr.ExprName, dec.err = dec.unmarshalString(val)
-
-		case "left_expression":
-
-			dec.scan.back()
-
-			expr.LeftExpr = dec.decodeExpr()
-
-		case "operator":
-
-			if tok != scanStringLit {
-				dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
-				return nil
-			}
-			expr.Op, dec.err = dec.unmarshalString(val)
-
-		case "right_expression":
-
-			dec.scan.back()
-
-			expr.RightExpr = dec.decodeExpr()
-
-		default:
-			dec.err = fmt.Errorf("unexpected key '%s' for BinaryExpr object", key)
 		}
 
 		if dec.err != nil {
@@ -590,38 +600,40 @@ func (dec *decoder) decodeCallExprAttrs() *ast.CallExpr {
 			return nil
 		}
 
-		switch key {
+		if tok == scanNullVal {
+			switch key {
 
-		case "expression_name":
+			case "expression_name":
 
-			if tok != scanStringLit {
-				dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
-				return nil
+				if tok != scanStringLit {
+					dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
+					return nil
+				}
+				expr.ExprName, dec.err = dec.unmarshalString(val)
+
+			case "function":
+
+				dec.scan.back()
+
+				expr.Fun = dec.decodeFuncRef()
+
+			case "arguments":
+
+				dec.scan.back()
+
+				expr.Args = dec.decodeExprs()
+
+			case "line":
+
+				if tok != scanInt64Lit {
+					dec.err = fmt.Errorf("expected 'Int64 literal', found '%v'", tok)
+					return nil
+				}
+				expr.Line, dec.err = dec.unmarshalInt64(val)
+
+			default:
+				dec.err = fmt.Errorf("unexpected key '%s' for CallExpr object", key)
 			}
-			expr.ExprName, dec.err = dec.unmarshalString(val)
-
-		case "function":
-
-			dec.scan.back()
-
-			expr.Fun = dec.decodeFuncRef()
-
-		case "arguments":
-
-			dec.scan.back()
-
-			expr.Args = dec.decodeExprs()
-
-		case "line":
-
-			if tok != scanInt64Lit {
-				dec.err = fmt.Errorf("expected 'Int64 literal', found '%v'", tok)
-				return nil
-			}
-			expr.Line, dec.err = dec.unmarshalInt64(val)
-
-		default:
-			dec.err = fmt.Errorf("unexpected key '%s' for CallExpr object", key)
 		}
 
 		if dec.err != nil {
@@ -675,54 +687,56 @@ func (dec *decoder) decodeClassLitAttrs() *ast.ClassLit {
 			return nil
 		}
 
-		switch key {
+		if tok == scanNullVal {
+			switch key {
 
-		case "expression_name":
+			case "expression_name":
 
-			if tok != scanStringLit {
-				dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
-				return nil
+				if tok != scanStringLit {
+					dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
+					return nil
+				}
+				expr.ExprName, dec.err = dec.unmarshalString(val)
+
+			case "extended_classes":
+
+				dec.scan.back()
+
+				expr.ExtendedClasses = dec.decodeClassRefs()
+
+			case "implemented_interfaces":
+
+				dec.scan.back()
+
+				expr.ImplementedInterfaces = dec.decodeInterfaceRefs()
+
+			case "attributes":
+
+				dec.scan.back()
+
+				expr.Attrs = dec.decodeAttrs()
+
+			case "constructors":
+
+				dec.scan.back()
+
+				expr.Constructors = dec.decodeConstructorDecls()
+
+			case "destructors":
+
+				dec.scan.back()
+
+				expr.Destructors = dec.decodeDestructorDecls()
+
+			case "methods":
+
+				dec.scan.back()
+
+				expr.Methods = dec.decodeMethodDecls()
+
+			default:
+				dec.err = fmt.Errorf("unexpected key '%s' for ClassLit object", key)
 			}
-			expr.ExprName, dec.err = dec.unmarshalString(val)
-
-		case "extended_classes":
-
-			dec.scan.back()
-
-			expr.ExtendedClasses = dec.decodeClassRefs()
-
-		case "implemented_interfaces":
-
-			dec.scan.back()
-
-			expr.ImplementedInterfaces = dec.decodeInterfaceRefs()
-
-		case "attributes":
-
-			dec.scan.back()
-
-			expr.Attrs = dec.decodeAttrs()
-
-		case "constructors":
-
-			dec.scan.back()
-
-			expr.Constructors = dec.decodeConstructorDecls()
-
-		case "destructors":
-
-			dec.scan.back()
-
-			expr.Destructors = dec.decodeDestructorDecls()
-
-		case "methods":
-
-			dec.scan.back()
-
-			expr.Methods = dec.decodeMethodDecls()
-
-		default:
-			dec.err = fmt.Errorf("unexpected key '%s' for ClassLit object", key)
 		}
 
 		if dec.err != nil {
@@ -776,38 +790,40 @@ func (dec *decoder) decodeFuncLitAttrs() *ast.FuncLit {
 			return nil
 		}
 
-		switch key {
+		if tok == scanNullVal {
+			switch key {
 
-		case "expression_name":
+			case "expression_name":
 
-			if tok != scanStringLit {
-				dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
-				return nil
+				if tok != scanStringLit {
+					dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
+					return nil
+				}
+				expr.ExprName, dec.err = dec.unmarshalString(val)
+
+			case "type":
+
+				dec.scan.back()
+
+				expr.Type = dec.decodeFuncType()
+
+			case "body":
+
+				dec.scan.back()
+
+				expr.Body = dec.decodeStmts()
+
+			case "loc":
+
+				if tok != scanInt64Lit {
+					dec.err = fmt.Errorf("expected 'Int64 literal', found '%v'", tok)
+					return nil
+				}
+				expr.LoC, dec.err = dec.unmarshalInt64(val)
+
+			default:
+				dec.err = fmt.Errorf("unexpected key '%s' for FuncLit object", key)
 			}
-			expr.ExprName, dec.err = dec.unmarshalString(val)
-
-		case "type":
-
-			dec.scan.back()
-
-			expr.Type = dec.decodeFuncType()
-
-		case "body":
-
-			dec.scan.back()
-
-			expr.Body = dec.decodeStmts()
-
-		case "loc":
-
-			if tok != scanInt64Lit {
-				dec.err = fmt.Errorf("expected 'Int64 literal', found '%v'", tok)
-				return nil
-			}
-			expr.LoC, dec.err = dec.unmarshalInt64(val)
-
-		default:
-			dec.err = fmt.Errorf("unexpected key '%s' for FuncLit object", key)
 		}
 
 		if dec.err != nil {
@@ -861,26 +877,28 @@ func (dec *decoder) decodeIdentAttrs() *ast.Ident {
 			return nil
 		}
 
-		switch key {
+		if tok == scanNullVal {
+			switch key {
 
-		case "expression_name":
+			case "expression_name":
 
-			if tok != scanStringLit {
-				dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
-				return nil
+				if tok != scanStringLit {
+					dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
+					return nil
+				}
+				expr.ExprName, dec.err = dec.unmarshalString(val)
+
+			case "name":
+
+				if tok != scanStringLit {
+					dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
+					return nil
+				}
+				expr.Name, dec.err = dec.unmarshalString(val)
+
+			default:
+				dec.err = fmt.Errorf("unexpected key '%s' for Ident object", key)
 			}
-			expr.ExprName, dec.err = dec.unmarshalString(val)
-
-		case "name":
-
-			if tok != scanStringLit {
-				dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
-				return nil
-			}
-			expr.Name, dec.err = dec.unmarshalString(val)
-
-		default:
-			dec.err = fmt.Errorf("unexpected key '%s' for Ident object", key)
 		}
 
 		if dec.err != nil {
@@ -934,40 +952,42 @@ func (dec *decoder) decodeIncDecExprAttrs() *ast.IncDecExpr {
 			return nil
 		}
 
-		switch key {
+		if tok == scanNullVal {
+			switch key {
 
-		case "expression_name":
+			case "expression_name":
 
-			if tok != scanStringLit {
-				dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
-				return nil
+				if tok != scanStringLit {
+					dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
+					return nil
+				}
+				expr.ExprName, dec.err = dec.unmarshalString(val)
+
+			case "operand":
+
+				dec.scan.back()
+
+				expr.X = dec.decodeExpr()
+
+			case "operator":
+
+				if tok != scanStringLit {
+					dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
+					return nil
+				}
+				expr.Op, dec.err = dec.unmarshalString(val)
+
+			case "is_pre":
+
+				if tok != scanBoolLit {
+					dec.err = fmt.Errorf("expected 'Bool literal', found '%v'", tok)
+					return nil
+				}
+				expr.IsPre, dec.err = dec.unmarshalBool(val)
+
+			default:
+				dec.err = fmt.Errorf("unexpected key '%s' for IncDecExpr object", key)
 			}
-			expr.ExprName, dec.err = dec.unmarshalString(val)
-
-		case "operand":
-
-			dec.scan.back()
-
-			expr.X = dec.decodeExpr()
-
-		case "operator":
-
-			if tok != scanStringLit {
-				dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
-				return nil
-			}
-			expr.Op, dec.err = dec.unmarshalString(val)
-
-		case "is_pre":
-
-			if tok != scanBoolLit {
-				dec.err = fmt.Errorf("expected 'Bool literal', found '%v'", tok)
-				return nil
-			}
-			expr.IsPre, dec.err = dec.unmarshalBool(val)
-
-		default:
-			dec.err = fmt.Errorf("unexpected key '%s' for IncDecExpr object", key)
 		}
 
 		if dec.err != nil {
@@ -1021,30 +1041,32 @@ func (dec *decoder) decodeIndexExprAttrs() *ast.IndexExpr {
 			return nil
 		}
 
-		switch key {
+		if tok == scanNullVal {
+			switch key {
 
-		case "expression_name":
+			case "expression_name":
 
-			if tok != scanStringLit {
-				dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
-				return nil
+				if tok != scanStringLit {
+					dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
+					return nil
+				}
+				expr.ExprName, dec.err = dec.unmarshalString(val)
+
+			case "expression":
+
+				dec.scan.back()
+
+				expr.X = dec.decodeExpr()
+
+			case "index":
+
+				dec.scan.back()
+
+				expr.Index = dec.decodeExpr()
+
+			default:
+				dec.err = fmt.Errorf("unexpected key '%s' for IndexExpr object", key)
 			}
-			expr.ExprName, dec.err = dec.unmarshalString(val)
-
-		case "expression":
-
-			dec.scan.back()
-
-			expr.X = dec.decodeExpr()
-
-		case "index":
-
-			dec.scan.back()
-
-			expr.Index = dec.decodeExpr()
-
-		default:
-			dec.err = fmt.Errorf("unexpected key '%s' for IndexExpr object", key)
 		}
 
 		if dec.err != nil {
@@ -1098,36 +1120,38 @@ func (dec *decoder) decodeStructTypeAttrs() *ast.StructType {
 			return nil
 		}
 
-		switch key {
+		if tok == scanNullVal {
+			switch key {
 
-		case "expression_name":
+			case "expression_name":
 
-			if tok != scanStringLit {
-				dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
-				return nil
+				if tok != scanStringLit {
+					dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
+					return nil
+				}
+				expr.ExprName, dec.err = dec.unmarshalString(val)
+
+			case "doc":
+
+				dec.scan.back()
+
+				expr.Doc = dec.decodeStrings()
+
+			case "name":
+
+				dec.scan.back()
+
+				expr.Name = dec.decodeIdent()
+
+			case "fields":
+
+				dec.scan.back()
+
+				expr.Fields = dec.decodeFields()
+
+			default:
+				dec.err = fmt.Errorf("unexpected key '%s' for StructType object", key)
 			}
-			expr.ExprName, dec.err = dec.unmarshalString(val)
-
-		case "doc":
-
-			dec.scan.back()
-
-			expr.Doc = dec.decodeStrings()
-
-		case "name":
-
-			dec.scan.back()
-
-			expr.Name = dec.decodeIdent()
-
-		case "fields":
-
-			dec.scan.back()
-
-			expr.Fields = dec.decodeFields()
-
-		default:
-			dec.err = fmt.Errorf("unexpected key '%s' for StructType object", key)
 		}
 
 		if dec.err != nil {
@@ -1181,36 +1205,38 @@ func (dec *decoder) decodeTernaryExprAttrs() *ast.TernaryExpr {
 			return nil
 		}
 
-		switch key {
+		if tok == scanNullVal {
+			switch key {
 
-		case "expression_name":
+			case "expression_name":
 
-			if tok != scanStringLit {
-				dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
-				return nil
+				if tok != scanStringLit {
+					dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
+					return nil
+				}
+				expr.ExprName, dec.err = dec.unmarshalString(val)
+
+			case "condition":
+
+				dec.scan.back()
+
+				expr.Cond = dec.decodeExpr()
+
+			case "then":
+
+				dec.scan.back()
+
+				expr.Then = dec.decodeExpr()
+
+			case "else":
+
+				dec.scan.back()
+
+				expr.Else = dec.decodeExpr()
+
+			default:
+				dec.err = fmt.Errorf("unexpected key '%s' for TernaryExpr object", key)
 			}
-			expr.ExprName, dec.err = dec.unmarshalString(val)
-
-		case "condition":
-
-			dec.scan.back()
-
-			expr.Cond = dec.decodeExpr()
-
-		case "then":
-
-			dec.scan.back()
-
-			expr.Then = dec.decodeExpr()
-
-		case "else":
-
-			dec.scan.back()
-
-			expr.Else = dec.decodeExpr()
-
-		default:
-			dec.err = fmt.Errorf("unexpected key '%s' for TernaryExpr object", key)
 		}
 
 		if dec.err != nil {
@@ -1264,32 +1290,34 @@ func (dec *decoder) decodeUnaryExprAttrs() *ast.UnaryExpr {
 			return nil
 		}
 
-		switch key {
+		if tok == scanNullVal {
+			switch key {
 
-		case "expression_name":
+			case "expression_name":
 
-			if tok != scanStringLit {
-				dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
-				return nil
+				if tok != scanStringLit {
+					dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
+					return nil
+				}
+				expr.ExprName, dec.err = dec.unmarshalString(val)
+
+			case "operator":
+
+				if tok != scanStringLit {
+					dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
+					return nil
+				}
+				expr.Op, dec.err = dec.unmarshalString(val)
+
+			case "operand":
+
+				dec.scan.back()
+
+				expr.X = dec.decodeExpr()
+
+			default:
+				dec.err = fmt.Errorf("unexpected key '%s' for UnaryExpr object", key)
 			}
-			expr.ExprName, dec.err = dec.unmarshalString(val)
-
-		case "operator":
-
-			if tok != scanStringLit {
-				dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
-				return nil
-			}
-			expr.Op, dec.err = dec.unmarshalString(val)
-
-		case "operand":
-
-			dec.scan.back()
-
-			expr.X = dec.decodeExpr()
-
-		default:
-			dec.err = fmt.Errorf("unexpected key '%s' for UnaryExpr object", key)
 		}
 
 		if dec.err != nil {
@@ -1343,30 +1371,32 @@ func (dec *decoder) decodeValueSpecAttrs() *ast.ValueSpec {
 			return nil
 		}
 
-		switch key {
+		if tok == scanNullVal {
+			switch key {
 
-		case "expression_name":
+			case "expression_name":
 
-			if tok != scanStringLit {
-				dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
-				return nil
+				if tok != scanStringLit {
+					dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
+					return nil
+				}
+				expr.ExprName, dec.err = dec.unmarshalString(val)
+
+			case "name":
+
+				dec.scan.back()
+
+				expr.Name = dec.decodeIdent()
+
+			case "type":
+
+				dec.scan.back()
+
+				expr.Type = dec.decodeIdent()
+
+			default:
+				dec.err = fmt.Errorf("unexpected key '%s' for ValueSpec object", key)
 			}
-			expr.ExprName, dec.err = dec.unmarshalString(val)
-
-		case "name":
-
-			dec.scan.back()
-
-			expr.Name = dec.decodeIdent()
-
-		case "type":
-
-			dec.scan.back()
-
-			expr.Type = dec.decodeIdent()
-
-		default:
-			dec.err = fmt.Errorf("unexpected key '%s' for ValueSpec object", key)
 		}
 
 		if dec.err != nil {
@@ -1985,38 +2015,40 @@ func (dec *decoder) decodeAssignStmtAttrs() *ast.AssignStmt {
 			return nil
 		}
 
-		switch key {
+		if tok != scanNullVal {
+			switch key {
 
-		case "statement_name":
+			case "statement_name":
 
-			if tok != scanStringLit {
-				dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
-				return nil
+				if tok != scanStringLit {
+					dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
+					return nil
+				}
+				stmt.StmtName, dec.err = dec.unmarshalString(val)
+
+			case "left_hand_side":
+
+				dec.scan.back()
+
+				stmt.LHS = dec.decodeExprs()
+
+			case "right_hand_side":
+
+				dec.scan.back()
+
+				stmt.RHS = dec.decodeExprs()
+
+			case "line":
+
+				if tok != scanInt64Lit {
+					dec.err = fmt.Errorf("expected 'Int64 literal', found '%v'", tok)
+					return nil
+				}
+				stmt.Line, dec.err = dec.unmarshalInt64(val)
+
+			default:
+				dec.err = fmt.Errorf("unexpected key '%s' for AssignStmt object", key)
 			}
-			stmt.StmtName, dec.err = dec.unmarshalString(val)
-
-		case "left_hand_side":
-
-			dec.scan.back()
-
-			stmt.LHS = dec.decodeExprs()
-
-		case "right_hand_side":
-
-			dec.scan.back()
-
-			stmt.RHS = dec.decodeExprs()
-
-		case "line":
-
-			if tok != scanInt64Lit {
-				dec.err = fmt.Errorf("expected 'Int64 literal', found '%v'", tok)
-				return nil
-			}
-			stmt.Line, dec.err = dec.unmarshalInt64(val)
-
-		default:
-			dec.err = fmt.Errorf("unexpected key '%s' for AssignStmt object", key)
 		}
 
 		if dec.err != nil {
@@ -2070,24 +2102,26 @@ func (dec *decoder) decodeExprStmtAttrs() *ast.ExprStmt {
 			return nil
 		}
 
-		switch key {
+		if tok != scanNullVal {
+			switch key {
 
-		case "statement_name":
+			case "statement_name":
 
-			if tok != scanStringLit {
-				dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
-				return nil
+				if tok != scanStringLit {
+					dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
+					return nil
+				}
+				stmt.StmtName, dec.err = dec.unmarshalString(val)
+
+			case "expression":
+
+				dec.scan.back()
+
+				stmt.X = dec.decodeExpr()
+
+			default:
+				dec.err = fmt.Errorf("unexpected key '%s' for ExprStmt object", key)
 			}
-			stmt.StmtName, dec.err = dec.unmarshalString(val)
-
-		case "expression":
-
-			dec.scan.back()
-
-			stmt.X = dec.decodeExpr()
-
-		default:
-			dec.err = fmt.Errorf("unexpected key '%s' for ExprStmt object", key)
 		}
 
 		if dec.err != nil {
@@ -2141,50 +2175,52 @@ func (dec *decoder) decodeIfStmtAttrs() *ast.IfStmt {
 			return nil
 		}
 
-		switch key {
+		if tok != scanNullVal {
+			switch key {
 
-		case "statement_name":
+			case "statement_name":
 
-			if tok != scanStringLit {
-				dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
-				return nil
+				if tok != scanStringLit {
+					dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
+					return nil
+				}
+				stmt.StmtName, dec.err = dec.unmarshalString(val)
+
+			case "initialization":
+
+				dec.scan.back()
+
+				stmt.Init = dec.decodeStmt()
+
+			case "condition":
+
+				dec.scan.back()
+
+				stmt.Cond = dec.decodeExpr()
+
+			case "body":
+
+				dec.scan.back()
+
+				stmt.Body = dec.decodeStmts()
+
+			case "else":
+
+				dec.scan.back()
+
+				stmt.Else = dec.decodeStmts()
+
+			case "line":
+
+				if tok != scanInt64Lit {
+					dec.err = fmt.Errorf("expected 'Int64 literal', found '%v'", tok)
+					return nil
+				}
+				stmt.Line, dec.err = dec.unmarshalInt64(val)
+
+			default:
+				dec.err = fmt.Errorf("unexpected key '%s' for IfStmt object", key)
 			}
-			stmt.StmtName, dec.err = dec.unmarshalString(val)
-
-		case "initialization":
-
-			dec.scan.back()
-
-			stmt.Init = dec.decodeStmt()
-
-		case "condition":
-
-			dec.scan.back()
-
-			stmt.Cond = dec.decodeExpr()
-
-		case "body":
-
-			dec.scan.back()
-
-			stmt.Body = dec.decodeStmts()
-
-		case "else":
-
-			dec.scan.back()
-
-			stmt.Else = dec.decodeStmts()
-
-		case "line":
-
-			if tok != scanInt64Lit {
-				dec.err = fmt.Errorf("expected 'Int64 literal', found '%v'", tok)
-				return nil
-			}
-			stmt.Line, dec.err = dec.unmarshalInt64(val)
-
-		default:
-			dec.err = fmt.Errorf("unexpected key '%s' for IfStmt object", key)
 		}
 
 		if dec.err != nil {
@@ -2238,64 +2274,66 @@ func (dec *decoder) decodeLoopStmtAttrs() *ast.LoopStmt {
 			return nil
 		}
 
-		switch key {
+		if tok != scanNullVal {
+			switch key {
 
-		case "statement_name":
+			case "statement_name":
 
-			if tok != scanStringLit {
-				dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
-				return nil
+				if tok != scanStringLit {
+					dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
+					return nil
+				}
+				stmt.StmtName, dec.err = dec.unmarshalString(val)
+
+			case "initialization":
+
+				dec.scan.back()
+
+				stmt.Init = dec.decodeStmts()
+
+			case "condition":
+
+				dec.scan.back()
+
+				stmt.Cond = dec.decodeExpr()
+
+			case "post_iteration_statement":
+
+				dec.scan.back()
+
+				stmt.Post = dec.decodeStmts()
+
+			case "body":
+
+				dec.scan.back()
+
+				stmt.Body = dec.decodeStmts()
+
+			case "else":
+
+				dec.scan.back()
+
+				stmt.Else = dec.decodeStmts()
+
+			case "is_post_evaluated":
+
+				if tok != scanBoolLit {
+					dec.err = fmt.Errorf("expected 'Bool literal', found '%v'", tok)
+					return nil
+				}
+				stmt.IsPostEval, dec.err = dec.unmarshalBool(val)
+
+			case "line":
+
+				if tok != scanInt64Lit {
+					dec.err = fmt.Errorf("expected 'Int64 literal', found '%v'", tok)
+					return nil
+				}
+				stmt.Line, dec.err = dec.unmarshalInt64(val)
+
+			default:
+				dec.err = fmt.Errorf("unexpected key '%s' for LoopStmt object", key)
 			}
-			stmt.StmtName, dec.err = dec.unmarshalString(val)
-
-		case "initialization":
-
-			dec.scan.back()
-
-			stmt.Init = dec.decodeStmts()
-
-		case "condition":
-
-			dec.scan.back()
-
-			stmt.Cond = dec.decodeExpr()
-
-		case "post_iteration_statement":
-
-			dec.scan.back()
-
-			stmt.Post = dec.decodeStmts()
-
-		case "body":
-
-			dec.scan.back()
-
-			stmt.Body = dec.decodeStmts()
-
-		case "else":
-
-			dec.scan.back()
-
-			stmt.Else = dec.decodeStmts()
-
-		case "is_post_evaluated":
-
-			if tok != scanBoolLit {
-				dec.err = fmt.Errorf("expected 'Bool literal', found '%v'", tok)
-				return nil
-			}
-			stmt.IsPostEval, dec.err = dec.unmarshalBool(val)
-
-		case "line":
-
-			if tok != scanInt64Lit {
-				dec.err = fmt.Errorf("expected 'Int64 literal', found '%v'", tok)
-				return nil
-			}
-			stmt.Line, dec.err = dec.unmarshalInt64(val)
-
-		default:
-			dec.err = fmt.Errorf("unexpected key '%s' for LoopStmt object", key)
 		}
 
 		if dec.err != nil {
@@ -2349,32 +2387,34 @@ func (dec *decoder) decodeOtherStmtAttrs() *ast.OtherStmt {
 			return nil
 		}
 
-		switch key {
+		if tok != scanNullVal {
+			switch key {
 
-		case "statement_name":
+			case "statement_name":
 
-			if tok != scanStringLit {
-				dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
-				return nil
+				if tok != scanStringLit {
+					dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
+					return nil
+				}
+				stmt.StmtName, dec.err = dec.unmarshalString(val)
+
+			case "body":
+
+				dec.scan.back()
+
+				stmt.Body = dec.decodeStmts()
+
+			case "line":
+
+				if tok != scanInt64Lit {
+					dec.err = fmt.Errorf("expected 'Int64 literal', found '%v'", tok)
+					return nil
+				}
+				stmt.Line, dec.err = dec.unmarshalInt64(val)
+
+			default:
+				dec.err = fmt.Errorf("unexpected key '%s' for OtherStmt object", key)
 			}
-			stmt.StmtName, dec.err = dec.unmarshalString(val)
-
-		case "body":
-
-			dec.scan.back()
-
-			stmt.Body = dec.decodeStmts()
-
-		case "line":
-
-			if tok != scanInt64Lit {
-				dec.err = fmt.Errorf("expected 'Int64 literal', found '%v'", tok)
-				return nil
-			}
-			stmt.Line, dec.err = dec.unmarshalInt64(val)
-
-		default:
-			dec.err = fmt.Errorf("unexpected key '%s' for OtherStmt object", key)
 		}
 
 		if dec.err != nil {
@@ -2428,44 +2468,46 @@ func (dec *decoder) decodeRangeLoopStmtAttrs() *ast.RangeLoopStmt {
 			return nil
 		}
 
-		switch key {
+		if tok != scanNullVal {
+			switch key {
 
-		case "statement_name":
+			case "statement_name":
 
-			if tok != scanStringLit {
-				dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
-				return nil
+				if tok != scanStringLit {
+					dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
+					return nil
+				}
+				stmt.StmtName, dec.err = dec.unmarshalString(val)
+
+			case "variables":
+
+				dec.scan.back()
+
+				stmt.Vars = dec.decodeExprs()
+
+			case "iterable":
+
+				dec.scan.back()
+
+				stmt.Iterable = dec.decodeExpr()
+
+			case "body":
+
+				dec.scan.back()
+
+				stmt.Body = dec.decodeStmts()
+
+			case "line":
+
+				if tok != scanInt64Lit {
+					dec.err = fmt.Errorf("expected 'Int64 literal', found '%v'", tok)
+					return nil
+				}
+				stmt.Line, dec.err = dec.unmarshalInt64(val)
+
+			default:
+				dec.err = fmt.Errorf("unexpected key '%s' for RangeLoopStmt object", key)
 			}
-			stmt.StmtName, dec.err = dec.unmarshalString(val)
-
-		case "variables":
-
-			dec.scan.back()
-
-			stmt.Vars = dec.decodeExprs()
-
-		case "iterable":
-
-			dec.scan.back()
-
-			stmt.Iterable = dec.decodeExpr()
-
-		case "body":
-
-			dec.scan.back()
-
-			stmt.Body = dec.decodeStmts()
-
-		case "line":
-
-			if tok != scanInt64Lit {
-				dec.err = fmt.Errorf("expected 'Int64 literal', found '%v'", tok)
-				return nil
-			}
-			stmt.Line, dec.err = dec.unmarshalInt64(val)
-
-		default:
-			dec.err = fmt.Errorf("unexpected key '%s' for RangeLoopStmt object", key)
 		}
 
 		if dec.err != nil {
@@ -2519,32 +2561,34 @@ func (dec *decoder) decodeReturnStmtAttrs() *ast.ReturnStmt {
 			return nil
 		}
 
-		switch key {
+		if tok != scanNullVal {
+			switch key {
 
-		case "statement_name":
+			case "statement_name":
 
-			if tok != scanStringLit {
-				dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
-				return nil
+				if tok != scanStringLit {
+					dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
+					return nil
+				}
+				stmt.StmtName, dec.err = dec.unmarshalString(val)
+
+			case "results":
+
+				dec.scan.back()
+
+				stmt.Results = dec.decodeExprs()
+
+			case "line":
+
+				if tok != scanInt64Lit {
+					dec.err = fmt.Errorf("expected 'Int64 literal', found '%v'", tok)
+					return nil
+				}
+				stmt.Line, dec.err = dec.unmarshalInt64(val)
+
+			default:
+				dec.err = fmt.Errorf("unexpected key '%s' for ReturnStmt object", key)
 			}
-			stmt.StmtName, dec.err = dec.unmarshalString(val)
-
-		case "results":
-
-			dec.scan.back()
-
-			stmt.Results = dec.decodeExprs()
-
-		case "line":
-
-			if tok != scanInt64Lit {
-				dec.err = fmt.Errorf("expected 'Int64 literal', found '%v'", tok)
-				return nil
-			}
-			stmt.Line, dec.err = dec.unmarshalInt64(val)
-
-		default:
-			dec.err = fmt.Errorf("unexpected key '%s' for ReturnStmt object", key)
 		}
 
 		if dec.err != nil {
@@ -2598,42 +2642,44 @@ func (dec *decoder) decodeSwitchStmtAttrs() *ast.SwitchStmt {
 			return nil
 		}
 
-		switch key {
+		if tok != scanNullVal {
+			switch key {
 
-		case "statement_name":
+			case "statement_name":
 
-			if tok != scanStringLit {
-				dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
-				return nil
+				if tok != scanStringLit {
+					dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
+					return nil
+				}
+				stmt.StmtName, dec.err = dec.unmarshalString(val)
+
+			case "initialization":
+
+				dec.scan.back()
+
+				stmt.Init = dec.decodeExpr()
+
+			case "condition":
+
+				dec.scan.back()
+
+				stmt.Cond = dec.decodeExpr()
+
+			case "case_clauses":
+
+				dec.scan.back()
+
+				stmt.CaseClauses = dec.decodeCaseClauses()
+
+			case "default":
+
+				dec.scan.back()
+
+				stmt.Default = dec.decodeStmts()
+
+			default:
+				dec.err = fmt.Errorf("unexpected key '%s' for SwitchStmt object", key)
 			}
-			stmt.StmtName, dec.err = dec.unmarshalString(val)
-
-		case "initialization":
-
-			dec.scan.back()
-
-			stmt.Init = dec.decodeExpr()
-
-		case "condition":
-
-			dec.scan.back()
-
-			stmt.Cond = dec.decodeExpr()
-
-		case "case_clauses":
-
-			dec.scan.back()
-
-			stmt.CaseClauses = dec.decodeCaseClauses()
-
-		case "default":
-
-			dec.scan.back()
-
-			stmt.Default = dec.decodeStmts()
-
-		default:
-			dec.err = fmt.Errorf("unexpected key '%s' for SwitchStmt object", key)
 		}
 
 		if dec.err != nil {
@@ -2687,24 +2733,26 @@ func (dec *decoder) decodeThrowStmtAttrs() *ast.ThrowStmt {
 			return nil
 		}
 
-		switch key {
+		if tok != scanNullVal {
+			switch key {
 
-		case "statement_name":
+			case "statement_name":
 
-			if tok != scanStringLit {
-				dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
-				return nil
+				if tok != scanStringLit {
+					dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
+					return nil
+				}
+				stmt.StmtName, dec.err = dec.unmarshalString(val)
+
+			case "expression":
+
+				dec.scan.back()
+
+				stmt.X = dec.decodeExpr()
+
+			default:
+				dec.err = fmt.Errorf("unexpected key '%s' for ThrowStmt object", key)
 			}
-			stmt.StmtName, dec.err = dec.unmarshalString(val)
-
-		case "expression":
-
-			dec.scan.back()
-
-			stmt.X = dec.decodeExpr()
-
-		default:
-			dec.err = fmt.Errorf("unexpected key '%s' for ThrowStmt object", key)
 		}
 
 		if dec.err != nil {
@@ -2758,36 +2806,38 @@ func (dec *decoder) decodeTryStmtAttrs() *ast.TryStmt {
 			return nil
 		}
 
-		switch key {
+		if tok != scanNullVal {
+			switch key {
 
-		case "statement_name":
+			case "statement_name":
 
-			if tok != scanStringLit {
-				dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
-				return nil
+				if tok != scanStringLit {
+					dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
+					return nil
+				}
+				stmt.StmtName, dec.err = dec.unmarshalString(val)
+
+			case "body":
+
+				dec.scan.back()
+
+				stmt.Body = dec.decodeStmts()
+
+			case "catch_clauses":
+
+				dec.scan.back()
+
+				stmt.CatchClauses = dec.decodeCatchClauses()
+
+			case "finally":
+
+				dec.scan.back()
+
+				stmt.Finally = dec.decodeStmts()
+
+			default:
+				dec.err = fmt.Errorf("unexpected key '%s' for TryStmt object", key)
 			}
-			stmt.StmtName, dec.err = dec.unmarshalString(val)
-
-		case "body":
-
-			dec.scan.back()
-
-			stmt.Body = dec.decodeStmts()
-
-		case "catch_clauses":
-
-			dec.scan.back()
-
-			stmt.CatchClauses = dec.decodeCatchClauses()
-
-		case "finally":
-
-			dec.scan.back()
-
-			stmt.Finally = dec.decodeStmts()
-
-		default:
-			dec.err = fmt.Errorf("unexpected key '%s' for TryStmt object", key)
 		}
 
 		if dec.err != nil {
@@ -3135,6 +3185,9 @@ func (dec *decoder) decodeTryStmts() []*ast.TryStmt {
 }
 
 func (dec *decoder) decodeArrayType() *ast.ArrayType {
+	if dec.isNull() {
+		return nil
+	}
 	if !dec.assertNewObject() {
 		return nil
 	}
@@ -3160,29 +3213,31 @@ func (dec *decoder) decodeArrayType() *ast.ArrayType {
 			return nil
 		}
 
-		_, _, err = dec.scan.nextValue()
+		_, tok, err := dec.scan.nextValue()
 
 		if err != nil {
 			dec.err = err
 			return nil
 		}
 
-		switch key {
+		if tok != scanNullVal {
+			switch key {
 
-		case "dimensions":
+			case "dimensions":
 
-			dec.scan.back()
+				dec.scan.back()
 
-			any.Dims = dec.decodeInt64s()
+				any.Dims = dec.decodeInt64s()
 
-		case "element_type":
+			case "element_type":
 
-			dec.scan.back()
+				dec.scan.back()
 
-			any.Elt = dec.decodeExpr()
+				any.Elt = dec.decodeExpr()
 
-		default:
-			dec.err = fmt.Errorf("unexpected key '%s' for ArrayType object", key)
+			default:
+				dec.err = fmt.Errorf("unexpected key '%s' for ArrayType object", key)
+			}
 		}
 
 		if dec.err != nil {
@@ -3200,6 +3255,9 @@ func (dec *decoder) decodeArrayType() *ast.ArrayType {
 }
 
 func (dec *decoder) decodeAttr() *ast.Attr {
+	if dec.isNull() {
+		return nil
+	}
 	if !dec.assertNewObject() {
 		return nil
 	}
@@ -3232,34 +3290,36 @@ func (dec *decoder) decodeAttr() *ast.Attr {
 			return nil
 		}
 
-		switch key {
+		if tok != scanNullVal {
+			switch key {
 
-		case "visibility":
+			case "visibility":
 
-			if tok != scanStringLit {
-				dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
-				return nil
+				if tok != scanStringLit {
+					dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
+					return nil
+				}
+				any.Visibility, dec.err = dec.unmarshalString(val)
+
+			case "constant":
+
+				if tok != scanBoolLit {
+					dec.err = fmt.Errorf("expected 'Bool literal', found '%v'", tok)
+					return nil
+				}
+				any.Constant, dec.err = dec.unmarshalBool(val)
+
+			case "static":
+
+				if tok != scanBoolLit {
+					dec.err = fmt.Errorf("expected 'Bool literal', found '%v'", tok)
+					return nil
+				}
+				any.Static, dec.err = dec.unmarshalBool(val)
+
+			default:
+				dec.err = fmt.Errorf("unexpected key '%s' for Attr object", key)
 			}
-			any.Visibility, dec.err = dec.unmarshalString(val)
-
-		case "constant":
-
-			if tok != scanBoolLit {
-				dec.err = fmt.Errorf("expected 'Bool literal', found '%v'", tok)
-				return nil
-			}
-			any.Constant, dec.err = dec.unmarshalBool(val)
-
-		case "static":
-
-			if tok != scanBoolLit {
-				dec.err = fmt.Errorf("expected 'Bool literal', found '%v'", tok)
-				return nil
-			}
-			any.Static, dec.err = dec.unmarshalBool(val)
-
-		default:
-			dec.err = fmt.Errorf("unexpected key '%s' for Attr object", key)
 		}
 
 		if dec.err != nil {
@@ -3277,6 +3337,9 @@ func (dec *decoder) decodeAttr() *ast.Attr {
 }
 
 func (dec *decoder) decodeClassDecl() *ast.ClassDecl {
+	if dec.isNull() {
+		return nil
+	}
 	if !dec.assertNewObject() {
 		return nil
 	}
@@ -3309,80 +3372,82 @@ func (dec *decoder) decodeClassDecl() *ast.ClassDecl {
 			return nil
 		}
 
-		switch key {
+		if tok != scanNullVal {
+			switch key {
 
-		case "doc":
+			case "doc":
 
-			dec.scan.back()
+				dec.scan.back()
 
-			any.Doc = dec.decodeStrings()
+				any.Doc = dec.decodeStrings()
 
-		case "name":
+			case "name":
 
-			if tok != scanStringLit {
-				dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
-				return nil
+				if tok != scanStringLit {
+					dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
+					return nil
+				}
+				any.Name, dec.err = dec.unmarshalString(val)
+
+			case "visibility":
+
+				if tok != scanStringLit {
+					dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
+					return nil
+				}
+				any.Visibility, dec.err = dec.unmarshalString(val)
+
+			case "extended_classes":
+
+				dec.scan.back()
+
+				any.ExtendedClasses = dec.decodeClassRefs()
+
+			case "implemented_interfaces":
+
+				dec.scan.back()
+
+				any.ImplementedInterfaces = dec.decodeInterfaceRefs()
+
+			case "attributes":
+
+				dec.scan.back()
+
+				any.Attrs = dec.decodeAttrs()
+
+			case "constructors":
+
+				dec.scan.back()
+
+				any.Constructors = dec.decodeConstructorDecls()
+
+			case "destructors":
+
+				dec.scan.back()
+
+				any.Destructors = dec.decodeDestructorDecls()
+
+			case "methods":
+
+				dec.scan.back()
+
+				any.Methods = dec.decodeMethodDecls()
+
+			case "nested_classes":
+
+				dec.scan.back()
+
+				any.NestedClasses = dec.decodeClassDecls()
+
+			case "mixins":
+
+				dec.scan.back()
+
+				any.Mixins = dec.decodeTraitRefs()
+
+			default:
+				dec.err = fmt.Errorf("unexpected key '%s' for ClassDecl object", key)
 			}
-			any.Name, dec.err = dec.unmarshalString(val)
-
-		case "visibility":
-
-			if tok != scanStringLit {
-				dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
-				return nil
-			}
-			any.Visibility, dec.err = dec.unmarshalString(val)
-
-		case "extended_classes":
-
-			dec.scan.back()
-
-			any.ExtendedClasses = dec.decodeClassRefs()
-
-		case "implemented_interfaces":
-
-			dec.scan.back()
-
-			any.ImplementedInterfaces = dec.decodeInterfaceRefs()
-
-		case "attributes":
-
-			dec.scan.back()
-
-			any.Attrs = dec.decodeAttrs()
-
-		case "constructors":
-
-			dec.scan.back()
-
-			any.Constructors = dec.decodeConstructorDecls()
-
-		case "destructors":
-
-			dec.scan.back()
-
-			any.Destructors = dec.decodeDestructorDecls()
-
-		case "methods":
-
-			dec.scan.back()
-
-			any.Methods = dec.decodeMethodDecls()
-
-		case "nested_classes":
-
-			dec.scan.back()
-
-			any.NestedClasses = dec.decodeClassDecls()
-
-		case "mixins":
-
-			dec.scan.back()
-
-			any.Mixins = dec.decodeTraitRefs()
-
-		default:
-			dec.err = fmt.Errorf("unexpected key '%s' for ClassDecl object", key)
 		}
 
 		if dec.err != nil {
@@ -3400,6 +3465,9 @@ func (dec *decoder) decodeClassDecl() *ast.ClassDecl {
 }
 
 func (dec *decoder) decodeClassRef() *ast.ClassRef {
+	if dec.isNull() {
+		return nil
+	}
 	if !dec.assertNewObject() {
 		return nil
 	}
@@ -3432,26 +3500,28 @@ func (dec *decoder) decodeClassRef() *ast.ClassRef {
 			return nil
 		}
 
-		switch key {
+		if tok != scanNullVal {
+			switch key {
 
-		case "namespace":
+			case "namespace":
 
-			if tok != scanStringLit {
-				dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
-				return nil
+				if tok != scanStringLit {
+					dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
+					return nil
+				}
+				any.Namespace, dec.err = dec.unmarshalString(val)
+
+			case "class_name":
+
+				if tok != scanStringLit {
+					dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
+					return nil
+				}
+				any.ClassName, dec.err = dec.unmarshalString(val)
+
+			default:
+				dec.err = fmt.Errorf("unexpected key '%s' for ClassRef object", key)
 			}
-			any.Namespace, dec.err = dec.unmarshalString(val)
-
-		case "class_name":
-
-			if tok != scanStringLit {
-				dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
-				return nil
-			}
-			any.ClassName, dec.err = dec.unmarshalString(val)
-
-		default:
-			dec.err = fmt.Errorf("unexpected key '%s' for ClassRef object", key)
 		}
 
 		if dec.err != nil {
@@ -3469,6 +3539,9 @@ func (dec *decoder) decodeClassRef() *ast.ClassRef {
 }
 
 func (dec *decoder) decodeConstant() *ast.Constant {
+	if dec.isNull() {
+		return nil
+	}
 	if !dec.assertNewObject() {
 		return nil
 	}
@@ -3501,56 +3574,58 @@ func (dec *decoder) decodeConstant() *ast.Constant {
 			return nil
 		}
 
-		switch key {
+		if tok != scanNullVal {
+			switch key {
 
-		case "doc":
+			case "doc":
 
-			dec.scan.back()
+				dec.scan.back()
 
-			any.Doc = dec.decodeStrings()
+				any.Doc = dec.decodeStrings()
 
-		case "name":
+			case "name":
 
-			if tok != scanStringLit {
-				dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
-				return nil
+				if tok != scanStringLit {
+					dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
+					return nil
+				}
+				any.Name, dec.err = dec.unmarshalString(val)
+
+			case "type":
+
+				if tok != scanStringLit {
+					dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
+					return nil
+				}
+				any.Type, dec.err = dec.unmarshalString(val)
+
+			case "value":
+
+				if tok != scanStringLit {
+					dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
+					return nil
+				}
+				any.Value, dec.err = dec.unmarshalString(val)
+
+			case "is_pointer":
+
+				if tok != scanBoolLit {
+					dec.err = fmt.Errorf("expected 'Bool literal', found '%v'", tok)
+					return nil
+				}
+				any.IsPointer, dec.err = dec.unmarshalBool(val)
+
+			case "visibility":
+
+				if tok != scanStringLit {
+					dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
+					return nil
+				}
+				any.Visibility, dec.err = dec.unmarshalString(val)
+
+			default:
+				dec.err = fmt.Errorf("unexpected key '%s' for Constant object", key)
 			}
-			any.Name, dec.err = dec.unmarshalString(val)
-
-		case "type":
-
-			if tok != scanStringLit {
-				dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
-				return nil
-			}
-			any.Type, dec.err = dec.unmarshalString(val)
-
-		case "value":
-
-			if tok != scanStringLit {
-				dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
-				return nil
-			}
-			any.Value, dec.err = dec.unmarshalString(val)
-
-		case "is_pointer":
-
-			if tok != scanBoolLit {
-				dec.err = fmt.Errorf("expected 'Bool literal', found '%v'", tok)
-				return nil
-			}
-			any.IsPointer, dec.err = dec.unmarshalBool(val)
-
-		case "visibility":
-
-			if tok != scanStringLit {
-				dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
-				return nil
-			}
-			any.Visibility, dec.err = dec.unmarshalString(val)
-
-		default:
-			dec.err = fmt.Errorf("unexpected key '%s' for Constant object", key)
 		}
 
 		if dec.err != nil {
@@ -3568,6 +3643,9 @@ func (dec *decoder) decodeConstant() *ast.Constant {
 }
 
 func (dec *decoder) decodeConstructorCallExpr() *ast.ConstructorCallExpr {
+	if dec.isNull() {
+		return nil
+	}
 	if !dec.assertNewObject() {
 		return nil
 	}
@@ -3593,17 +3671,19 @@ func (dec *decoder) decodeConstructorCallExpr() *ast.ConstructorCallExpr {
 			return nil
 		}
 
-		_, _, err = dec.scan.nextValue()
+		_, tok, err := dec.scan.nextValue()
 
 		if err != nil {
 			dec.err = err
 			return nil
 		}
 
-		switch key {
+		if tok != scanNullVal {
+			switch key {
 
-		default:
-			dec.err = fmt.Errorf("unexpected key '%s' for ConstructorCallExpr object", key)
+			default:
+				dec.err = fmt.Errorf("unexpected key '%s' for ConstructorCallExpr object", key)
+			}
 		}
 
 		if dec.err != nil {
@@ -3621,6 +3701,9 @@ func (dec *decoder) decodeConstructorCallExpr() *ast.ConstructorCallExpr {
 }
 
 func (dec *decoder) decodeConstructorDecl() *ast.ConstructorDecl {
+	if dec.isNull() {
+		return nil
+	}
 	if !dec.assertNewObject() {
 		return nil
 	}
@@ -3653,52 +3736,54 @@ func (dec *decoder) decodeConstructorDecl() *ast.ConstructorDecl {
 			return nil
 		}
 
-		switch key {
+		if tok != scanNullVal {
+			switch key {
 
-		case "doc":
+			case "doc":
 
-			dec.scan.back()
+				dec.scan.back()
 
-			any.Doc = dec.decodeStrings()
+				any.Doc = dec.decodeStrings()
 
-		case "name":
+			case "name":
 
-			if tok != scanStringLit {
-				dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
-				return nil
+				if tok != scanStringLit {
+					dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
+					return nil
+				}
+				any.Name, dec.err = dec.unmarshalString(val)
+
+			case "parameters":
+
+				dec.scan.back()
+
+				any.Params = dec.decodeFields()
+
+			case "body":
+
+				dec.scan.back()
+
+				any.Body = dec.decodeStmts()
+
+			case "visibility":
+
+				if tok != scanStringLit {
+					dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
+					return nil
+				}
+				any.Visibility, dec.err = dec.unmarshalString(val)
+
+			case "loc":
+
+				if tok != scanInt64Lit {
+					dec.err = fmt.Errorf("expected 'Int64 literal', found '%v'", tok)
+					return nil
+				}
+				any.LoC, dec.err = dec.unmarshalInt64(val)
+
+			default:
+				dec.err = fmt.Errorf("unexpected key '%s' for ConstructorDecl object", key)
 			}
-			any.Name, dec.err = dec.unmarshalString(val)
-
-		case "parameters":
-
-			dec.scan.back()
-
-			any.Params = dec.decodeFields()
-
-		case "body":
-
-			dec.scan.back()
-
-			any.Body = dec.decodeStmts()
-
-		case "visibility":
-
-			if tok != scanStringLit {
-				dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
-				return nil
-			}
-			any.Visibility, dec.err = dec.unmarshalString(val)
-
-		case "loc":
-
-			if tok != scanInt64Lit {
-				dec.err = fmt.Errorf("expected 'Int64 literal', found '%v'", tok)
-				return nil
-			}
-			any.LoC, dec.err = dec.unmarshalInt64(val)
-
-		default:
-			dec.err = fmt.Errorf("unexpected key '%s' for ConstructorDecl object", key)
 		}
 
 		if dec.err != nil {
@@ -3716,6 +3801,9 @@ func (dec *decoder) decodeConstructorDecl() *ast.ConstructorDecl {
 }
 
 func (dec *decoder) decodeDeclStmt() *ast.DeclStmt {
+	if dec.isNull() {
+		return nil
+	}
 	if !dec.assertNewObject() {
 		return nil
 	}
@@ -3748,18 +3836,20 @@ func (dec *decoder) decodeDeclStmt() *ast.DeclStmt {
 			return nil
 		}
 
-		switch key {
+		if tok != scanNullVal {
+			switch key {
 
-		case "kind":
+			case "kind":
 
-			if tok != scanStringLit {
-				dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
-				return nil
+				if tok != scanStringLit {
+					dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
+					return nil
+				}
+				any.Kind, dec.err = dec.unmarshalString(val)
+
+			default:
+				dec.err = fmt.Errorf("unexpected key '%s' for DeclStmt object", key)
 			}
-			any.Kind, dec.err = dec.unmarshalString(val)
-
-		default:
-			dec.err = fmt.Errorf("unexpected key '%s' for DeclStmt object", key)
 		}
 
 		if dec.err != nil {
@@ -3777,6 +3867,9 @@ func (dec *decoder) decodeDeclStmt() *ast.DeclStmt {
 }
 
 func (dec *decoder) decodeDestructorDecl() *ast.DestructorDecl {
+	if dec.isNull() {
+		return nil
+	}
 	if !dec.assertNewObject() {
 		return nil
 	}
@@ -3802,17 +3895,19 @@ func (dec *decoder) decodeDestructorDecl() *ast.DestructorDecl {
 			return nil
 		}
 
-		_, _, err = dec.scan.nextValue()
+		_, tok, err := dec.scan.nextValue()
 
 		if err != nil {
 			dec.err = err
 			return nil
 		}
 
-		switch key {
+		if tok != scanNullVal {
+			switch key {
 
-		default:
-			dec.err = fmt.Errorf("unexpected key '%s' for DestructorDecl object", key)
+			default:
+				dec.err = fmt.Errorf("unexpected key '%s' for DestructorDecl object", key)
+			}
 		}
 
 		if dec.err != nil {
@@ -3830,6 +3925,9 @@ func (dec *decoder) decodeDestructorDecl() *ast.DestructorDecl {
 }
 
 func (dec *decoder) decodeEnumDecl() *ast.EnumDecl {
+	if dec.isNull() {
+		return nil
+	}
 	if !dec.assertNewObject() {
 		return nil
 	}
@@ -3862,68 +3960,70 @@ func (dec *decoder) decodeEnumDecl() *ast.EnumDecl {
 			return nil
 		}
 
-		switch key {
+		if tok != scanNullVal {
+			switch key {
 
-		case "doc":
+			case "doc":
 
-			dec.scan.back()
+				dec.scan.back()
 
-			any.Doc = dec.decodeStrings()
+				any.Doc = dec.decodeStrings()
 
-		case "name":
+			case "name":
 
-			if tok != scanStringLit {
-				dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
-				return nil
+				if tok != scanStringLit {
+					dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
+					return nil
+				}
+				any.Name, dec.err = dec.unmarshalString(val)
+
+			case "visibility":
+
+				if tok != scanStringLit {
+					dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
+					return nil
+				}
+				any.Visibility, dec.err = dec.unmarshalString(val)
+
+			case "implemented_interfaces":
+
+				dec.scan.back()
+
+				any.ImplementedInterfaces = dec.decodeInterfaceRefs()
+
+			case "enum_constants":
+
+				dec.scan.back()
+
+				any.EnumConstants = dec.decodeIdents()
+
+			case "attributes":
+
+				dec.scan.back()
+
+				any.Attrs = dec.decodeAttrs()
+
+			case "constructors":
+
+				dec.scan.back()
+
+				any.Constructors = dec.decodeConstructorDecls()
+
+			case "destructors":
+
+				dec.scan.back()
+
+				any.Destructors = dec.decodeDestructorDecls()
+
+			case "methods":
+
+				dec.scan.back()
+
+				any.Methods = dec.decodeMethodDecls()
+
+			default:
+				dec.err = fmt.Errorf("unexpected key '%s' for EnumDecl object", key)
 			}
-			any.Name, dec.err = dec.unmarshalString(val)
-
-		case "visibility":
-
-			if tok != scanStringLit {
-				dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
-				return nil
-			}
-			any.Visibility, dec.err = dec.unmarshalString(val)
-
-		case "implemented_interfaces":
-
-			dec.scan.back()
-
-			any.ImplementedInterfaces = dec.decodeInterfaceRefs()
-
-		case "enum_constants":
-
-			dec.scan.back()
-
-			any.EnumConstants = dec.decodeIdents()
-
-		case "attributes":
-
-			dec.scan.back()
-
-			any.Attrs = dec.decodeAttrs()
-
-		case "constructors":
-
-			dec.scan.back()
-
-			any.Constructors = dec.decodeConstructorDecls()
-
-		case "destructors":
-
-			dec.scan.back()
-
-			any.Destructors = dec.decodeDestructorDecls()
-
-		case "methods":
-
-			dec.scan.back()
-
-			any.Methods = dec.decodeMethodDecls()
-
-		default:
-			dec.err = fmt.Errorf("unexpected key '%s' for EnumDecl object", key)
 		}
 
 		if dec.err != nil {
@@ -3941,6 +4041,9 @@ func (dec *decoder) decodeEnumDecl() *ast.EnumDecl {
 }
 
 func (dec *decoder) decodeFuncDecl() *ast.FuncDecl {
+	if dec.isNull() {
+		return nil
+	}
 	if !dec.assertNewObject() {
 		return nil
 	}
@@ -3973,52 +4076,54 @@ func (dec *decoder) decodeFuncDecl() *ast.FuncDecl {
 			return nil
 		}
 
-		switch key {
+		if tok != scanNullVal {
+			switch key {
 
-		case "doc":
+			case "doc":
 
-			dec.scan.back()
+				dec.scan.back()
 
-			any.Doc = dec.decodeStrings()
+				any.Doc = dec.decodeStrings()
 
-		case "name":
+			case "name":
 
-			if tok != scanStringLit {
-				dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
-				return nil
+				if tok != scanStringLit {
+					dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
+					return nil
+				}
+				any.Name, dec.err = dec.unmarshalString(val)
+
+			case "type":
+
+				dec.scan.back()
+
+				any.Type = dec.decodeFuncType()
+
+			case "body":
+
+				dec.scan.back()
+
+				any.Body = dec.decodeStmts()
+
+			case "visibility":
+
+				if tok != scanStringLit {
+					dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
+					return nil
+				}
+				any.Visibility, dec.err = dec.unmarshalString(val)
+
+			case "loc":
+
+				if tok != scanInt64Lit {
+					dec.err = fmt.Errorf("expected 'Int64 literal', found '%v'", tok)
+					return nil
+				}
+				any.LoC, dec.err = dec.unmarshalInt64(val)
+
+			default:
+				dec.err = fmt.Errorf("unexpected key '%s' for FuncDecl object", key)
 			}
-			any.Name, dec.err = dec.unmarshalString(val)
-
-		case "type":
-
-			dec.scan.back()
-
-			any.Type = dec.decodeFuncType()
-
-		case "body":
-
-			dec.scan.back()
-
-			any.Body = dec.decodeStmts()
-
-		case "visibility":
-
-			if tok != scanStringLit {
-				dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
-				return nil
-			}
-			any.Visibility, dec.err = dec.unmarshalString(val)
-
-		case "loc":
-
-			if tok != scanInt64Lit {
-				dec.err = fmt.Errorf("expected 'Int64 literal', found '%v'", tok)
-				return nil
-			}
-			any.LoC, dec.err = dec.unmarshalInt64(val)
-
-		default:
-			dec.err = fmt.Errorf("unexpected key '%s' for FuncDecl object", key)
 		}
 
 		if dec.err != nil {
@@ -4036,6 +4141,9 @@ func (dec *decoder) decodeFuncDecl() *ast.FuncDecl {
 }
 
 func (dec *decoder) decodeFuncRef() *ast.FuncRef {
+	if dec.isNull() {
+		return nil
+	}
 	if !dec.assertNewObject() {
 		return nil
 	}
@@ -4068,26 +4176,28 @@ func (dec *decoder) decodeFuncRef() *ast.FuncRef {
 			return nil
 		}
 
-		switch key {
+		if tok != scanNullVal {
+			switch key {
 
-		case "namespace":
+			case "namespace":
 
-			if tok != scanStringLit {
-				dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
-				return nil
+				if tok != scanStringLit {
+					dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
+					return nil
+				}
+				any.Namespace, dec.err = dec.unmarshalString(val)
+
+			case "function_name":
+
+				if tok != scanStringLit {
+					dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
+					return nil
+				}
+				any.FuncName, dec.err = dec.unmarshalString(val)
+
+			default:
+				dec.err = fmt.Errorf("unexpected key '%s' for FuncRef object", key)
 			}
-			any.Namespace, dec.err = dec.unmarshalString(val)
-
-		case "function_name":
-
-			if tok != scanStringLit {
-				dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
-				return nil
-			}
-			any.FuncName, dec.err = dec.unmarshalString(val)
-
-		default:
-			dec.err = fmt.Errorf("unexpected key '%s' for FuncRef object", key)
 		}
 
 		if dec.err != nil {
@@ -4105,6 +4215,9 @@ func (dec *decoder) decodeFuncRef() *ast.FuncRef {
 }
 
 func (dec *decoder) decodeFuncType() *ast.FuncType {
+	if dec.isNull() {
+		return nil
+	}
 	if !dec.assertNewObject() {
 		return nil
 	}
@@ -4130,29 +4243,31 @@ func (dec *decoder) decodeFuncType() *ast.FuncType {
 			return nil
 		}
 
-		_, _, err = dec.scan.nextValue()
+		_, tok, err := dec.scan.nextValue()
 
 		if err != nil {
 			dec.err = err
 			return nil
 		}
 
-		switch key {
+		if tok != scanNullVal {
+			switch key {
 
-		case "parameters":
+			case "parameters":
 
-			dec.scan.back()
+				dec.scan.back()
 
-			any.Params = dec.decodeFields()
+				any.Params = dec.decodeFields()
 
-		case "results":
+			case "results":
 
-			dec.scan.back()
+				dec.scan.back()
 
-			any.Results = dec.decodeFields()
+				any.Results = dec.decodeFields()
 
-		default:
-			dec.err = fmt.Errorf("unexpected key '%s' for FuncType object", key)
+			default:
+				dec.err = fmt.Errorf("unexpected key '%s' for FuncType object", key)
+			}
 		}
 
 		if dec.err != nil {
@@ -4170,6 +4285,9 @@ func (dec *decoder) decodeFuncType() *ast.FuncType {
 }
 
 func (dec *decoder) decodeGlobalDecl() *ast.GlobalDecl {
+	if dec.isNull() {
+		return nil
+	}
 	if !dec.assertNewObject() {
 		return nil
 	}
@@ -4202,42 +4320,44 @@ func (dec *decoder) decodeGlobalDecl() *ast.GlobalDecl {
 			return nil
 		}
 
-		switch key {
+		if tok != scanNullVal {
+			switch key {
 
-		case "doc":
+			case "doc":
 
-			dec.scan.back()
+				dec.scan.back()
 
-			any.Doc = dec.decodeStrings()
+				any.Doc = dec.decodeStrings()
 
-		case "name":
+			case "name":
 
-			dec.scan.back()
+				dec.scan.back()
 
-			any.Name = dec.decodeIdent()
+				any.Name = dec.decodeIdent()
 
-		case "value":
+			case "value":
 
-			dec.scan.back()
+				dec.scan.back()
 
-			any.Value = dec.decodeExpr()
+				any.Value = dec.decodeExpr()
 
-		case "type":
+			case "type":
 
-			dec.scan.back()
+				dec.scan.back()
 
-			any.Type = dec.decodeIdent()
+				any.Type = dec.decodeIdent()
 
-		case "visibility":
+			case "visibility":
 
-			if tok != scanStringLit {
-				dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
-				return nil
+				if tok != scanStringLit {
+					dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
+					return nil
+				}
+				any.Visibility, dec.err = dec.unmarshalString(val)
+
+			default:
+				dec.err = fmt.Errorf("unexpected key '%s' for GlobalDecl object", key)
 			}
-			any.Visibility, dec.err = dec.unmarshalString(val)
-
-		default:
-			dec.err = fmt.Errorf("unexpected key '%s' for GlobalDecl object", key)
 		}
 
 		if dec.err != nil {
@@ -4255,6 +4375,9 @@ func (dec *decoder) decodeGlobalDecl() *ast.GlobalDecl {
 }
 
 func (dec *decoder) decodeInterface() *ast.Interface {
+	if dec.isNull() {
+		return nil
+	}
 	if !dec.assertNewObject() {
 		return nil
 	}
@@ -4287,44 +4410,46 @@ func (dec *decoder) decodeInterface() *ast.Interface {
 			return nil
 		}
 
-		switch key {
+		if tok != scanNullVal {
+			switch key {
 
-		case "doc":
+			case "doc":
 
-			dec.scan.back()
+				dec.scan.back()
 
-			any.Doc = dec.decodeStrings()
+				any.Doc = dec.decodeStrings()
 
-		case "name":
+			case "name":
 
-			if tok != scanStringLit {
-				dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
-				return nil
+				if tok != scanStringLit {
+					dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
+					return nil
+				}
+				any.Name, dec.err = dec.unmarshalString(val)
+
+			case "implemented_interfaces":
+
+				dec.scan.back()
+
+				any.ImplementedInterfaces = dec.decodeInterfaceRefs()
+
+			case "prototypes":
+
+				dec.scan.back()
+
+				any.Protos = dec.decodeProtoDecls()
+
+			case "visibility":
+
+				if tok != scanStringLit {
+					dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
+					return nil
+				}
+				any.Visibility, dec.err = dec.unmarshalString(val)
+
+			default:
+				dec.err = fmt.Errorf("unexpected key '%s' for Interface object", key)
 			}
-			any.Name, dec.err = dec.unmarshalString(val)
-
-		case "implemented_interfaces":
-
-			dec.scan.back()
-
-			any.ImplementedInterfaces = dec.decodeInterfaceRefs()
-
-		case "prototypes":
-
-			dec.scan.back()
-
-			any.Protos = dec.decodeProtoDecls()
-
-		case "visibility":
-
-			if tok != scanStringLit {
-				dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
-				return nil
-			}
-			any.Visibility, dec.err = dec.unmarshalString(val)
-
-		default:
-			dec.err = fmt.Errorf("unexpected key '%s' for Interface object", key)
 		}
 
 		if dec.err != nil {
@@ -4342,6 +4467,9 @@ func (dec *decoder) decodeInterface() *ast.Interface {
 }
 
 func (dec *decoder) decodeInterfaceRef() *ast.InterfaceRef {
+	if dec.isNull() {
+		return nil
+	}
 	if !dec.assertNewObject() {
 		return nil
 	}
@@ -4374,26 +4502,28 @@ func (dec *decoder) decodeInterfaceRef() *ast.InterfaceRef {
 			return nil
 		}
 
-		switch key {
+		if tok != scanNullVal {
+			switch key {
 
-		case "namespace":
+			case "namespace":
 
-			if tok != scanStringLit {
-				dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
-				return nil
+				if tok != scanStringLit {
+					dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
+					return nil
+				}
+				any.Namespace, dec.err = dec.unmarshalString(val)
+
+			case "interface_name":
+
+				if tok != scanStringLit {
+					dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
+					return nil
+				}
+				any.InterfaceName, dec.err = dec.unmarshalString(val)
+
+			default:
+				dec.err = fmt.Errorf("unexpected key '%s' for InterfaceRef object", key)
 			}
-			any.Namespace, dec.err = dec.unmarshalString(val)
-
-		case "interface_name":
-
-			if tok != scanStringLit {
-				dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
-				return nil
-			}
-			any.InterfaceName, dec.err = dec.unmarshalString(val)
-
-		default:
-			dec.err = fmt.Errorf("unexpected key '%s' for InterfaceRef object", key)
 		}
 
 		if dec.err != nil {
@@ -4411,6 +4541,9 @@ func (dec *decoder) decodeInterfaceRef() *ast.InterfaceRef {
 }
 
 func (dec *decoder) decodeListLit() *ast.ListLit {
+	if dec.isNull() {
+		return nil
+	}
 	if !dec.assertNewObject() {
 		return nil
 	}
@@ -4436,29 +4569,31 @@ func (dec *decoder) decodeListLit() *ast.ListLit {
 			return nil
 		}
 
-		_, _, err = dec.scan.nextValue()
+		_, tok, err := dec.scan.nextValue()
 
 		if err != nil {
 			dec.err = err
 			return nil
 		}
 
-		switch key {
+		if tok != scanNullVal {
+			switch key {
 
-		case "type":
+			case "type":
 
-			dec.scan.back()
+				dec.scan.back()
 
-			any.Type = dec.decodeListType()
+				any.Type = dec.decodeListType()
 
-		case "elements":
+			case "elements":
 
-			dec.scan.back()
+				dec.scan.back()
 
-			any.Elts = dec.decodeExprs()
+				any.Elts = dec.decodeExprs()
 
-		default:
-			dec.err = fmt.Errorf("unexpected key '%s' for ListLit object", key)
+			default:
+				dec.err = fmt.Errorf("unexpected key '%s' for ListLit object", key)
+			}
 		}
 
 		if dec.err != nil {
@@ -4476,6 +4611,9 @@ func (dec *decoder) decodeListLit() *ast.ListLit {
 }
 
 func (dec *decoder) decodeListType() *ast.ListType {
+	if dec.isNull() {
+		return nil
+	}
 	if !dec.assertNewObject() {
 		return nil
 	}
@@ -4508,32 +4646,34 @@ func (dec *decoder) decodeListType() *ast.ListType {
 			return nil
 		}
 
-		switch key {
+		if tok != scanNullVal {
+			switch key {
 
-		case "length":
+			case "length":
 
-			if tok != scanInt64Lit {
-				dec.err = fmt.Errorf("expected 'Int64 literal', found '%v'", tok)
-				return nil
+				if tok != scanInt64Lit {
+					dec.err = fmt.Errorf("expected 'Int64 literal', found '%v'", tok)
+					return nil
+				}
+				any.Len, dec.err = dec.unmarshalInt64(val)
+
+			case "capacity":
+
+				if tok != scanInt64Lit {
+					dec.err = fmt.Errorf("expected 'Int64 literal', found '%v'", tok)
+					return nil
+				}
+				any.Max, dec.err = dec.unmarshalInt64(val)
+
+			case "element_type":
+
+				dec.scan.back()
+
+				any.Elt = dec.decodeExpr()
+
+			default:
+				dec.err = fmt.Errorf("unexpected key '%s' for ListType object", key)
 			}
-			any.Len, dec.err = dec.unmarshalInt64(val)
-
-		case "capacity":
-
-			if tok != scanInt64Lit {
-				dec.err = fmt.Errorf("expected 'Int64 literal', found '%v'", tok)
-				return nil
-			}
-			any.Max, dec.err = dec.unmarshalInt64(val)
-
-		case "element_type":
-
-			dec.scan.back()
-
-			any.Elt = dec.decodeExpr()
-
-		default:
-			dec.err = fmt.Errorf("unexpected key '%s' for ListType object", key)
 		}
 
 		if dec.err != nil {
@@ -4551,6 +4691,9 @@ func (dec *decoder) decodeListType() *ast.ListType {
 }
 
 func (dec *decoder) decodeMapLit() *ast.MapLit {
+	if dec.isNull() {
+		return nil
+	}
 	if !dec.assertNewObject() {
 		return nil
 	}
@@ -4576,29 +4719,31 @@ func (dec *decoder) decodeMapLit() *ast.MapLit {
 			return nil
 		}
 
-		_, _, err = dec.scan.nextValue()
+		_, tok, err := dec.scan.nextValue()
 
 		if err != nil {
 			dec.err = err
 			return nil
 		}
 
-		switch key {
+		if tok != scanNullVal {
+			switch key {
 
-		case "type":
+			case "type":
 
-			dec.scan.back()
+				dec.scan.back()
 
-			any.Type = dec.decodeMapType()
+				any.Type = dec.decodeMapType()
 
-		case "elements":
+			case "elements":
 
-			dec.scan.back()
+				dec.scan.back()
 
-			any.Elts = dec.decodeKeyValuePairs()
+				any.Elts = dec.decodeKeyValuePairs()
 
-		default:
-			dec.err = fmt.Errorf("unexpected key '%s' for MapLit object", key)
+			default:
+				dec.err = fmt.Errorf("unexpected key '%s' for MapLit object", key)
+			}
 		}
 
 		if dec.err != nil {
@@ -4616,6 +4761,9 @@ func (dec *decoder) decodeMapLit() *ast.MapLit {
 }
 
 func (dec *decoder) decodeKeyValuePair() *ast.KeyValuePair {
+	if dec.isNull() {
+		return nil
+	}
 	if !dec.assertNewObject() {
 		return nil
 	}
@@ -4641,29 +4789,31 @@ func (dec *decoder) decodeKeyValuePair() *ast.KeyValuePair {
 			return nil
 		}
 
-		_, _, err = dec.scan.nextValue()
+		_, tok, err := dec.scan.nextValue()
 
 		if err != nil {
 			dec.err = err
 			return nil
 		}
 
-		switch key {
+		if tok != scanNullVal {
+			switch key {
 
-		case "key":
+			case "key":
 
-			dec.scan.back()
+				dec.scan.back()
 
-			any.Key = dec.decodeExpr()
+				any.Key = dec.decodeExpr()
 
-		case "value":
+			case "value":
 
-			dec.scan.back()
+				dec.scan.back()
 
-			any.Value = dec.decodeExpr()
+				any.Value = dec.decodeExpr()
 
-		default:
-			dec.err = fmt.Errorf("unexpected key '%s' for KeyValuePair object", key)
+			default:
+				dec.err = fmt.Errorf("unexpected key '%s' for KeyValuePair object", key)
+			}
 		}
 
 		if dec.err != nil {
@@ -4681,6 +4831,9 @@ func (dec *decoder) decodeKeyValuePair() *ast.KeyValuePair {
 }
 
 func (dec *decoder) decodeMapType() *ast.MapType {
+	if dec.isNull() {
+		return nil
+	}
 	if !dec.assertNewObject() {
 		return nil
 	}
@@ -4706,29 +4859,31 @@ func (dec *decoder) decodeMapType() *ast.MapType {
 			return nil
 		}
 
-		_, _, err = dec.scan.nextValue()
+		_, tok, err := dec.scan.nextValue()
 
 		if err != nil {
 			dec.err = err
 			return nil
 		}
 
-		switch key {
+		if tok != scanNullVal {
+			switch key {
 
-		case "key_type":
+			case "key_type":
 
-			dec.scan.back()
+				dec.scan.back()
 
-			any.KeyType = dec.decodeExpr()
+				any.KeyType = dec.decodeExpr()
 
-		case "value_type":
+			case "value_type":
 
-			dec.scan.back()
+				dec.scan.back()
 
-			any.ValueType = dec.decodeExpr()
+				any.ValueType = dec.decodeExpr()
 
-		default:
-			dec.err = fmt.Errorf("unexpected key '%s' for MapType object", key)
+			default:
+				dec.err = fmt.Errorf("unexpected key '%s' for MapType object", key)
+			}
 		}
 
 		if dec.err != nil {
@@ -4746,6 +4901,9 @@ func (dec *decoder) decodeMapType() *ast.MapType {
 }
 
 func (dec *decoder) decodeMethodDecl() *ast.MethodDecl {
+	if dec.isNull() {
+		return nil
+	}
 	if !dec.assertNewObject() {
 		return nil
 	}
@@ -4778,18 +4936,20 @@ func (dec *decoder) decodeMethodDecl() *ast.MethodDecl {
 			return nil
 		}
 
-		switch key {
+		if tok != scanNullVal {
+			switch key {
 
-		case "override":
+			case "override":
 
-			if tok != scanBoolLit {
-				dec.err = fmt.Errorf("expected 'Bool literal', found '%v'", tok)
-				return nil
+				if tok != scanBoolLit {
+					dec.err = fmt.Errorf("expected 'Bool literal', found '%v'", tok)
+					return nil
+				}
+				any.Override, dec.err = dec.unmarshalBool(val)
+
+			default:
+				dec.err = fmt.Errorf("unexpected key '%s' for MethodDecl object", key)
 			}
-			any.Override, dec.err = dec.unmarshalBool(val)
-
-		default:
-			dec.err = fmt.Errorf("unexpected key '%s' for MethodDecl object", key)
 		}
 
 		if dec.err != nil {
@@ -4807,6 +4967,9 @@ func (dec *decoder) decodeMethodDecl() *ast.MethodDecl {
 }
 
 func (dec *decoder) decodeProtoDecl() *ast.ProtoDecl {
+	if dec.isNull() {
+		return nil
+	}
 	if !dec.assertNewObject() {
 		return nil
 	}
@@ -4839,36 +5002,38 @@ func (dec *decoder) decodeProtoDecl() *ast.ProtoDecl {
 			return nil
 		}
 
-		switch key {
+		if tok != scanNullVal {
+			switch key {
 
-		case "doc":
+			case "doc":
 
-			dec.scan.back()
+				dec.scan.back()
 
-			any.Doc = dec.decodeStrings()
+				any.Doc = dec.decodeStrings()
 
-		case "name":
+			case "name":
 
-			dec.scan.back()
+				dec.scan.back()
 
-			any.Name = dec.decodeIdent()
+				any.Name = dec.decodeIdent()
 
-		case "type":
+			case "type":
 
-			dec.scan.back()
+				dec.scan.back()
 
-			any.Type = dec.decodeFuncType()
+				any.Type = dec.decodeFuncType()
 
-		case "visibility":
+			case "visibility":
 
-			if tok != scanStringLit {
-				dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
-				return nil
+				if tok != scanStringLit {
+					dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
+					return nil
+				}
+				any.Visibility, dec.err = dec.unmarshalString(val)
+
+			default:
+				dec.err = fmt.Errorf("unexpected key '%s' for ProtoDecl object", key)
 			}
-			any.Visibility, dec.err = dec.unmarshalString(val)
-
-		default:
-			dec.err = fmt.Errorf("unexpected key '%s' for ProtoDecl object", key)
 		}
 
 		if dec.err != nil {
@@ -4886,6 +5051,9 @@ func (dec *decoder) decodeProtoDecl() *ast.ProtoDecl {
 }
 
 func (dec *decoder) decodeField() *ast.Field {
+	if dec.isNull() {
+		return nil
+	}
 	if !dec.assertNewObject() {
 		return nil
 	}
@@ -4918,32 +5086,34 @@ func (dec *decoder) decodeField() *ast.Field {
 			return nil
 		}
 
-		switch key {
+		if tok != scanNullVal {
+			switch key {
 
-		case "doc":
+			case "doc":
 
-			dec.scan.back()
+				dec.scan.back()
 
-			any.Doc = dec.decodeStrings()
+				any.Doc = dec.decodeStrings()
 
-		case "name":
+			case "name":
 
-			if tok != scanStringLit {
-				dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
-				return nil
+				if tok != scanStringLit {
+					dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
+					return nil
+				}
+				any.Name, dec.err = dec.unmarshalString(val)
+
+			case "type":
+
+				if tok != scanStringLit {
+					dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
+					return nil
+				}
+				any.Type, dec.err = dec.unmarshalString(val)
+
+			default:
+				dec.err = fmt.Errorf("unexpected key '%s' for Field object", key)
 			}
-			any.Name, dec.err = dec.unmarshalString(val)
-
-		case "type":
-
-			if tok != scanStringLit {
-				dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
-				return nil
-			}
-			any.Type, dec.err = dec.unmarshalString(val)
-
-		default:
-			dec.err = fmt.Errorf("unexpected key '%s' for Field object", key)
 		}
 
 		if dec.err != nil {
@@ -4961,6 +5131,9 @@ func (dec *decoder) decodeField() *ast.Field {
 }
 
 func (dec *decoder) decodeCaseClause() *ast.CaseClause {
+	if dec.isNull() {
+		return nil
+	}
 	if !dec.assertNewObject() {
 		return nil
 	}
@@ -4986,29 +5159,31 @@ func (dec *decoder) decodeCaseClause() *ast.CaseClause {
 			return nil
 		}
 
-		_, _, err = dec.scan.nextValue()
+		_, tok, err := dec.scan.nextValue()
 
 		if err != nil {
 			dec.err = err
 			return nil
 		}
 
-		switch key {
+		if tok != scanNullVal {
+			switch key {
 
-		case "conditions":
+			case "conditions":
 
-			dec.scan.back()
+				dec.scan.back()
 
-			any.Conds = dec.decodeExprs()
+				any.Conds = dec.decodeExprs()
 
-		case "body":
+			case "body":
 
-			dec.scan.back()
+				dec.scan.back()
 
-			any.Body = dec.decodeStmts()
+				any.Body = dec.decodeStmts()
 
-		default:
-			dec.err = fmt.Errorf("unexpected key '%s' for CaseClause object", key)
+			default:
+				dec.err = fmt.Errorf("unexpected key '%s' for CaseClause object", key)
+			}
 		}
 
 		if dec.err != nil {
@@ -5026,6 +5201,9 @@ func (dec *decoder) decodeCaseClause() *ast.CaseClause {
 }
 
 func (dec *decoder) decodeTrait() *ast.Trait {
+	if dec.isNull() {
+		return nil
+	}
 	if !dec.assertNewObject() {
 		return nil
 	}
@@ -5058,42 +5236,44 @@ func (dec *decoder) decodeTrait() *ast.Trait {
 			return nil
 		}
 
-		switch key {
+		if tok != scanNullVal {
+			switch key {
 
-		case "name":
+			case "name":
 
-			if tok != scanStringLit {
-				dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
-				return nil
+				if tok != scanStringLit {
+					dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
+					return nil
+				}
+				any.Name, dec.err = dec.unmarshalString(val)
+
+			case "attributes":
+
+				dec.scan.back()
+
+				any.Attrs = dec.decodeAttrs()
+
+			case "methods":
+
+				dec.scan.back()
+
+				any.Methods = dec.decodeMethodDecls()
+
+			case "classes":
+
+				dec.scan.back()
+
+				any.Classes = dec.decodeClassDecls()
+
+			case "traits":
+
+				dec.scan.back()
+
+				any.Traits = dec.decodeTraits()
+
+			default:
+				dec.err = fmt.Errorf("unexpected key '%s' for Trait object", key)
 			}
-			any.Name, dec.err = dec.unmarshalString(val)
-
-		case "attributes":
-
-			dec.scan.back()
-
-			any.Attrs = dec.decodeAttrs()
-
-		case "methods":
-
-			dec.scan.back()
-
-			any.Methods = dec.decodeMethodDecls()
-
-		case "classes":
-
-			dec.scan.back()
-
-			any.Classes = dec.decodeClassDecls()
-
-		case "traits":
-
-			dec.scan.back()
-
-			any.Traits = dec.decodeTraits()
-
-		default:
-			dec.err = fmt.Errorf("unexpected key '%s' for Trait object", key)
 		}
 
 		if dec.err != nil {
@@ -5111,6 +5291,9 @@ func (dec *decoder) decodeTrait() *ast.Trait {
 }
 
 func (dec *decoder) decodeTraitRef() *ast.TraitRef {
+	if dec.isNull() {
+		return nil
+	}
 	if !dec.assertNewObject() {
 		return nil
 	}
@@ -5143,26 +5326,28 @@ func (dec *decoder) decodeTraitRef() *ast.TraitRef {
 			return nil
 		}
 
-		switch key {
+		if tok != scanNullVal {
+			switch key {
 
-		case "namespace":
+			case "namespace":
 
-			if tok != scanStringLit {
-				dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
-				return nil
+				if tok != scanStringLit {
+					dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
+					return nil
+				}
+				any.Namespace, dec.err = dec.unmarshalString(val)
+
+			case "trait_name":
+
+				if tok != scanStringLit {
+					dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
+					return nil
+				}
+				any.TraitName, dec.err = dec.unmarshalString(val)
+
+			default:
+				dec.err = fmt.Errorf("unexpected key '%s' for TraitRef object", key)
 			}
-			any.Namespace, dec.err = dec.unmarshalString(val)
-
-		case "trait_name":
-
-			if tok != scanStringLit {
-				dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
-				return nil
-			}
-			any.TraitName, dec.err = dec.unmarshalString(val)
-
-		default:
-			dec.err = fmt.Errorf("unexpected key '%s' for TraitRef object", key)
 		}
 
 		if dec.err != nil {
@@ -5180,6 +5365,9 @@ func (dec *decoder) decodeTraitRef() *ast.TraitRef {
 }
 
 func (dec *decoder) decodeCatchClause() *ast.CatchClause {
+	if dec.isNull() {
+		return nil
+	}
 	if !dec.assertNewObject() {
 		return nil
 	}
@@ -5205,29 +5393,31 @@ func (dec *decoder) decodeCatchClause() *ast.CatchClause {
 			return nil
 		}
 
-		_, _, err = dec.scan.nextValue()
+		_, tok, err := dec.scan.nextValue()
 
 		if err != nil {
 			dec.err = err
 			return nil
 		}
 
-		switch key {
+		if tok != scanNullVal {
+			switch key {
 
-		case "params":
+			case "params":
 
-			dec.scan.back()
+				dec.scan.back()
 
-			any.Params = dec.decodeFields()
+				any.Params = dec.decodeFields()
 
-		case "body":
+			case "body":
 
-			dec.scan.back()
+				dec.scan.back()
 
-			any.Body = dec.decodeStmts()
+				any.Body = dec.decodeStmts()
 
-		default:
-			dec.err = fmt.Errorf("unexpected key '%s' for CatchClause object", key)
+			default:
+				dec.err = fmt.Errorf("unexpected key '%s' for CatchClause object", key)
+			}
 		}
 
 		if dec.err != nil {
@@ -5245,6 +5435,9 @@ func (dec *decoder) decodeCatchClause() *ast.CatchClause {
 }
 
 func (dec *decoder) decodeTypeSpec() *ast.TypeSpec {
+	if dec.isNull() {
+		return nil
+	}
 	if !dec.assertNewObject() {
 		return nil
 	}
@@ -5270,35 +5463,37 @@ func (dec *decoder) decodeTypeSpec() *ast.TypeSpec {
 			return nil
 		}
 
-		_, _, err = dec.scan.nextValue()
+		_, tok, err := dec.scan.nextValue()
 
 		if err != nil {
 			dec.err = err
 			return nil
 		}
 
-		switch key {
+		if tok != scanNullVal {
+			switch key {
 
-		case "doc":
+			case "doc":
 
-			dec.scan.back()
+				dec.scan.back()
 
-			any.Doc = dec.decodeStrings()
+				any.Doc = dec.decodeStrings()
 
-		case "name":
+			case "name":
 
-			dec.scan.back()
+				dec.scan.back()
 
-			any.Name = dec.decodeIdent()
+				any.Name = dec.decodeIdent()
 
-		case "type":
+			case "type":
 
-			dec.scan.back()
+				dec.scan.back()
 
-			any.Type = dec.decodeExpr()
+				any.Type = dec.decodeExpr()
 
-		default:
-			dec.err = fmt.Errorf("unexpected key '%s' for TypeSpec object", key)
+			default:
+				dec.err = fmt.Errorf("unexpected key '%s' for TypeSpec object", key)
+			}
 		}
 
 		if dec.err != nil {
@@ -5316,6 +5511,9 @@ func (dec *decoder) decodeTypeSpec() *ast.TypeSpec {
 }
 
 func (dec *decoder) decodeVar() *ast.Var {
+	if dec.isNull() {
+		return nil
+	}
 	if !dec.assertNewObject() {
 		return nil
 	}
@@ -5348,56 +5546,58 @@ func (dec *decoder) decodeVar() *ast.Var {
 			return nil
 		}
 
-		switch key {
+		if tok != scanNullVal {
+			switch key {
 
-		case "doc":
+			case "doc":
 
-			dec.scan.back()
+				dec.scan.back()
 
-			any.Doc = dec.decodeStrings()
+				any.Doc = dec.decodeStrings()
 
-		case "name":
+			case "name":
 
-			if tok != scanStringLit {
-				dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
-				return nil
+				if tok != scanStringLit {
+					dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
+					return nil
+				}
+				any.Name, dec.err = dec.unmarshalString(val)
+
+			case "type":
+
+				if tok != scanStringLit {
+					dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
+					return nil
+				}
+				any.Type, dec.err = dec.unmarshalString(val)
+
+			case "value":
+
+				if tok != scanStringLit {
+					dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
+					return nil
+				}
+				any.Value, dec.err = dec.unmarshalString(val)
+
+			case "is_pointer":
+
+				if tok != scanBoolLit {
+					dec.err = fmt.Errorf("expected 'Bool literal', found '%v'", tok)
+					return nil
+				}
+				any.IsPointer, dec.err = dec.unmarshalBool(val)
+
+			case "visibility":
+
+				if tok != scanStringLit {
+					dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
+					return nil
+				}
+				any.Visibility, dec.err = dec.unmarshalString(val)
+
+			default:
+				dec.err = fmt.Errorf("unexpected key '%s' for Var object", key)
 			}
-			any.Name, dec.err = dec.unmarshalString(val)
-
-		case "type":
-
-			if tok != scanStringLit {
-				dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
-				return nil
-			}
-			any.Type, dec.err = dec.unmarshalString(val)
-
-		case "value":
-
-			if tok != scanStringLit {
-				dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
-				return nil
-			}
-			any.Value, dec.err = dec.unmarshalString(val)
-
-		case "is_pointer":
-
-			if tok != scanBoolLit {
-				dec.err = fmt.Errorf("expected 'Bool literal', found '%v'", tok)
-				return nil
-			}
-			any.IsPointer, dec.err = dec.unmarshalBool(val)
-
-		case "visibility":
-
-			if tok != scanStringLit {
-				dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
-				return nil
-			}
-			any.Visibility, dec.err = dec.unmarshalString(val)
-
-		default:
-			dec.err = fmt.Errorf("unexpected key '%s' for Var object", key)
 		}
 
 		if dec.err != nil {

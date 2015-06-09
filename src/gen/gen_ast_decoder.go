@@ -272,33 +272,35 @@ func (dec *decoder) decode{{ .Name }}Attrs() *ast.{{ .Name }} {
 		{{ if .HasBasicType }}
 		val, tok, err := dec.scan.nextValue()
 		{{ else }}
-		_, _, err = dec.scan.nextValue()
+		_, tok, err := dec.scan.nextValue()
 		{{ end }}
 		if err != nil {
 			dec.err = err
 			return nil
 		}
 
-		switch key {
-		{{ range $index, $field := .Fields }}
-		case "{{ $field.JSONName }}":
-			{{ if $field.BasicType }}
-				if tok != scan{{ $field.Type }}Lit {
-					dec.err = fmt.Errorf("expected '{{ $field.Type }} literal', found '%v'", tok)
-					return nil
-				}
-				expr.{{ $field.Name }}, dec.err = dec.unmarshal{{ $field.Type }}(val)
-			{{ else }}
-				dec.scan.back()
-				{{ if $field.Array }}
-					expr.{{ $field.Name }} = dec.decode{{ $field.Type }}s()
+		if tok == scanNullVal {
+			switch key {
+			{{ range $index, $field := .Fields }}
+			case "{{ $field.JSONName }}":
+				{{ if $field.BasicType }}
+					if tok != scan{{ $field.Type }}Lit {
+						dec.err = fmt.Errorf("expected '{{ $field.Type }} literal', found '%v'", tok)
+						return nil
+					}
+					expr.{{ $field.Name }}, dec.err = dec.unmarshal{{ $field.Type }}(val)
 				{{ else }}
-					expr.{{ $field.Name }} = dec.decode{{ $field.Type }}()
+					dec.scan.back()
+					{{ if $field.Array }}
+						expr.{{ $field.Name }} = dec.decode{{ $field.Type }}s()
+					{{ else }}
+						expr.{{ $field.Name }} = dec.decode{{ $field.Type }}()
+					{{ end }}
 				{{ end }}
 			{{ end }}
-		{{ end }}
-		default:
-			dec.err = fmt.Errorf("unexpected key '%s' for {{.Name}} object", key)
+			default:
+				dec.err = fmt.Errorf("unexpected key '%s' for {{.Name}} object", key)
+			}
 		}
 
 		if dec.err != nil {
@@ -352,33 +354,35 @@ func (dec *decoder) decode{{ .Name }}Attrs() *ast.{{ .Name }} {
 		{{ if .HasBasicType }}
 		val, tok, err := dec.scan.nextValue()
 		{{ else }}
-		_, _, err = dec.scan.nextValue()
+		_, tok, err := dec.scan.nextValue()
 		{{ end }}
 		if err != nil {
 			dec.err = err
 			return nil
 		}
 
-		switch key {
-		{{ range $index, $field := .Fields }}
-		case "{{ $field.JSONName }}":
-			{{ if $field.BasicType }}
-				if tok != scan{{ $field.Type }}Lit {
-					dec.err = fmt.Errorf("expected '{{ $field.Type }} literal', found '%v'", tok)
-					return nil
-				}
-				stmt.{{ $field.Name }}, dec.err = dec.unmarshal{{ $field.Type }}(val)
-			{{ else }}
-				dec.scan.back()
-				{{ if $field.Array }}
-					stmt.{{ $field.Name }} = dec.decode{{ $field.Type }}s()
+		if tok != scanNullVal {
+			switch key {
+			{{ range $index, $field := .Fields }}
+			case "{{ $field.JSONName }}":
+				{{ if $field.BasicType }}
+					if tok != scan{{ $field.Type }}Lit {
+						dec.err = fmt.Errorf("expected '{{ $field.Type }} literal', found '%v'", tok)
+						return nil
+					}
+					stmt.{{ $field.Name }}, dec.err = dec.unmarshal{{ $field.Type }}(val)
 				{{ else }}
-					stmt.{{ $field.Name }} = dec.decode{{ $field.Type }}()
+					dec.scan.back()
+					{{ if $field.Array }}
+						stmt.{{ $field.Name }} = dec.decode{{ $field.Type }}s()
+					{{ else }}
+						stmt.{{ $field.Name }} = dec.decode{{ $field.Type }}()
+					{{ end }}
 				{{ end }}
 			{{ end }}
-		{{ end }}
-		default:
-			dec.err = fmt.Errorf("unexpected key '%s' for {{.Name}} object", key)
+			default:
+				dec.err = fmt.Errorf("unexpected key '%s' for {{.Name}} object", key)
+			}
 		}
 
 		if dec.err != nil {
@@ -400,6 +404,9 @@ func (dec *decoder) decode{{ .Name }}Attrs() *ast.{{ .Name }} {
 // template for other structures
 const tmplOther = `
 func (dec *decoder) decode{{ .Name }}() *ast.{{ .Name }} {
+	if dec.isNull() {
+		return nil
+	}
 	if !dec.assertNewObject() {
 		return nil
 	}
@@ -428,33 +435,35 @@ func (dec *decoder) decode{{ .Name }}() *ast.{{ .Name }} {
 		{{ if .HasBasicType }}
 		val, tok, err := dec.scan.nextValue()
 		{{ else }}
-		_, _, err = dec.scan.nextValue()
+		_, tok, err := dec.scan.nextValue()
 		{{ end }}
 		if err != nil {
 			dec.err = err
 			return nil
 		}
 
-		switch key {
-		{{ range $index, $field := .Fields }}
-		case "{{ $field.JSONName }}":
-			{{ if $field.BasicType }}
-				if tok != scan{{ $field.Type }}Lit {
-					dec.err = fmt.Errorf("expected '{{ $field.Type }} literal', found '%v'", tok)
-					return nil
-				}
-				any.{{ $field.Name }}, dec.err = dec.unmarshal{{ $field.Type }}(val)
-			{{ else }}
-				dec.scan.back()
-				{{ if $field.Array }}
-					any.{{ $field.Name }} = dec.decode{{ $field.Type }}s()
+		if tok != scanNullVal {
+			switch key {
+			{{ range $index, $field := .Fields }}
+			case "{{ $field.JSONName }}":
+				{{ if $field.BasicType }}
+					if tok != scan{{ $field.Type }}Lit {
+						dec.err = fmt.Errorf("expected '{{ $field.Type }} literal', found '%v'", tok)
+						return nil
+					}
+					any.{{ $field.Name }}, dec.err = dec.unmarshal{{ $field.Type }}(val)
 				{{ else }}
-					any.{{ $field.Name }} = dec.decode{{ $field.Type }}()
+					dec.scan.back()
+					{{ if $field.Array }}
+						any.{{ $field.Name }} = dec.decode{{ $field.Type }}s()
+					{{ else }}
+						any.{{ $field.Name }} = dec.decode{{ $field.Type }}()
+					{{ end }}
 				{{ end }}
 			{{ end }}
-		{{ end }}
-		default:
-			dec.err = fmt.Errorf("unexpected key '%s' for {{.Name}} object", key)
+			default:
+				dec.err = fmt.Errorf("unexpected key '%s' for {{.Name}} object", key)
+			}
 		}
 
 		if dec.err != nil {
