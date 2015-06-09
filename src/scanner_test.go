@@ -90,6 +90,56 @@ func TestNextKey(t *testing.T) {
 	}
 }
 
+func TestNextValue(t *testing.T) {
+	// test valid values
+	validKeys := map[string]scanToken{
+		`[`:     scanBeginArray,
+		`]`:     scanEndArray,
+		`{`:     scanBeginObject,
+		`}`:     scanEndObject,
+		`42`:    scanInt64Lit,
+		`42.42`: scanFloat64Lit,
+		`"foo"`: scanStringLit,
+		`null`:  scanNullVal,
+		`true`:  scanBoolLit,
+		`false`: scanBoolLit,
+		`,`:     scanComma,
+	}
+	for val, expectedTok := range validKeys {
+		buf := bytes.NewBufferString(val)
+		scan := newScanner(buf)
+		_, tok, err := scan.nextValue()
+		if err != nil {
+			t.Errorf("nextValue '%s': %v", string(val), err)
+		}
+		if expectedTok != tok {
+			t.Errorf("nextValue '%s': found '%v', expected '%v'", string(val), tok, expectedTok)
+		}
+	}
+
+	// test invalid values
+	invalidKeys := map[string]error{
+		`z`:  errors.New("illegal value 'z'"),
+		``:   errors.New("expected value, found EOF"),
+		`  `: errors.New("expected value, found EOF"),
+	}
+	for val, expectedErr := range invalidKeys {
+		buf := bytes.NewBufferString(val)
+		scan := newScanner(buf)
+		_, tok, err := scan.nextValue()
+		if err == nil {
+			t.Errorf("nextValue '%s': found no error, expected \"%v\"", string(val), expectedErr)
+			continue
+		}
+		if err.Error() != expectedErr.Error() {
+			t.Errorf("nextValue '%s': found \"%v\", expected \"%v\"", string(val), err, expectedErr)
+		}
+		if tok != scanIllegalToken {
+			t.Errorf("nextValue '%s': found '%v', expected '%v'", string(val), tok, scanIllegalToken)
+		}
+	}
+}
+
 func TestReadNumber(t *testing.T) {
 	// test int64
 	buf := bytes.NewBufferString("42}")
