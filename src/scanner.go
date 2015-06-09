@@ -53,6 +53,8 @@ type scanner struct {
 	r   io.Reader
 	err error
 
+	globPos int64 // position in the JSON input
+
 	buf []byte
 	pos int // position inside the buffer; must be -1 by default
 
@@ -173,6 +175,7 @@ func (scan *scanner) peek() (byte, error) {
 }
 
 func (scan *scanner) read() (byte, error) {
+	scan.globPos++
 	if scan.pos == -1 || (scan.pos > len(scan.buf)-1 && !scan.eof) {
 		n, err := scan.r.Read(scan.buf)
 		if err != nil {
@@ -234,6 +237,9 @@ func (scan *scanner) readNumber() ([]byte, scanToken, error) {
 	for {
 		c, err := scan.read()
 		if err != nil {
+			if err == io.EOF {
+				break
+			}
 			return nil, scanIllegalToken, err
 		}
 		if c == ',' || c == '}' || c == ']' {
