@@ -35,8 +35,8 @@ func (dec *decoder) decode() (*Project, error) {
 	return prj, nil
 }
 
-func (dec *decoder) errorf(v interface{}) error {
-	return fmt.Errorf("malformed json: %v", v)
+func (dec *decoder) errorf(err error) error {
+	return fmt.Errorf("malformed json at %d: %v", dec.scan.globPos, err)
 }
 
 // decodeProject decodes a project object.
@@ -94,7 +94,7 @@ func (dec *decoder) decodeProject() *Project {
 			}
 			prj.Name, dec.err = dec.unmarshalString(val)
 		default:
-			dec.err = errors.New("unexpected value for project object")
+			dec.err = fmt.Errorf("unexpected key '%s' for project object", key)
 		}
 
 		if dec.err != nil {
@@ -190,7 +190,7 @@ func (dec *decoder) decodePackage() *Package {
 			}
 			pkg.Name, dec.err = dec.unmarshalString(val)
 		default:
-			dec.err = errors.New("unexpected value for project object")
+			dec.err = fmt.Errorf("unexpected key '%s' for package object", key)
 		}
 
 		if dec.err != nil {
@@ -322,7 +322,7 @@ func (dec *decoder) decodeSrcFile() *SrcFile {
 			}
 			sf.LoC, dec.err = dec.unmarshalInt64(val)
 		default:
-			dec.err = fmt.Errorf("unexpected value for the key '%s' of a source file object", key)
+			dec.err = fmt.Errorf("unexpected key '%s' for source file object", key)
 		}
 
 		if dec.err != nil {
@@ -508,7 +508,7 @@ func (dec *decoder) decodeLanguage() *Language {
 			}
 			lang.Lang, dec.err = dec.unmarshalString(val)
 		default:
-			dec.err = fmt.Errorf("unexpected value for the key '%s' of a language object", key)
+			dec.err = fmt.Errorf("unexpected key '%s' for language object", key)
 		}
 
 		if dec.err != nil {

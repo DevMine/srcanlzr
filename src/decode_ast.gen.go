@@ -218,7 +218,7 @@ func (dec *decoder) decodeArrayExprAttrs() *ast.ArrayExpr {
 			expr.Type = dec.decodeArrayType()
 
 		default:
-			dec.err = fmt.Errorf("unexpected value for the key '%s' of a ArrayExpr object", key)
+			dec.err = fmt.Errorf("unexpected key '%s' for ArrayExpr object", key)
 		}
 
 		if dec.err != nil {
@@ -295,7 +295,7 @@ func (dec *decoder) decodeArrayLitAttrs() *ast.ArrayLit {
 			expr.Elts = dec.decodeExprs()
 
 		default:
-			dec.err = fmt.Errorf("unexpected value for the key '%s' of a ArrayLit object", key)
+			dec.err = fmt.Errorf("unexpected key '%s' for ArrayLit object", key)
 		}
 
 		if dec.err != nil {
@@ -366,7 +366,7 @@ func (dec *decoder) decodeAttrRefAttrs() *ast.AttrRef {
 			expr.Name = dec.decodeIdent()
 
 		default:
-			dec.err = fmt.Errorf("unexpected value for the key '%s' of a AttrRef object", key)
+			dec.err = fmt.Errorf("unexpected key '%s' for AttrRef object", key)
 		}
 
 		if dec.err != nil {
@@ -447,7 +447,7 @@ func (dec *decoder) decodeBasicLitAttrs() *ast.BasicLit {
 			expr.Value, dec.err = dec.unmarshalString(val)
 
 		default:
-			dec.err = fmt.Errorf("unexpected value for the key '%s' of a BasicLit object", key)
+			dec.err = fmt.Errorf("unexpected key '%s' for BasicLit object", key)
 		}
 
 		if dec.err != nil {
@@ -532,7 +532,7 @@ func (dec *decoder) decodeBinaryExprAttrs() *ast.BinaryExpr {
 			expr.RightExpr = dec.decodeExpr()
 
 		default:
-			dec.err = fmt.Errorf("unexpected value for the key '%s' of a BinaryExpr object", key)
+			dec.err = fmt.Errorf("unexpected key '%s' for BinaryExpr object", key)
 		}
 
 		if dec.err != nil {
@@ -609,7 +609,7 @@ func (dec *decoder) decodeCallExprAttrs() *ast.CallExpr {
 			expr.Args = dec.decodeExprs()
 
 		default:
-			dec.err = fmt.Errorf("unexpected value for the key '%s' of a CallExpr object", key)
+			dec.err = fmt.Errorf("unexpected key '%s' for CallExpr object", key)
 		}
 
 		if dec.err != nil {
@@ -710,7 +710,7 @@ func (dec *decoder) decodeClassLitAttrs() *ast.ClassLit {
 			expr.Methods = dec.decodeMethodDecls()
 
 		default:
-			dec.err = fmt.Errorf("unexpected value for the key '%s' of a ClassLit object", key)
+			dec.err = fmt.Errorf("unexpected key '%s' for ClassLit object", key)
 		}
 
 		if dec.err != nil {
@@ -795,7 +795,7 @@ func (dec *decoder) decodeFuncLitAttrs() *ast.FuncLit {
 			expr.LoC, dec.err = dec.unmarshalInt64(val)
 
 		default:
-			dec.err = fmt.Errorf("unexpected value for the key '%s' of a FuncLit object", key)
+			dec.err = fmt.Errorf("unexpected key '%s' for FuncLit object", key)
 		}
 
 		if dec.err != nil {
@@ -868,7 +868,7 @@ func (dec *decoder) decodeIdentAttrs() *ast.Ident {
 			expr.Name, dec.err = dec.unmarshalString(val)
 
 		default:
-			dec.err = fmt.Errorf("unexpected value for the key '%s' of a Ident object", key)
+			dec.err = fmt.Errorf("unexpected key '%s' for Ident object", key)
 		}
 
 		if dec.err != nil {
@@ -955,7 +955,7 @@ func (dec *decoder) decodeIncDecExprAttrs() *ast.IncDecExpr {
 			expr.IsPre, dec.err = dec.unmarshalBool(val)
 
 		default:
-			dec.err = fmt.Errorf("unexpected value for the key '%s' of a IncDecExpr object", key)
+			dec.err = fmt.Errorf("unexpected key '%s' for IncDecExpr object", key)
 		}
 
 		if dec.err != nil {
@@ -1032,7 +1032,7 @@ func (dec *decoder) decodeIndexExprAttrs() *ast.IndexExpr {
 			expr.Index = dec.decodeExpr()
 
 		default:
-			dec.err = fmt.Errorf("unexpected value for the key '%s' of a IndexExpr object", key)
+			dec.err = fmt.Errorf("unexpected key '%s' for IndexExpr object", key)
 		}
 
 		if dec.err != nil {
@@ -1115,7 +1115,7 @@ func (dec *decoder) decodeStructTypeAttrs() *ast.StructType {
 			expr.Fields = dec.decodeFields()
 
 		default:
-			dec.err = fmt.Errorf("unexpected value for the key '%s' of a StructType object", key)
+			dec.err = fmt.Errorf("unexpected key '%s' for StructType object", key)
 		}
 
 		if dec.err != nil {
@@ -1198,7 +1198,7 @@ func (dec *decoder) decodeTernaryExprAttrs() *ast.TernaryExpr {
 			expr.Else = dec.decodeExpr()
 
 		default:
-			dec.err = fmt.Errorf("unexpected value for the key '%s' of a TernaryExpr object", key)
+			dec.err = fmt.Errorf("unexpected key '%s' for TernaryExpr object", key)
 		}
 
 		if dec.err != nil {
@@ -1277,7 +1277,7 @@ func (dec *decoder) decodeUnaryExprAttrs() *ast.UnaryExpr {
 			expr.X = dec.decodeExpr()
 
 		default:
-			dec.err = fmt.Errorf("unexpected value for the key '%s' of a UnaryExpr object", key)
+			dec.err = fmt.Errorf("unexpected key '%s' for UnaryExpr object", key)
 		}
 
 		if dec.err != nil {
@@ -1354,7 +1354,7 @@ func (dec *decoder) decodeValueSpecAttrs() *ast.ValueSpec {
 			expr.Type = dec.decodeIdent()
 
 		default:
-			dec.err = fmt.Errorf("unexpected value for the key '%s' of a ValueSpec object", key)
+			dec.err = fmt.Errorf("unexpected key '%s' for ValueSpec object", key)
 		}
 
 		if dec.err != nil {
@@ -2000,7 +2000,7 @@ func (dec *decoder) decodeAssignStmtAttrs() *ast.AssignStmt {
 			stmt.Line, dec.err = dec.unmarshalInt64(val)
 
 		default:
-			dec.err = fmt.Errorf("unexpected value for the key '%s' of a AssignStmt object", key)
+			dec.err = fmt.Errorf("unexpected key '%s' for AssignStmt object", key)
 		}
 
 		if dec.err != nil {
@@ -2071,7 +2071,7 @@ func (dec *decoder) decodeExprStmtAttrs() *ast.ExprStmt {
 			stmt.X = dec.decodeExpr()
 
 		default:
-			dec.err = fmt.Errorf("unexpected value for the key '%s' of a ExprStmt object", key)
+			dec.err = fmt.Errorf("unexpected key '%s' for ExprStmt object", key)
 		}
 
 		if dec.err != nil {
@@ -2168,7 +2168,7 @@ func (dec *decoder) decodeIfStmtAttrs() *ast.IfStmt {
 			stmt.Line, dec.err = dec.unmarshalInt64(val)
 
 		default:
-			dec.err = fmt.Errorf("unexpected value for the key '%s' of a IfStmt object", key)
+			dec.err = fmt.Errorf("unexpected key '%s' for IfStmt object", key)
 		}
 
 		if dec.err != nil {
@@ -2279,7 +2279,7 @@ func (dec *decoder) decodeLoopStmtAttrs() *ast.LoopStmt {
 			stmt.Line, dec.err = dec.unmarshalInt64(val)
 
 		default:
-			dec.err = fmt.Errorf("unexpected value for the key '%s' of a LoopStmt object", key)
+			dec.err = fmt.Errorf("unexpected key '%s' for LoopStmt object", key)
 		}
 
 		if dec.err != nil {
@@ -2358,7 +2358,7 @@ func (dec *decoder) decodeOtherStmtAttrs() *ast.OtherStmt {
 			stmt.Line, dec.err = dec.unmarshalInt64(val)
 
 		default:
-			dec.err = fmt.Errorf("unexpected value for the key '%s' of a OtherStmt object", key)
+			dec.err = fmt.Errorf("unexpected key '%s' for OtherStmt object", key)
 		}
 
 		if dec.err != nil {
@@ -2449,7 +2449,7 @@ func (dec *decoder) decodeRangeLoopStmtAttrs() *ast.RangeLoopStmt {
 			stmt.Line, dec.err = dec.unmarshalInt64(val)
 
 		default:
-			dec.err = fmt.Errorf("unexpected value for the key '%s' of a RangeLoopStmt object", key)
+			dec.err = fmt.Errorf("unexpected key '%s' for RangeLoopStmt object", key)
 		}
 
 		if dec.err != nil {
@@ -2528,7 +2528,7 @@ func (dec *decoder) decodeReturnStmtAttrs() *ast.ReturnStmt {
 			stmt.Line, dec.err = dec.unmarshalInt64(val)
 
 		default:
-			dec.err = fmt.Errorf("unexpected value for the key '%s' of a ReturnStmt object", key)
+			dec.err = fmt.Errorf("unexpected key '%s' for ReturnStmt object", key)
 		}
 
 		if dec.err != nil {
@@ -2617,7 +2617,7 @@ func (dec *decoder) decodeSwitchStmtAttrs() *ast.SwitchStmt {
 			stmt.Default = dec.decodeStmts()
 
 		default:
-			dec.err = fmt.Errorf("unexpected value for the key '%s' of a SwitchStmt object", key)
+			dec.err = fmt.Errorf("unexpected key '%s' for SwitchStmt object", key)
 		}
 
 		if dec.err != nil {
@@ -2688,7 +2688,7 @@ func (dec *decoder) decodeThrowStmtAttrs() *ast.ThrowStmt {
 			stmt.X = dec.decodeExpr()
 
 		default:
-			dec.err = fmt.Errorf("unexpected value for the key '%s' of a ThrowStmt object", key)
+			dec.err = fmt.Errorf("unexpected key '%s' for ThrowStmt object", key)
 		}
 
 		if dec.err != nil {
@@ -2771,7 +2771,7 @@ func (dec *decoder) decodeTryStmtAttrs() *ast.TryStmt {
 			stmt.Finally = dec.decodeStmts()
 
 		default:
-			dec.err = fmt.Errorf("unexpected value for the key '%s' of a TryStmt object", key)
+			dec.err = fmt.Errorf("unexpected key '%s' for TryStmt object", key)
 		}
 
 		if dec.err != nil {
@@ -3167,7 +3167,7 @@ func (dec *decoder) decodeArrayType() *ast.ArrayType {
 			any.Elt = dec.decodeExpr()
 
 		default:
-			dec.err = fmt.Errorf("unexpected value for the key '%s' of a ArrayType object", key)
+			dec.err = fmt.Errorf("unexpected key '%s' for ArrayType object", key)
 		}
 
 		if dec.err != nil {
@@ -3245,7 +3245,7 @@ func (dec *decoder) decodeAttr() *ast.Attr {
 			any.Static, dec.err = dec.unmarshalBool(val)
 
 		default:
-			dec.err = fmt.Errorf("unexpected value for the key '%s' of a Attr object", key)
+			dec.err = fmt.Errorf("unexpected key '%s' for Attr object", key)
 		}
 
 		if dec.err != nil {
@@ -3369,7 +3369,7 @@ func (dec *decoder) decodeClassDecl() *ast.ClassDecl {
 			any.Mixins = dec.decodeTraitRefs()
 
 		default:
-			dec.err = fmt.Errorf("unexpected value for the key '%s' of a ClassDecl object", key)
+			dec.err = fmt.Errorf("unexpected key '%s' for ClassDecl object", key)
 		}
 
 		if dec.err != nil {
@@ -3439,7 +3439,7 @@ func (dec *decoder) decodeClassRef() *ast.ClassRef {
 			any.ClassName, dec.err = dec.unmarshalString(val)
 
 		default:
-			dec.err = fmt.Errorf("unexpected value for the key '%s' of a ClassRef object", key)
+			dec.err = fmt.Errorf("unexpected key '%s' for ClassRef object", key)
 		}
 
 		if dec.err != nil {
@@ -3539,7 +3539,7 @@ func (dec *decoder) decodeConstant() *ast.Constant {
 			any.Visibility, dec.err = dec.unmarshalString(val)
 
 		default:
-			dec.err = fmt.Errorf("unexpected value for the key '%s' of a Constant object", key)
+			dec.err = fmt.Errorf("unexpected key '%s' for Constant object", key)
 		}
 
 		if dec.err != nil {
@@ -3593,7 +3593,7 @@ func (dec *decoder) decodeConstructorCallExpr() *ast.ConstructorCallExpr {
 		switch key {
 
 		default:
-			dec.err = fmt.Errorf("unexpected value for the key '%s' of a ConstructorCallExpr object", key)
+			dec.err = fmt.Errorf("unexpected key '%s' for ConstructorCallExpr object", key)
 		}
 
 		if dec.err != nil {
@@ -3689,7 +3689,7 @@ func (dec *decoder) decodeConstructorDecl() *ast.ConstructorDecl {
 			any.LoC, dec.err = dec.unmarshalInt64(val)
 
 		default:
-			dec.err = fmt.Errorf("unexpected value for the key '%s' of a ConstructorDecl object", key)
+			dec.err = fmt.Errorf("unexpected key '%s' for ConstructorDecl object", key)
 		}
 
 		if dec.err != nil {
@@ -3751,7 +3751,7 @@ func (dec *decoder) decodeDeclStmt() *ast.DeclStmt {
 			any.Kind, dec.err = dec.unmarshalString(val)
 
 		default:
-			dec.err = fmt.Errorf("unexpected value for the key '%s' of a DeclStmt object", key)
+			dec.err = fmt.Errorf("unexpected key '%s' for DeclStmt object", key)
 		}
 
 		if dec.err != nil {
@@ -3805,7 +3805,7 @@ func (dec *decoder) decodeDestructorDecl() *ast.DestructorDecl {
 		switch key {
 
 		default:
-			dec.err = fmt.Errorf("unexpected value for the key '%s' of a DestructorDecl object", key)
+			dec.err = fmt.Errorf("unexpected key '%s' for DestructorDecl object", key)
 		}
 
 		if dec.err != nil {
@@ -3917,7 +3917,7 @@ func (dec *decoder) decodeEnumDecl() *ast.EnumDecl {
 			any.Methods = dec.decodeMethodDecls()
 
 		default:
-			dec.err = fmt.Errorf("unexpected value for the key '%s' of a EnumDecl object", key)
+			dec.err = fmt.Errorf("unexpected key '%s' for EnumDecl object", key)
 		}
 
 		if dec.err != nil {
@@ -4013,7 +4013,7 @@ func (dec *decoder) decodeFuncDecl() *ast.FuncDecl {
 			any.LoC, dec.err = dec.unmarshalInt64(val)
 
 		default:
-			dec.err = fmt.Errorf("unexpected value for the key '%s' of a FuncDecl object", key)
+			dec.err = fmt.Errorf("unexpected key '%s' for FuncDecl object", key)
 		}
 
 		if dec.err != nil {
@@ -4083,7 +4083,7 @@ func (dec *decoder) decodeFuncRef() *ast.FuncRef {
 			any.FuncName, dec.err = dec.unmarshalString(val)
 
 		default:
-			dec.err = fmt.Errorf("unexpected value for the key '%s' of a FuncRef object", key)
+			dec.err = fmt.Errorf("unexpected key '%s' for FuncRef object", key)
 		}
 
 		if dec.err != nil {
@@ -4149,7 +4149,7 @@ func (dec *decoder) decodeFuncType() *ast.FuncType {
 			any.Results = dec.decodeFields()
 
 		default:
-			dec.err = fmt.Errorf("unexpected value for the key '%s' of a FuncType object", key)
+			dec.err = fmt.Errorf("unexpected key '%s' for FuncType object", key)
 		}
 
 		if dec.err != nil {
@@ -4235,7 +4235,7 @@ func (dec *decoder) decodeGlobalDecl() *ast.GlobalDecl {
 			any.Visibility, dec.err = dec.unmarshalString(val)
 
 		default:
-			dec.err = fmt.Errorf("unexpected value for the key '%s' of a GlobalDecl object", key)
+			dec.err = fmt.Errorf("unexpected key '%s' for GlobalDecl object", key)
 		}
 
 		if dec.err != nil {
@@ -4323,7 +4323,7 @@ func (dec *decoder) decodeInterface() *ast.Interface {
 			any.Visibility, dec.err = dec.unmarshalString(val)
 
 		default:
-			dec.err = fmt.Errorf("unexpected value for the key '%s' of a Interface object", key)
+			dec.err = fmt.Errorf("unexpected key '%s' for Interface object", key)
 		}
 
 		if dec.err != nil {
@@ -4393,7 +4393,7 @@ func (dec *decoder) decodeInterfaceRef() *ast.InterfaceRef {
 			any.InterfaceName, dec.err = dec.unmarshalString(val)
 
 		default:
-			dec.err = fmt.Errorf("unexpected value for the key '%s' of a InterfaceRef object", key)
+			dec.err = fmt.Errorf("unexpected key '%s' for InterfaceRef object", key)
 		}
 
 		if dec.err != nil {
@@ -4459,7 +4459,7 @@ func (dec *decoder) decodeListLit() *ast.ListLit {
 			any.Elts = dec.decodeExprs()
 
 		default:
-			dec.err = fmt.Errorf("unexpected value for the key '%s' of a ListLit object", key)
+			dec.err = fmt.Errorf("unexpected key '%s' for ListLit object", key)
 		}
 
 		if dec.err != nil {
@@ -4535,7 +4535,7 @@ func (dec *decoder) decodeListType() *ast.ListType {
 			any.Elt = dec.decodeExpr()
 
 		default:
-			dec.err = fmt.Errorf("unexpected value for the key '%s' of a ListType object", key)
+			dec.err = fmt.Errorf("unexpected key '%s' for ListType object", key)
 		}
 
 		if dec.err != nil {
@@ -4601,7 +4601,7 @@ func (dec *decoder) decodeMapLit() *ast.MapLit {
 			any.Elts = dec.decodeKeyValuePairs()
 
 		default:
-			dec.err = fmt.Errorf("unexpected value for the key '%s' of a MapLit object", key)
+			dec.err = fmt.Errorf("unexpected key '%s' for MapLit object", key)
 		}
 
 		if dec.err != nil {
@@ -4667,7 +4667,7 @@ func (dec *decoder) decodeKeyValuePair() *ast.KeyValuePair {
 			any.Value = dec.decodeExpr()
 
 		default:
-			dec.err = fmt.Errorf("unexpected value for the key '%s' of a KeyValuePair object", key)
+			dec.err = fmt.Errorf("unexpected key '%s' for KeyValuePair object", key)
 		}
 
 		if dec.err != nil {
@@ -4733,7 +4733,7 @@ func (dec *decoder) decodeMapType() *ast.MapType {
 			any.ValueType = dec.decodeExpr()
 
 		default:
-			dec.err = fmt.Errorf("unexpected value for the key '%s' of a MapType object", key)
+			dec.err = fmt.Errorf("unexpected key '%s' for MapType object", key)
 		}
 
 		if dec.err != nil {
@@ -4795,7 +4795,7 @@ func (dec *decoder) decodeMethodDecl() *ast.MethodDecl {
 			any.Override, dec.err = dec.unmarshalBool(val)
 
 		default:
-			dec.err = fmt.Errorf("unexpected value for the key '%s' of a MethodDecl object", key)
+			dec.err = fmt.Errorf("unexpected key '%s' for MethodDecl object", key)
 		}
 
 		if dec.err != nil {
@@ -4875,7 +4875,7 @@ func (dec *decoder) decodeProtoDecl() *ast.ProtoDecl {
 			any.Visibility, dec.err = dec.unmarshalString(val)
 
 		default:
-			dec.err = fmt.Errorf("unexpected value for the key '%s' of a ProtoDecl object", key)
+			dec.err = fmt.Errorf("unexpected key '%s' for ProtoDecl object", key)
 		}
 
 		if dec.err != nil {
@@ -4951,7 +4951,7 @@ func (dec *decoder) decodeField() *ast.Field {
 			any.Type, dec.err = dec.unmarshalString(val)
 
 		default:
-			dec.err = fmt.Errorf("unexpected value for the key '%s' of a Field object", key)
+			dec.err = fmt.Errorf("unexpected key '%s' for Field object", key)
 		}
 
 		if dec.err != nil {
@@ -5017,7 +5017,7 @@ func (dec *decoder) decodeCaseClause() *ast.CaseClause {
 			any.Body = dec.decodeStmts()
 
 		default:
-			dec.err = fmt.Errorf("unexpected value for the key '%s' of a CaseClause object", key)
+			dec.err = fmt.Errorf("unexpected key '%s' for CaseClause object", key)
 		}
 
 		if dec.err != nil {
@@ -5103,7 +5103,7 @@ func (dec *decoder) decodeTrait() *ast.Trait {
 			any.Traits = dec.decodeTraits()
 
 		default:
-			dec.err = fmt.Errorf("unexpected value for the key '%s' of a Trait object", key)
+			dec.err = fmt.Errorf("unexpected key '%s' for Trait object", key)
 		}
 
 		if dec.err != nil {
@@ -5173,7 +5173,7 @@ func (dec *decoder) decodeTraitRef() *ast.TraitRef {
 			any.TraitName, dec.err = dec.unmarshalString(val)
 
 		default:
-			dec.err = fmt.Errorf("unexpected value for the key '%s' of a TraitRef object", key)
+			dec.err = fmt.Errorf("unexpected key '%s' for TraitRef object", key)
 		}
 
 		if dec.err != nil {
@@ -5239,7 +5239,7 @@ func (dec *decoder) decodeCatchClause() *ast.CatchClause {
 			any.Body = dec.decodeStmts()
 
 		default:
-			dec.err = fmt.Errorf("unexpected value for the key '%s' of a CatchClause object", key)
+			dec.err = fmt.Errorf("unexpected key '%s' for CatchClause object", key)
 		}
 
 		if dec.err != nil {
@@ -5311,7 +5311,7 @@ func (dec *decoder) decodeTypeSpec() *ast.TypeSpec {
 			any.Type = dec.decodeExpr()
 
 		default:
-			dec.err = fmt.Errorf("unexpected value for the key '%s' of a TypeSpec object", key)
+			dec.err = fmt.Errorf("unexpected key '%s' for TypeSpec object", key)
 		}
 
 		if dec.err != nil {
@@ -5411,7 +5411,7 @@ func (dec *decoder) decodeVar() *ast.Var {
 			any.Visibility, dec.err = dec.unmarshalString(val)
 
 		default:
-			dec.err = fmt.Errorf("unexpected value for the key '%s' of a Var object", key)
+			dec.err = fmt.Errorf("unexpected key '%s' for Var object", key)
 		}
 
 		if dec.err != nil {

@@ -290,7 +290,7 @@ func (dec *decoder) decode{{ .Name }}Attrs() *ast.{{ .Name }} {
 			{{ end }}
 		{{ end }}
 		default:
-			dec.err = fmt.Errorf("unexpected value for the key '%s' of a {{.Name}} object", key)
+			dec.err = fmt.Errorf("unexpected key '%s' for {{.Name}} object", key)
 		}
 
 		if dec.err != nil {
@@ -370,7 +370,7 @@ func (dec *decoder) decode{{ .Name }}Attrs() *ast.{{ .Name }} {
 			{{ end }}
 		{{ end }}
 		default:
-			dec.err = fmt.Errorf("unexpected value for the key '%s' of a {{.Name}} object", key)
+			dec.err = fmt.Errorf("unexpected key '%s' for {{.Name}} object", key)
 		}
 
 		if dec.err != nil {
@@ -447,7 +447,7 @@ func (dec *decoder) decode{{ .Name }}() *ast.{{ .Name }} {
 			{{ end }}
 		{{ end }}
 		default:
-			dec.err = fmt.Errorf("unexpected value for the key '%s' of a {{.Name}} object", key)
+			dec.err = fmt.Errorf("unexpected key '%s' for {{.Name}} object", key)
 		}
 
 		if dec.err != nil {
