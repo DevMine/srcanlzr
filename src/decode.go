@@ -685,7 +685,8 @@ func (dec *decoder) isEndArray() bool {
 
 // isEmptyObject tests if the object is empty (no key/value pairs inside).
 //
-// This method does not consume any byte.
+// This method does not consume any byte except when the object is empty.
+// In this case, it consumes the '}'.
 //
 // If an error occurs, it returns false and set dec.err.
 func (dec *decoder) isEmptyObject() bool {
@@ -699,6 +700,9 @@ func (dec *decoder) isEmptyObject() bool {
 		}
 		return false
 	} else if b == '}' {
+		// We need to read the next byte here because if the caller accept empty
+		// object, it will continue the decoding and won't expect to find a '}'.
+		_, dec.err = dec.scan.read()
 		return true
 	}
 	return false
@@ -706,7 +710,8 @@ func (dec *decoder) isEmptyObject() bool {
 
 // isEmptyArray tests if the object is empty (no values inside).
 //
-// This method does not consume any byte.
+// This method does not consume any byte except when the array is empty.
+// In this case, it consumes the ']'.
 //
 // If an error occurs, it returns false and set dec.err.
 func (dec *decoder) isEmptyArray() bool {
@@ -718,6 +723,9 @@ func (dec *decoder) isEmptyArray() bool {
 		}
 		return false
 	} else if b == ']' {
+		// We need to read the next byte here because if the caller accept empty
+		// array, it will continue the decoding and won't expect to find a ']'.
+		_, dec.err = dec.scan.read()
 		return true
 	}
 	return false
