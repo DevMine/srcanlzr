@@ -2657,7 +2657,7 @@ func (dec *decoder) decodeSwitchStmtAttrs() *ast.SwitchStmt {
 
 				dec.scan.back()
 
-				stmt.Init = dec.decodeExpr()
+				stmt.Init = dec.decodeStmt()
 
 			case "condition":
 

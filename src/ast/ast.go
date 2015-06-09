@@ -320,7 +320,7 @@ type Field struct {
 
 type SwitchStmt struct {
 	StmtName    string        `json:"statement_name"`
-	Init        Expr          `json:"initialization,omitempty"`
+	Init        Stmt          `json:"initialization,omitempty"`
 	Cond        Expr          `json:"condition,omitempty"` // TODO rename with a more appropriate name
 	CaseClauses []*CaseClause `json:"case_clauses,omitempty"`
 	Default     []Stmt        `json:"default,omitempty"`
