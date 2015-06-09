@@ -279,7 +279,7 @@ func (dec *decoder) decode{{ .Name }}Attrs() *ast.{{ .Name }} {
 			return nil
 		}
 
-		if tok == scanNullVal {
+		if tok != scanNullVal {
 			switch key {
 			{{ range $index, $field := .Fields }}
 			case "{{ $field.JSONName }}":

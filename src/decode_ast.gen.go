@@ -205,7 +205,7 @@ func (dec *decoder) decodeArrayExprAttrs() *ast.ArrayExpr {
 			return nil
 		}
 
-		if tok == scanNullVal {
+		if tok != scanNullVal {
 			switch key {
 
 			case "expression_name":
@@ -278,7 +278,7 @@ func (dec *decoder) decodeArrayLitAttrs() *ast.ArrayLit {
 			return nil
 		}
 
-		if tok == scanNullVal {
+		if tok != scanNullVal {
 			switch key {
 
 			case "expression_name":
@@ -357,7 +357,7 @@ func (dec *decoder) decodeAttrRefAttrs() *ast.AttrRef {
 			return nil
 		}
 
-		if tok == scanNullVal {
+		if tok != scanNullVal {
 			switch key {
 
 			case "expression_name":
@@ -430,7 +430,7 @@ func (dec *decoder) decodeBasicLitAttrs() *ast.BasicLit {
 			return nil
 		}
 
-		if tok == scanNullVal {
+		if tok != scanNullVal {
 			switch key {
 
 			case "expression_name":
@@ -513,7 +513,7 @@ func (dec *decoder) decodeBinaryExprAttrs() *ast.BinaryExpr {
 			return nil
 		}
 
-		if tok == scanNullVal {
+		if tok != scanNullVal {
 			switch key {
 
 			case "expression_name":
@@ -600,7 +600,7 @@ func (dec *decoder) decodeCallExprAttrs() *ast.CallExpr {
 			return nil
 		}
 
-		if tok == scanNullVal {
+		if tok != scanNullVal {
 			switch key {
 
 			case "expression_name":
@@ -687,7 +687,7 @@ func (dec *decoder) decodeClassLitAttrs() *ast.ClassLit {
 			return nil
 		}
 
-		if tok == scanNullVal {
+		if tok != scanNullVal {
 			switch key {
 
 			case "expression_name":
@@ -790,7 +790,7 @@ func (dec *decoder) decodeFuncLitAttrs() *ast.FuncLit {
 			return nil
 		}
 
-		if tok == scanNullVal {
+		if tok != scanNullVal {
 			switch key {
 
 			case "expression_name":
@@ -877,7 +877,7 @@ func (dec *decoder) decodeIdentAttrs() *ast.Ident {
 			return nil
 		}
 
-		if tok == scanNullVal {
+		if tok != scanNullVal {
 			switch key {
 
 			case "expression_name":
@@ -952,7 +952,7 @@ func (dec *decoder) decodeIncDecExprAttrs() *ast.IncDecExpr {
 			return nil
 		}
 
-		if tok == scanNullVal {
+		if tok != scanNullVal {
 			switch key {
 
 			case "expression_name":
@@ -1041,7 +1041,7 @@ func (dec *decoder) decodeIndexExprAttrs() *ast.IndexExpr {
 			return nil
 		}
 
-		if tok == scanNullVal {
+		if tok != scanNullVal {
 			switch key {
 
 			case "expression_name":
@@ -1120,7 +1120,7 @@ func (dec *decoder) decodeStructTypeAttrs() *ast.StructType {
 			return nil
 		}
 
-		if tok == scanNullVal {
+		if tok != scanNullVal {
 			switch key {
 
 			case "expression_name":
@@ -1205,7 +1205,7 @@ func (dec *decoder) decodeTernaryExprAttrs() *ast.TernaryExpr {
 			return nil
 		}
 
-		if tok == scanNullVal {
+		if tok != scanNullVal {
 			switch key {
 
 			case "expression_name":
@@ -1290,7 +1290,7 @@ func (dec *decoder) decodeUnaryExprAttrs() *ast.UnaryExpr {
 			return nil
 		}
 
-		if tok == scanNullVal {
+		if tok != scanNullVal {
 			switch key {
 
 			case "expression_name":
@@ -1371,7 +1371,7 @@ func (dec *decoder) decodeValueSpecAttrs() *ast.ValueSpec {
 			return nil
 		}
 
-		if tok == scanNullVal {
+		if tok != scanNullVal {
 			switch key {
 
 			case "expression_name":
