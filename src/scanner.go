@@ -246,6 +246,7 @@ func (scan *scanner) readNumber() ([]byte, scanToken, error) {
 			if numLen == 0 {
 				return nil, scanIllegalToken, errors.New("expected number, found nothing")
 			}
+			scan.back()
 			break
 		}
 		if c == '.' {
