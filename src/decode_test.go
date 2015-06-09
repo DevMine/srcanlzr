@@ -97,10 +97,10 @@ func TestDecodeIdent(t *testing.T) {
 		t.Fatal(dec.err)
 	}
 	if ident.ExprName != expected.ExprName {
-		t.Errorf("decodeIdent: found '%s', found '%s'", ident.ExprName, expected.ExprName)
+		t.Errorf("decodeIdent: found '%s', expected '%s'", ident.ExprName, expected.ExprName)
 	}
 	if ident.Name != expected.Name {
-		t.Errorf("decodeIdent: found '%s', found '%s'", ident.Name, expected.Name)
+		t.Errorf("decodeIdent: found '%s', expected '%s'", ident.Name, expected.Name)
 	}
 }
 
