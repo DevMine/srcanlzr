@@ -76,10 +76,13 @@ func (dec *decoder) decodeProject() *Project {
 
 		switch key {
 		case "packages":
+			dec.scan.back()
 			prj.Packages = dec.decodePackages()
 		case "languages":
+			dec.scan.back()
 			prj.Langs = dec.decodeLanguages()
 		case "repository":
+			dec.scan.back()
 			prj.Repo = dec.decodeRepository()
 		case "loc":
 			if tok != scanInt64Lit {
@@ -174,8 +177,10 @@ func (dec *decoder) decodePackage() *Package {
 
 		switch key {
 		case "source_files":
+			dec.scan.back()
 			pkg.SrcFiles = dec.decodeSrcFiles()
 		case "doc":
+			dec.scan.back()
 			pkg.Doc = dec.decodeStrings()
 		case "loc":
 			if tok != scanInt64Lit {
