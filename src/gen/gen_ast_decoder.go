@@ -396,7 +396,6 @@ func (dec *decoder) decode{{ .Name }}() *ast.{{ .Name }} {
 		return nil
 	}
 	if dec.isEmptyObject() {
-		dec.err = errors.New("{{ .Name }} object cannot be empty")
 		return nil
 	}
 	if dec.err != nil {

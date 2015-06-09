@@ -3123,7 +3123,6 @@ func (dec *decoder) decodeArrayType() *ast.ArrayType {
 		return nil
 	}
 	if dec.isEmptyObject() {
-		dec.err = errors.New("ArrayType object cannot be empty")
 		return nil
 	}
 	if dec.err != nil {
@@ -3189,7 +3188,6 @@ func (dec *decoder) decodeAttr() *ast.Attr {
 		return nil
 	}
 	if dec.isEmptyObject() {
-		dec.err = errors.New("Attr object cannot be empty")
 		return nil
 	}
 	if dec.err != nil {
@@ -3267,7 +3265,6 @@ func (dec *decoder) decodeClassDecl() *ast.ClassDecl {
 		return nil
 	}
 	if dec.isEmptyObject() {
-		dec.err = errors.New("ClassDecl object cannot be empty")
 		return nil
 	}
 	if dec.err != nil {
@@ -3391,7 +3388,6 @@ func (dec *decoder) decodeClassRef() *ast.ClassRef {
 		return nil
 	}
 	if dec.isEmptyObject() {
-		dec.err = errors.New("ClassRef object cannot be empty")
 		return nil
 	}
 	if dec.err != nil {
@@ -3461,7 +3457,6 @@ func (dec *decoder) decodeConstant() *ast.Constant {
 		return nil
 	}
 	if dec.isEmptyObject() {
-		dec.err = errors.New("Constant object cannot be empty")
 		return nil
 	}
 	if dec.err != nil {
@@ -3561,7 +3556,6 @@ func (dec *decoder) decodeConstructorCallExpr() *ast.ConstructorCallExpr {
 		return nil
 	}
 	if dec.isEmptyObject() {
-		dec.err = errors.New("ConstructorCallExpr object cannot be empty")
 		return nil
 	}
 	if dec.err != nil {
@@ -3615,7 +3609,6 @@ func (dec *decoder) decodeConstructorDecl() *ast.ConstructorDecl {
 		return nil
 	}
 	if dec.isEmptyObject() {
-		dec.err = errors.New("ConstructorDecl object cannot be empty")
 		return nil
 	}
 	if dec.err != nil {
@@ -3711,7 +3704,6 @@ func (dec *decoder) decodeDeclStmt() *ast.DeclStmt {
 		return nil
 	}
 	if dec.isEmptyObject() {
-		dec.err = errors.New("DeclStmt object cannot be empty")
 		return nil
 	}
 	if dec.err != nil {
@@ -3773,7 +3765,6 @@ func (dec *decoder) decodeDestructorDecl() *ast.DestructorDecl {
 		return nil
 	}
 	if dec.isEmptyObject() {
-		dec.err = errors.New("DestructorDecl object cannot be empty")
 		return nil
 	}
 	if dec.err != nil {
@@ -3827,7 +3818,6 @@ func (dec *decoder) decodeEnumDecl() *ast.EnumDecl {
 		return nil
 	}
 	if dec.isEmptyObject() {
-		dec.err = errors.New("EnumDecl object cannot be empty")
 		return nil
 	}
 	if dec.err != nil {
@@ -3939,7 +3929,6 @@ func (dec *decoder) decodeFuncDecl() *ast.FuncDecl {
 		return nil
 	}
 	if dec.isEmptyObject() {
-		dec.err = errors.New("FuncDecl object cannot be empty")
 		return nil
 	}
 	if dec.err != nil {
@@ -4035,7 +4024,6 @@ func (dec *decoder) decodeFuncRef() *ast.FuncRef {
 		return nil
 	}
 	if dec.isEmptyObject() {
-		dec.err = errors.New("FuncRef object cannot be empty")
 		return nil
 	}
 	if dec.err != nil {
@@ -4105,7 +4093,6 @@ func (dec *decoder) decodeFuncType() *ast.FuncType {
 		return nil
 	}
 	if dec.isEmptyObject() {
-		dec.err = errors.New("FuncType object cannot be empty")
 		return nil
 	}
 	if dec.err != nil {
@@ -4171,7 +4158,6 @@ func (dec *decoder) decodeGlobalDecl() *ast.GlobalDecl {
 		return nil
 	}
 	if dec.isEmptyObject() {
-		dec.err = errors.New("GlobalDecl object cannot be empty")
 		return nil
 	}
 	if dec.err != nil {
@@ -4257,7 +4243,6 @@ func (dec *decoder) decodeInterface() *ast.Interface {
 		return nil
 	}
 	if dec.isEmptyObject() {
-		dec.err = errors.New("Interface object cannot be empty")
 		return nil
 	}
 	if dec.err != nil {
@@ -4345,7 +4330,6 @@ func (dec *decoder) decodeInterfaceRef() *ast.InterfaceRef {
 		return nil
 	}
 	if dec.isEmptyObject() {
-		dec.err = errors.New("InterfaceRef object cannot be empty")
 		return nil
 	}
 	if dec.err != nil {
@@ -4415,7 +4399,6 @@ func (dec *decoder) decodeListLit() *ast.ListLit {
 		return nil
 	}
 	if dec.isEmptyObject() {
-		dec.err = errors.New("ListLit object cannot be empty")
 		return nil
 	}
 	if dec.err != nil {
@@ -4481,7 +4464,6 @@ func (dec *decoder) decodeListType() *ast.ListType {
 		return nil
 	}
 	if dec.isEmptyObject() {
-		dec.err = errors.New("ListType object cannot be empty")
 		return nil
 	}
 	if dec.err != nil {
@@ -4557,7 +4539,6 @@ func (dec *decoder) decodeMapLit() *ast.MapLit {
 		return nil
 	}
 	if dec.isEmptyObject() {
-		dec.err = errors.New("MapLit object cannot be empty")
 		return nil
 	}
 	if dec.err != nil {
@@ -4623,7 +4604,6 @@ func (dec *decoder) decodeKeyValuePair() *ast.KeyValuePair {
 		return nil
 	}
 	if dec.isEmptyObject() {
-		dec.err = errors.New("KeyValuePair object cannot be empty")
 		return nil
 	}
 	if dec.err != nil {
@@ -4689,7 +4669,6 @@ func (dec *decoder) decodeMapType() *ast.MapType {
 		return nil
 	}
 	if dec.isEmptyObject() {
-		dec.err = errors.New("MapType object cannot be empty")
 		return nil
 	}
 	if dec.err != nil {
@@ -4755,7 +4734,6 @@ func (dec *decoder) decodeMethodDecl() *ast.MethodDecl {
 		return nil
 	}
 	if dec.isEmptyObject() {
-		dec.err = errors.New("MethodDecl object cannot be empty")
 		return nil
 	}
 	if dec.err != nil {
@@ -4817,7 +4795,6 @@ func (dec *decoder) decodeProtoDecl() *ast.ProtoDecl {
 		return nil
 	}
 	if dec.isEmptyObject() {
-		dec.err = errors.New("ProtoDecl object cannot be empty")
 		return nil
 	}
 	if dec.err != nil {
@@ -4897,7 +4874,6 @@ func (dec *decoder) decodeField() *ast.Field {
 		return nil
 	}
 	if dec.isEmptyObject() {
-		dec.err = errors.New("Field object cannot be empty")
 		return nil
 	}
 	if dec.err != nil {
@@ -4973,7 +4949,6 @@ func (dec *decoder) decodeCaseClause() *ast.CaseClause {
 		return nil
 	}
 	if dec.isEmptyObject() {
-		dec.err = errors.New("CaseClause object cannot be empty")
 		return nil
 	}
 	if dec.err != nil {
@@ -5039,7 +5014,6 @@ func (dec *decoder) decodeTrait() *ast.Trait {
 		return nil
 	}
 	if dec.isEmptyObject() {
-		dec.err = errors.New("Trait object cannot be empty")
 		return nil
 	}
 	if dec.err != nil {
@@ -5125,7 +5099,6 @@ func (dec *decoder) decodeTraitRef() *ast.TraitRef {
 		return nil
 	}
 	if dec.isEmptyObject() {
-		dec.err = errors.New("TraitRef object cannot be empty")
 		return nil
 	}
 	if dec.err != nil {
@@ -5195,7 +5168,6 @@ func (dec *decoder) decodeCatchClause() *ast.CatchClause {
 		return nil
 	}
 	if dec.isEmptyObject() {
-		dec.err = errors.New("CatchClause object cannot be empty")
 		return nil
 	}
 	if dec.err != nil {
@@ -5261,7 +5233,6 @@ func (dec *decoder) decodeTypeSpec() *ast.TypeSpec {
 		return nil
 	}
 	if dec.isEmptyObject() {
-		dec.err = errors.New("TypeSpec object cannot be empty")
 		return nil
 	}
 	if dec.err != nil {
@@ -5333,7 +5304,6 @@ func (dec *decoder) decodeVar() *ast.Var {
 		return nil
 	}
 	if dec.isEmptyObject() {
-		dec.err = errors.New("Var object cannot be empty")
 		return nil
 	}
 	if dec.err != nil {
