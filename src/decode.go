@@ -194,6 +194,12 @@ func (dec *decoder) decodePackage() *Package {
 				return nil
 			}
 			pkg.Name, dec.err = dec.unmarshalString(val)
+		case "path":
+			if tok != scanStringLit {
+				dec.err = fmt.Errorf("expected string literal, found %v", tok)
+				return nil
+			}
+			pkg.Path, dec.err = dec.unmarshalString(val)
 		default:
 			dec.err = fmt.Errorf("unexpected key '%s' for package object", key)
 		}
