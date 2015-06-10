@@ -16,7 +16,8 @@ bench:
 	go test -bench=. -benchmem ${PKG}/...
 
 deps:
-	 go get -u github.com/DevMine/repotool/model
+	go get -u golang.org/x/tools/imports
+	go get -u github.com/DevMine/repotool/model
 
 dev-deps:
 	 go get -u github.com/golang/lint/golint
