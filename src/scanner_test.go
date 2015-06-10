@@ -243,7 +243,7 @@ func TestReadBool(t *testing.T) {
 	scan = newScanner(buf)
 	val, err = scan.readBool('f')
 	if err == nil {
-		t.Fatal("readBool 'oo': found no error, expected \"%v\"", expectedErr)
+		t.Fatalf("readBool 'oo': found no error, expected \"%v\"", expectedErr)
 	}
 	if err.Error() != expectedErr.Error() {
 		t.Fatalf("readBool 'oo': found \"%v\", expected \"%v\"", err, expectedErr)
