@@ -17,5 +17,10 @@
 	imperative to make the JSON decoding work. This constraint is not really
 	convenient but necessary in order to make performance optimizations in the
 	JSON decoding process.
+
+	For more information about how serialization work, refer to the
+	documentation of the src package:
+
+	   http://godoc.org/github.com/DevMine/srcanlzr/src
 */
 package ast
