@@ -14,6 +14,13 @@ build:
 test:
 	go test ${PKG}/...
 
+bench:
+	go test -bench=. -benchmem ${PKG}/...
+
+deps:
+	go get -u golang.org/x/tools/imports
+	go get -u github.com/DevMine/repotool/model
+
 package: clean deps build
 	test -d ${DIR} || mkdir ${DIR}
 	cp ${EXEC} ${DIR}/
@@ -21,11 +28,9 @@ package: clean deps build
 	tar czvf ${DIR}.tar.gz ${DIR}
 	rm -rf ${DIR}
 
-deps:
-	 go get -u -f github.com/DevMine/repotool/model
-
 dev-deps:
 	 go get -u github.com/golang/lint/golint
+	 go get -u golang.org/x/tools/imports
 
 check:
 	go vet ${PKG}/...

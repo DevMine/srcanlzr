@@ -8,6 +8,8 @@ import (
 	"strings"
 
 	"github.com/DevMine/srcanlzr/src"
+	"github.com/DevMine/srcanlzr/src/ast"
+	"github.com/DevMine/srcanlzr/src/token"
 )
 
 type counters struct {
@@ -130,7 +132,7 @@ func (dc CommentRatios) Analyze(p *src.Project, r *Result) error {
 	return nil
 }
 
-func (cnt *counters) interfaceCommentCoverage(interfaceDecl *src.Interface) {
+func (cnt *counters) interfaceCommentCoverage(interfaceDecl *ast.Interface) {
 
 	if isVisible(interfaceDecl.Visibility) {
 		cnt.nbInter++
@@ -150,7 +152,7 @@ func (cnt *counters) interfaceCommentCoverage(interfaceDecl *src.Interface) {
 
 }
 
-func (cnt *counters) classesCommentCoverage(classDecl *src.ClassDecl) {
+func (cnt *counters) classesCommentCoverage(classDecl *ast.ClassDecl) {
 
 	if isVisible(classDecl.Visibility) {
 		cnt.nbClas++
@@ -176,7 +178,7 @@ func (cnt *counters) classesCommentCoverage(classDecl *src.ClassDecl) {
 
 }
 
-func (cnt *counters) enumCommentCoverage(enumDecl *src.EnumDecl) {
+func (cnt *counters) enumCommentCoverage(enumDecl *ast.EnumDecl) {
 
 	if isVisible(enumDecl.Visibility) {
 		cnt.nbEnum++
@@ -197,7 +199,7 @@ func (cnt *counters) enumCommentCoverage(enumDecl *src.EnumDecl) {
 	cnt.functionsCommentCoverage(enumDecl.Constructors, enumDecl.Destructors, enumDecl.Methods)
 }
 
-func (cnt *counters) functionsCommentCoverage(cstrs []*src.ConstructorDecl, dstrs []*src.DestructorDecl, mthds []*src.MethodDecl) {
+func (cnt *counters) functionsCommentCoverage(cstrs []*ast.ConstructorDecl, dstrs []*ast.DestructorDecl, mthds []*ast.MethodDecl) {
 
 	for _, fct := range cstrs {
 		if isVisible(fct.Visibility) {
@@ -227,9 +229,9 @@ func (cnt *counters) functionsCommentCoverage(cstrs []*src.ConstructorDecl, dstr
 }
 
 func isVisible(v string) bool {
-	return v == src.PublicVisibility ||
-		v == src.ProtectedVisibility ||
-		v == src.PackageVisibility
+	return v == token.PublicVisibility ||
+		v == token.ProtectedVisibility ||
+		v == token.PackageVisibility
 }
 
 func hasComment(doc []string) bool {

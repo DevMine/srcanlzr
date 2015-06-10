@@ -1,80 +1,50 @@
-// Copyright 2014-2015 The DevMine Authors. All rights reserved.
+// Copyright 2014-2015 The project AUTHORS. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
 package src
 
 import (
-	"fmt"
-	"reflect"
+	"io"
+	"os"
 )
 
-type Interface struct {
-	Doc                   []string        `json:"doc,omitempty"`
-	Name                  string          `json:"name"`
-	ImplementedInterfaces []*InterfaceRef `json:"implemented_interfaces,omitempty"`
-	Protos                []*ProtoDecl    `json:"prototypes"`
-	Visibility            string          `json:"visibility"`
+// Decode decodes a JSON encoded src.Project read from r.
+func Decode(r io.Reader) (*Project, error) {
+	dec := newDecoder(r)
+	return dec.decode()
 }
 
-func newInterface(m map[string]interface{}) (*Interface, error) {
-	var err error
-	errPrefix := "src/interface"
-	i := Interface{}
-
-	if i.Doc, err = extractStringSliceValue("doc", errPrefix, m); err != nil && isExist(err) {
-		return nil, addDebugInfo(err)
+// DecodeFile decodes a JSON encoded src.Project read from a given file.
+func DecodeFile(path string) (*Project, error) {
+	f, err := os.Open(path)
+	if err != nil {
+		return nil, err
 	}
-
-	if i.Name, err = extractStringValue("name", errPrefix, m); err != nil {
-		return nil, addDebugInfo(err)
-	}
-
-	if i.ImplementedInterfaces, err = newInterfaceRefsSlice("implemented_interfaces", errPrefix, m); err != nil && isExist(err) {
-		return nil, addDebugInfo(err)
-	}
-
-	if i.Protos, err = newProtoDeclsSlice("prototypes", errPrefix, m); err != nil {
-		return nil, addDebugInfo(err)
-	}
-
-	if i.Visibility, err = extractStringValue("visibility", errPrefix, m); err != nil {
-		return nil, addDebugInfo(err)
-	}
-
-	return &i, nil
+	defer f.Close()
+	return Decode(f)
 }
 
-func newInterfacesSlice(key, errPrefix string, m map[string]interface{}) ([]*Interface, error) {
-	var err error
-	var s reflect.Value
+// MergeAll merges a list of projects.
+//
+// There must be at least one project. In this case, it just returns a copy of
+// the project. Moreover, the projects must be distinct.
+//
+// The merge only performs shallow copies, which means that if the field value
+// is a pointer it copies the memory address and not the value pointed.
+func MergeAll(ps ...*Project) (*Project, error) {
+	return mergeAll(ps...)
+}
 
-	interfsMap, ok := m[key]
-	if !ok {
-		// XXX It is not possible to add debug info on this error because it is
-		// required that this error be en "errNotExist".
-		return nil, errNotExist
+// Merge merges two project. See MergeAll for more details.
+func Merge(p1, p2 *Project) *Project {
+	// merge() merges p2 into p1, therefore we need to copy p1 before merging.
+	newPrj := &Project{
+		Name:     p1.Name,
+		Langs:    p1.Langs,
+		Packages: p1.Packages,
+		LoC:      p1.LoC,
 	}
-
-	if s = reflect.ValueOf(interfsMap); s.Kind() != reflect.Slice {
-		return nil, addDebugInfo(fmt.Errorf(
-			"%s: field '%s' is supposed to be a slice", errPrefix, key))
-	}
-
-	interfs := make([]*Interface, s.Len(), s.Len())
-	for i := 0; i < s.Len(); i++ {
-		interf := s.Index(i).Interface()
-
-		switch interf.(type) {
-		case map[string]interface{}:
-			if interfs[i], err = newInterface(interf.(map[string]interface{})); err != nil {
-				return nil, addDebugInfo(err)
-			}
-		default:
-			return nil, addDebugInfo(fmt.Errorf(
-				"%s: '%s' must be a map[string]interface{}", errPrefix, key))
-		}
-	}
-
-	return interfs, nil
+	merge(newPrj, p2)
+	return newPrj
 }
