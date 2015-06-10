@@ -363,7 +363,7 @@ type TryStmt struct {
 }
 
 type CatchClause struct {
-	Params []*Field `json:"params,omitempty"`
+	Params []*Field `json:"parameters,omitempty"`
 	Body   []Stmt   `json:"body,omitempty"`
 }
 
