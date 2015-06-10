@@ -317,7 +317,7 @@ func (dec *decoder) decodeSrcFile() *SrcFile {
 		case "interfaces":
 			dec.scan.back()
 			sf.Interfaces = dec.decodeInterfaces()
-		case "clases":
+		case "classes":
 			dec.scan.back()
 			sf.Classes = dec.decodeClassDecls()
 		case "enums":
