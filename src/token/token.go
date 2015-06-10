@@ -49,33 +49,6 @@ const (
 	VarDecl   = "VAR"      // variable
 )
 
-// Expression names
-const (
-	// Expression names
-	UnaryExprName           = "UNARY"            // unary expression (!foo)
-	BinaryExprName          = "BINARY"           // binary expression (foo && bar)
-	TernaryExprName         = "TERNARY"          // ternary expression (foo ? 42 : 0)
-	IncDecExprName          = "INC_DEC"          // increment/decrement expression (i++/i--)
-	CallExprName            = "CALL"             // call expression (foo(42))
-	ConstructorCallExprName = "CONSTRUCTOR_CALL" // constructor call expression (foo = new Foo())
-	ArrayExprName           = "ARRAY"            // array expression
-	IndexExprName           = "INDEX"            // index expression (foo[i])
-
-	// Literal names
-	BasicLitName = "BASIC_LIT" // basic literal ("foo", 42, 12.34, ...)
-	FuncLitName  = "FUNC_LIT"  // function literal (foo := func() { ... })
-	ClassLitName = "CLASS_LIT" // class literal
-	ArrayLitName = "ARRAY_LIT" // array literal (foo = [1,2,3])
-
-	// Type names
-	StructTypeName = "STRUCT_TYPE" // struct type
-
-	// Other
-	AttrRefName   = "ATTR_REF"   // attribute reference (this.foo)
-	ValueSpecName = "VALUE_SPEC" // value specifier
-	IdentName     = "IDENT"      // identifier
-)
-
 // Increment/Decrement operators
 const (
 	INC = "INC" // increment operator (i++)
@@ -105,6 +78,33 @@ const (
 	TryStmtName       = "TRY"        // try...catch statement
 	ThrowStmtName     = "THROW"      // throw exception
 	OtherStmtName     = "OTHER"      // any other not supported statement
+)
+
+// Expression names
+const (
+	// Expression names
+	UnaryExprName           = "UNARY"            // unary expression (!foo)
+	BinaryExprName          = "BINARY"           // binary expression (foo && bar)
+	TernaryExprName         = "TERNARY"          // ternary expression (foo ? 42 : 0)
+	IncDecExprName          = "INC_DEC"          // increment/decrement expression (i++/i--)
+	CallExprName            = "CALL"             // call expression (foo(42))
+	ConstructorCallExprName = "CONSTRUCTOR_CALL" // constructor call expression (foo = new Foo())
+	ArrayExprName           = "ARRAY"            // array expression
+	IndexExprName           = "INDEX"            // index expression (foo[i])
+
+	// Literal names
+	BasicLitName = "BASIC_LIT" // basic literal ("foo", 42, 12.34, ...)
+	FuncLitName  = "FUNC_LIT"  // function literal (foo := func() { ... })
+	ClassLitName = "CLASS_LIT" // class literal
+	ArrayLitName = "ARRAY_LIT" // array literal (foo = [1,2,3])
+
+	// Type names
+	StructTypeName = "STRUCT_TYPE" // struct type
+
+	// Other
+	AttrRefName   = "ATTR_REF"   // attribute reference (this.foo)
+	ValueSpecName = "VALUE_SPEC" // value specifier
+	IdentName     = "IDENT"      // identifier
 )
 
 // Supported visiblities
