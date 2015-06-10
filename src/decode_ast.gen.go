@@ -134,6 +134,9 @@ func (dec *decoder) decodeExpr() ast.Expr {
 	case token.ClassLitName:
 		expr = dec.decodeClassLitAttrs()
 
+	case token.ConstructorCallExprName:
+		expr = dec.decodeConstructorCallExprAttrs()
+
 	case token.FuncLitName:
 		expr = dec.decodeFuncLitAttrs()
 
@@ -183,7 +186,8 @@ func (dec *decoder) decodeArrayExpr() *ast.ArrayExpr {
 }
 
 func (dec *decoder) decodeArrayExprAttrs() *ast.ArrayExpr {
-	expr := ast.ArrayExpr{ExprName: token.ArrayExprName}
+	expr := ast.ArrayExpr{}
+	expr.ExprName = token.ArrayExprName
 	for {
 		key, err := dec.scan.nextKey()
 		if err != nil {
@@ -256,7 +260,8 @@ func (dec *decoder) decodeArrayLit() *ast.ArrayLit {
 }
 
 func (dec *decoder) decodeArrayLitAttrs() *ast.ArrayLit {
-	expr := ast.ArrayLit{ExprName: token.ArrayLitName}
+	expr := ast.ArrayLit{}
+	expr.ExprName = token.ArrayLitName
 	for {
 		key, err := dec.scan.nextKey()
 		if err != nil {
@@ -335,7 +340,8 @@ func (dec *decoder) decodeAttrRef() *ast.AttrRef {
 }
 
 func (dec *decoder) decodeAttrRefAttrs() *ast.AttrRef {
-	expr := ast.AttrRef{ExprName: token.AttrRefName}
+	expr := ast.AttrRef{}
+	expr.ExprName = token.AttrRefName
 	for {
 		key, err := dec.scan.nextKey()
 		if err != nil {
@@ -408,7 +414,8 @@ func (dec *decoder) decodeBasicLit() *ast.BasicLit {
 }
 
 func (dec *decoder) decodeBasicLitAttrs() *ast.BasicLit {
-	expr := ast.BasicLit{ExprName: token.BasicLitName}
+	expr := ast.BasicLit{}
+	expr.ExprName = token.BasicLitName
 	for {
 		key, err := dec.scan.nextKey()
 		if err != nil {
@@ -491,7 +498,8 @@ func (dec *decoder) decodeBinaryExpr() *ast.BinaryExpr {
 }
 
 func (dec *decoder) decodeBinaryExprAttrs() *ast.BinaryExpr {
-	expr := ast.BinaryExpr{ExprName: token.BinaryExprName}
+	expr := ast.BinaryExpr{}
+	expr.ExprName = token.BinaryExprName
 	for {
 		key, err := dec.scan.nextKey()
 		if err != nil {
@@ -578,7 +586,8 @@ func (dec *decoder) decodeCallExpr() *ast.CallExpr {
 }
 
 func (dec *decoder) decodeCallExprAttrs() *ast.CallExpr {
-	expr := ast.CallExpr{ExprName: token.CallExprName}
+	expr := ast.CallExpr{}
+	expr.ExprName = token.CallExprName
 	for {
 		key, err := dec.scan.nextKey()
 		if err != nil {
@@ -665,7 +674,8 @@ func (dec *decoder) decodeClassLit() *ast.ClassLit {
 }
 
 func (dec *decoder) decodeClassLitAttrs() *ast.ClassLit {
-	expr := ast.ClassLit{ExprName: token.ClassLitName}
+	expr := ast.ClassLit{}
+	expr.ExprName = token.ClassLitName
 	for {
 		key, err := dec.scan.nextKey()
 		if err != nil {
@@ -753,6 +763,94 @@ func (dec *decoder) decodeClassLitAttrs() *ast.ClassLit {
 	return &expr
 }
 
+func (dec *decoder) decodeConstructorCallExpr() *ast.ConstructorCallExpr {
+	if !dec.assertNewObject() {
+		return nil
+	}
+	if dec.isEmptyObject() {
+		dec.err = errors.New("ConstructorCallExpr object cannot be empty")
+		return nil
+	}
+	if dec.err != nil {
+		return nil
+	}
+	return dec.decodeConstructorCallExprAttrs()
+}
+
+func (dec *decoder) decodeConstructorCallExprAttrs() *ast.ConstructorCallExpr {
+	expr := ast.ConstructorCallExpr{}
+	expr.ExprName = token.ConstructorCallExprName
+	for {
+		key, err := dec.scan.nextKey()
+		if err != nil {
+			if err == io.EOF {
+				break
+			}
+			dec.err = err
+			return nil
+		}
+		if key == "" {
+			dec.err = errors.New("empty key")
+			return nil
+		}
+
+		val, tok, err := dec.scan.nextValue()
+
+		if err != nil {
+			dec.err = err
+			return nil
+		}
+
+		if tok != scanNullVal {
+			switch key {
+
+			case "expression_name":
+
+				if tok != scanStringLit {
+					dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
+					return nil
+				}
+				expr.ExprName, dec.err = dec.unmarshalString(val)
+
+			case "function":
+
+				dec.scan.back()
+
+				expr.Fun = dec.decodeFuncRef()
+
+			case "arguments":
+
+				dec.scan.back()
+
+				expr.Args = dec.decodeExprs()
+
+			case "line":
+
+				if tok != scanInt64Lit {
+					dec.err = fmt.Errorf("expected 'Int64 literal', found '%v'", tok)
+					return nil
+				}
+				expr.Line, dec.err = dec.unmarshalInt64(val)
+
+			default:
+				dec.err = fmt.Errorf("unexpected key '%s' for ConstructorCallExpr object", key)
+			}
+		}
+
+		if dec.err != nil {
+			return nil
+		}
+
+		if dec.isEndObject() {
+			break
+		}
+		if err != nil {
+			return nil
+		}
+	}
+	return &expr
+}
+
 func (dec *decoder) decodeFuncLit() *ast.FuncLit {
 	if !dec.assertNewObject() {
 		return nil
@@ -768,7 +866,8 @@ func (dec *decoder) decodeFuncLit() *ast.FuncLit {
 }
 
 func (dec *decoder) decodeFuncLitAttrs() *ast.FuncLit {
-	expr := ast.FuncLit{ExprName: token.FuncLitName}
+	expr := ast.FuncLit{}
+	expr.ExprName = token.FuncLitName
 	for {
 		key, err := dec.scan.nextKey()
 		if err != nil {
@@ -855,7 +954,8 @@ func (dec *decoder) decodeIdent() *ast.Ident {
 }
 
 func (dec *decoder) decodeIdentAttrs() *ast.Ident {
-	expr := ast.Ident{ExprName: token.IdentName}
+	expr := ast.Ident{}
+	expr.ExprName = token.IdentName
 	for {
 		key, err := dec.scan.nextKey()
 		if err != nil {
@@ -930,7 +1030,8 @@ func (dec *decoder) decodeIncDecExpr() *ast.IncDecExpr {
 }
 
 func (dec *decoder) decodeIncDecExprAttrs() *ast.IncDecExpr {
-	expr := ast.IncDecExpr{ExprName: token.IncDecExprName}
+	expr := ast.IncDecExpr{}
+	expr.ExprName = token.IncDecExprName
 	for {
 		key, err := dec.scan.nextKey()
 		if err != nil {
@@ -1019,7 +1120,8 @@ func (dec *decoder) decodeIndexExpr() *ast.IndexExpr {
 }
 
 func (dec *decoder) decodeIndexExprAttrs() *ast.IndexExpr {
-	expr := ast.IndexExpr{ExprName: token.IndexExprName}
+	expr := ast.IndexExpr{}
+	expr.ExprName = token.IndexExprName
 	for {
 		key, err := dec.scan.nextKey()
 		if err != nil {
@@ -1098,7 +1200,8 @@ func (dec *decoder) decodeStructType() *ast.StructType {
 }
 
 func (dec *decoder) decodeStructTypeAttrs() *ast.StructType {
-	expr := ast.StructType{ExprName: token.StructTypeName}
+	expr := ast.StructType{}
+	expr.ExprName = token.StructTypeName
 	for {
 		key, err := dec.scan.nextKey()
 		if err != nil {
@@ -1183,7 +1286,8 @@ func (dec *decoder) decodeTernaryExpr() *ast.TernaryExpr {
 }
 
 func (dec *decoder) decodeTernaryExprAttrs() *ast.TernaryExpr {
-	expr := ast.TernaryExpr{ExprName: token.TernaryExprName}
+	expr := ast.TernaryExpr{}
+	expr.ExprName = token.TernaryExprName
 	for {
 		key, err := dec.scan.nextKey()
 		if err != nil {
@@ -1268,7 +1372,8 @@ func (dec *decoder) decodeUnaryExpr() *ast.UnaryExpr {
 }
 
 func (dec *decoder) decodeUnaryExprAttrs() *ast.UnaryExpr {
-	expr := ast.UnaryExpr{ExprName: token.UnaryExprName}
+	expr := ast.UnaryExpr{}
+	expr.ExprName = token.UnaryExprName
 	for {
 		key, err := dec.scan.nextKey()
 		if err != nil {
@@ -1349,7 +1454,8 @@ func (dec *decoder) decodeValueSpec() *ast.ValueSpec {
 }
 
 func (dec *decoder) decodeValueSpecAttrs() *ast.ValueSpec {
-	expr := ast.ValueSpec{ExprName: token.ValueSpecName}
+	expr := ast.ValueSpec{}
+	expr.ExprName = token.ValueSpecName
 	for {
 		key, err := dec.scan.nextKey()
 		if err != nil {
@@ -1627,6 +1733,39 @@ func (dec *decoder) decodeClassLits() []*ast.ClassLit {
 
 	for {
 		elt := dec.decodeClassLit()
+		if dec.err != nil {
+			return nil
+		}
+
+		a = append(a, elt)
+
+		if dec.isEndArray() {
+			break
+		}
+		if dec.err != nil {
+			return nil
+		}
+	}
+
+	return a
+}
+
+func (dec *decoder) decodeConstructorCallExprs() []*ast.ConstructorCallExpr {
+	if !dec.assertNewArray() {
+		return nil
+	}
+
+	a := []*ast.ConstructorCallExpr{}
+
+	if dec.isEmptyArray() {
+		return a
+	}
+	if dec.err != nil {
+		return nil
+	}
+
+	for {
+		elt := dec.decodeConstructorCallExpr()
 		if dec.err != nil {
 			return nil
 		}
@@ -1941,6 +2080,9 @@ func (dec *decoder) decodeStmt() ast.Stmt {
 	case token.AssignStmtName:
 		stmt = dec.decodeAssignStmtAttrs()
 
+	case token.DeclStmtName:
+		stmt = dec.decodeDeclStmtAttrs()
+
 	case token.ExprStmtName:
 		stmt = dec.decodeExprStmtAttrs()
 
@@ -1969,7 +2111,7 @@ func (dec *decoder) decodeStmt() ast.Stmt {
 		stmt = dec.decodeTryStmtAttrs()
 
 	default:
-		dec.err = fmt.Errorf("unknown expression '%s'", stmtName)
+		dec.err = fmt.Errorf("unknown statement '%s'", stmtName)
 		return nil
 	}
 	if dec.err != nil {
@@ -1993,7 +2135,8 @@ func (dec *decoder) decodeAssignStmt() *ast.AssignStmt {
 }
 
 func (dec *decoder) decodeAssignStmtAttrs() *ast.AssignStmt {
-	stmt := ast.AssignStmt{StmtName: token.AssignStmtName}
+	stmt := ast.AssignStmt{}
+	stmt.StmtName = token.AssignStmtName
 	for {
 		key, err := dec.scan.nextKey()
 		if err != nil {
@@ -2065,6 +2208,102 @@ func (dec *decoder) decodeAssignStmtAttrs() *ast.AssignStmt {
 	return &stmt
 }
 
+func (dec *decoder) decodeDeclStmt() *ast.DeclStmt {
+	if !dec.assertNewObject() {
+		return nil
+	}
+	if dec.isEmptyObject() {
+		dec.err = errors.New("DeclStmt object cannot be empty")
+		return nil
+	}
+	if dec.err != nil {
+		return nil
+	}
+	return dec.decodeDeclStmtAttrs()
+}
+
+func (dec *decoder) decodeDeclStmtAttrs() *ast.DeclStmt {
+	stmt := ast.DeclStmt{}
+	stmt.StmtName = token.DeclStmtName
+	for {
+		key, err := dec.scan.nextKey()
+		if err != nil {
+			if err == io.EOF {
+				break
+			}
+			dec.err = err
+			return nil
+		}
+		if key == "" {
+			dec.err = errors.New("empty key")
+			return nil
+		}
+
+		val, tok, err := dec.scan.nextValue()
+
+		if err != nil {
+			dec.err = err
+			return nil
+		}
+
+		if tok != scanNullVal {
+			switch key {
+
+			case "statement_name":
+
+				if tok != scanStringLit {
+					dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
+					return nil
+				}
+				stmt.StmtName, dec.err = dec.unmarshalString(val)
+
+			case "left_hand_side":
+
+				dec.scan.back()
+
+				stmt.LHS = dec.decodeExprs()
+
+			case "right_hand_side":
+
+				dec.scan.back()
+
+				stmt.RHS = dec.decodeExprs()
+
+			case "line":
+
+				if tok != scanInt64Lit {
+					dec.err = fmt.Errorf("expected 'Int64 literal', found '%v'", tok)
+					return nil
+				}
+				stmt.Line, dec.err = dec.unmarshalInt64(val)
+
+			case "kind":
+
+				if tok != scanStringLit {
+					dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
+					return nil
+				}
+				stmt.Kind, dec.err = dec.unmarshalString(val)
+
+			default:
+				dec.err = fmt.Errorf("unexpected key '%s' for DeclStmt object", key)
+			}
+		}
+
+		if dec.err != nil {
+			return nil
+		}
+
+		if dec.isEndObject() {
+			break
+		}
+		if err != nil {
+			return nil
+		}
+	}
+	return &stmt
+}
+
 func (dec *decoder) decodeExprStmt() *ast.ExprStmt {
 	if !dec.assertNewObject() {
 		return nil
@@ -2080,7 +2319,8 @@ func (dec *decoder) decodeExprStmt() *ast.ExprStmt {
 }
 
 func (dec *decoder) decodeExprStmtAttrs() *ast.ExprStmt {
-	stmt := ast.ExprStmt{StmtName: token.ExprStmtName}
+	stmt := ast.ExprStmt{}
+	stmt.StmtName = token.ExprStmtName
 	for {
 		key, err := dec.scan.nextKey()
 		if err != nil {
@@ -2153,7 +2393,8 @@ func (dec *decoder) decodeIfStmt() *ast.IfStmt {
 }
 
 func (dec *decoder) decodeIfStmtAttrs() *ast.IfStmt {
-	stmt := ast.IfStmt{StmtName: token.IfStmtName}
+	stmt := ast.IfStmt{}
+	stmt.StmtName = token.IfStmtName
 	for {
 		key, err := dec.scan.nextKey()
 		if err != nil {
@@ -2252,7 +2493,8 @@ func (dec *decoder) decodeLoopStmt() *ast.LoopStmt {
 }
 
 func (dec *decoder) decodeLoopStmtAttrs() *ast.LoopStmt {
-	stmt := ast.LoopStmt{StmtName: token.LoopStmtName}
+	stmt := ast.LoopStmt{}
+	stmt.StmtName = token.LoopStmtName
 	for {
 		key, err := dec.scan.nextKey()
 		if err != nil {
@@ -2365,7 +2607,8 @@ func (dec *decoder) decodeOtherStmt() *ast.OtherStmt {
 }
 
 func (dec *decoder) decodeOtherStmtAttrs() *ast.OtherStmt {
-	stmt := ast.OtherStmt{StmtName: token.OtherStmtName}
+	stmt := ast.OtherStmt{}
+	stmt.StmtName = token.OtherStmtName
 	for {
 		key, err := dec.scan.nextKey()
 		if err != nil {
@@ -2446,7 +2689,8 @@ func (dec *decoder) decodeRangeLoopStmt() *ast.RangeLoopStmt {
 }
 
 func (dec *decoder) decodeRangeLoopStmtAttrs() *ast.RangeLoopStmt {
-	stmt := ast.RangeLoopStmt{StmtName: token.RangeLoopStmtName}
+	stmt := ast.RangeLoopStmt{}
+	stmt.StmtName = token.RangeLoopStmtName
 	for {
 		key, err := dec.scan.nextKey()
 		if err != nil {
@@ -2539,7 +2783,8 @@ func (dec *decoder) decodeReturnStmt() *ast.ReturnStmt {
 }
 
 func (dec *decoder) decodeReturnStmtAttrs() *ast.ReturnStmt {
-	stmt := ast.ReturnStmt{StmtName: token.ReturnStmtName}
+	stmt := ast.ReturnStmt{}
+	stmt.StmtName = token.ReturnStmtName
 	for {
 		key, err := dec.scan.nextKey()
 		if err != nil {
@@ -2620,7 +2865,8 @@ func (dec *decoder) decodeSwitchStmt() *ast.SwitchStmt {
 }
 
 func (dec *decoder) decodeSwitchStmtAttrs() *ast.SwitchStmt {
-	stmt := ast.SwitchStmt{StmtName: token.SwitchStmtName}
+	stmt := ast.SwitchStmt{}
+	stmt.StmtName = token.SwitchStmtName
 	for {
 		key, err := dec.scan.nextKey()
 		if err != nil {
@@ -2711,7 +2957,8 @@ func (dec *decoder) decodeThrowStmt() *ast.ThrowStmt {
 }
 
 func (dec *decoder) decodeThrowStmtAttrs() *ast.ThrowStmt {
-	stmt := ast.ThrowStmt{StmtName: token.ThrowStmtName}
+	stmt := ast.ThrowStmt{}
+	stmt.StmtName = token.ThrowStmtName
 	for {
 		key, err := dec.scan.nextKey()
 		if err != nil {
@@ -2784,7 +3031,8 @@ func (dec *decoder) decodeTryStmt() *ast.TryStmt {
 }
 
 func (dec *decoder) decodeTryStmtAttrs() *ast.TryStmt {
-	stmt := ast.TryStmt{StmtName: token.TryStmtName}
+	stmt := ast.TryStmt{}
+	stmt.StmtName = token.TryStmtName
 	for {
 		key, err := dec.scan.nextKey()
 		if err != nil {
@@ -2870,6 +3118,39 @@ func (dec *decoder) decodeAssignStmts() []*ast.AssignStmt {
 
 	for {
 		elt := dec.decodeAssignStmt()
+		if dec.err != nil {
+			return nil
+		}
+
+		a = append(a, elt)
+
+		if dec.isEndArray() {
+			break
+		}
+		if dec.err != nil {
+			return nil
+		}
+	}
+
+	return a
+}
+
+func (dec *decoder) decodeDeclStmts() []*ast.DeclStmt {
+	if !dec.assertNewArray() {
+		return nil
+	}
+
+	a := []*ast.DeclStmt{}
+
+	if dec.isEmptyArray() {
+		return a
+	}
+	if dec.err != nil {
+		return nil
+	}
+
+	for {
+		elt := dec.decodeDeclStmt()
 		if dec.err != nil {
 			return nil
 		}
@@ -3293,6 +3574,44 @@ func (dec *decoder) decodeAttr() *ast.Attr {
 		if tok != scanNullVal {
 			switch key {
 
+			case "doc":
+
+				dec.scan.back()
+
+				any.Doc = dec.decodeStrings()
+
+			case "name":
+
+				if tok != scanStringLit {
+					dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
+					return nil
+				}
+				any.Name, dec.err = dec.unmarshalString(val)
+
+			case "type":
+
+				if tok != scanStringLit {
+					dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
+					return nil
+				}
+				any.Type, dec.err = dec.unmarshalString(val)
+
+			case "value":
+
+				if tok != scanStringLit {
+					dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
+					return nil
+				}
+				any.Value, dec.err = dec.unmarshalString(val)
+
+			case "is_pointer":
+
+				if tok != scanBoolLit {
+					dec.err = fmt.Errorf("expected 'Bool literal', found '%v'", tok)
+					return nil
+				}
+				any.IsPointer, dec.err = dec.unmarshalBool(val)
+
 			case "visibility":
 
 				if tok != scanStringLit {
@@ -3642,64 +3961,6 @@ func (dec *decoder) decodeConstant() *ast.Constant {
 	return &any
 }
 
-func (dec *decoder) decodeConstructorCallExpr() *ast.ConstructorCallExpr {
-	if dec.isNull() {
-		return nil
-	}
-	if !dec.assertNewObject() {
-		return nil
-	}
-	if dec.isEmptyObject() {
-		return nil
-	}
-	if dec.err != nil {
-		return nil
-	}
-
-	any := ast.ConstructorCallExpr{}
-	for {
-		key, err := dec.scan.nextKey()
-		if err != nil {
-			if err == io.EOF {
-				break
-			}
-			dec.err = err
-			return nil
-		}
-		if key == "" {
-			dec.err = errors.New("empty key")
-			return nil
-		}
-
-		_, tok, err := dec.scan.nextValue()
-
-		if err != nil {
-			dec.err = err
-			return nil
-		}
-
-		if tok != scanNullVal {
-			switch key {
-
-			default:
-				dec.err = fmt.Errorf("unexpected key '%s' for ConstructorCallExpr object", key)
-			}
-		}
-
-		if dec.err != nil {
-			return nil
-		}
-
-		if dec.isEndObject() {
-			break
-		}
-		if err != nil {
-			return nil
-		}
-	}
-	return &any
-}
-
 func (dec *decoder) decodeConstructorDecl() *ast.ConstructorDecl {
 	if dec.isNull() {
 		return nil
@@ -3800,72 +4061,6 @@ func (dec *decoder) decodeConstructorDecl() *ast.ConstructorDecl {
 	return &any
 }
 
-func (dec *decoder) decodeDeclStmt() *ast.DeclStmt {
-	if dec.isNull() {
-		return nil
-	}
-	if !dec.assertNewObject() {
-		return nil
-	}
-	if dec.isEmptyObject() {
-		return nil
-	}
-	if dec.err != nil {
-		return nil
-	}
-
-	any := ast.DeclStmt{}
-	for {
-		key, err := dec.scan.nextKey()
-		if err != nil {
-			if err == io.EOF {
-				break
-			}
-			dec.err = err
-			return nil
-		}
-		if key == "" {
-			dec.err = errors.New("empty key")
-			return nil
-		}
-
-		val, tok, err := dec.scan.nextValue()
-
-		if err != nil {
-			dec.err = err
-			return nil
-		}
-
-		if tok != scanNullVal {
-			switch key {
-
-			case "kind":
-
-				if tok != scanStringLit {
-					dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
-					return nil
-				}
-				any.Kind, dec.err = dec.unmarshalString(val)
-
-			default:
-				dec.err = fmt.Errorf("unexpected key '%s' for DeclStmt object", key)
-			}
-		}
-
-		if dec.err != nil {
-			return nil
-		}
-
-		if dec.isEndObject() {
-			break
-		}
-		if err != nil {
-			return nil
-		}
-	}
-	return &any
-}
-
 func (dec *decoder) decodeDestructorDecl() *ast.DestructorDecl {
 	if dec.isNull() {
 		return nil
@@ -3895,7 +4090,7 @@ func (dec *decoder) decodeDestructorDecl() *ast.DestructorDecl {
 			return nil
 		}
 
-		_, tok, err := dec.scan.nextValue()
+		val, tok, err := dec.scan.nextValue()
 
 		if err != nil {
 			dec.err = err
@@ -3904,6 +4099,48 @@ func (dec *decoder) decodeDestructorDecl() *ast.DestructorDecl {
 
 		if tok != scanNullVal {
 			switch key {
+
+			case "doc":
+
+				dec.scan.back()
+
+				any.Doc = dec.decodeStrings()
+
+			case "name":
+
+				if tok != scanStringLit {
+					dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
+					return nil
+				}
+				any.Name, dec.err = dec.unmarshalString(val)
+
+			case "parameters":
+
+				dec.scan.back()
+
+				any.Params = dec.decodeFields()
+
+			case "body":
+
+				dec.scan.back()
+
+				any.Body = dec.decodeStmts()
+
+			case "visibility":
+
+				if tok != scanStringLit {
+					dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
+					return nil
+				}
+				any.Visibility, dec.err = dec.unmarshalString(val)
+
+			case "loc":
+
+				if tok != scanInt64Lit {
+					dec.err = fmt.Errorf("expected 'Int64 literal', found '%v'", tok)
+					return nil
+				}
+				any.LoC, dec.err = dec.unmarshalInt64(val)
 
 			default:
 				dec.err = fmt.Errorf("unexpected key '%s' for DestructorDecl object", key)
@@ -4939,6 +5176,48 @@ func (dec *decoder) decodeMethodDecl() *ast.MethodDecl {
 		if tok != scanNullVal {
 			switch key {
 
+			case "doc":
+
+				dec.scan.back()
+
+				any.Doc = dec.decodeStrings()
+
+			case "name":
+
+				if tok != scanStringLit {
+					dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
+					return nil
+				}
+				any.Name, dec.err = dec.unmarshalString(val)
+
+			case "type":
+
+				dec.scan.back()
+
+				any.Type = dec.decodeFuncType()
+
+			case "body":
+
+				dec.scan.back()
+
+				any.Body = dec.decodeStmts()
+
+			case "visibility":
+
+				if tok != scanStringLit {
+					dec.err = fmt.Errorf("expected 'String literal', found '%v'", tok)
+					return nil
+				}
+				any.Visibility, dec.err = dec.unmarshalString(val)
+
+			case "loc":
+
+				if tok != scanInt64Lit {
+					dec.err = fmt.Errorf("expected 'Int64 literal', found '%v'", tok)
+					return nil
+				}
+				any.LoC, dec.err = dec.unmarshalInt64(val)
+
 			case "override":
 
 				if tok != scanBoolLit {
@@ -5403,7 +5682,7 @@ func (dec *decoder) decodeCatchClause() *ast.CatchClause {
 		if tok != scanNullVal {
 			switch key {
 
-			case "params":
+			case "parameters":
 
 				dec.scan.back()
 
@@ -5779,39 +6058,6 @@ func (dec *decoder) decodeConstants() []*ast.Constant {
 	return a
 }
 
-func (dec *decoder) decodeConstructorCallExprs() []*ast.ConstructorCallExpr {
-	if !dec.assertNewArray() {
-		return nil
-	}
-
-	a := []*ast.ConstructorCallExpr{}
-
-	if dec.isEmptyArray() {
-		return a
-	}
-	if dec.err != nil {
-		return nil
-	}
-
-	for {
-		elt := dec.decodeConstructorCallExpr()
-		if dec.err != nil {
-			return nil
-		}
-
-		a = append(a, elt)
-
-		if dec.isEndArray() {
-			break
-		}
-		if dec.err != nil {
-			return nil
-		}
-	}
-
-	return a
-}
-
 func (dec *decoder) decodeConstructorDecls() []*ast.ConstructorDecl {
 	if !dec.assertNewArray() {
 		return nil
@@ -5828,39 +6074,6 @@ func (dec *decoder) decodeConstructorDecls() []*ast.ConstructorDecl {
 
 	for {
 		elt := dec.decodeConstructorDecl()
-		if dec.err != nil {
-			return nil
-		}
-
-		a = append(a, elt)
-
-		if dec.isEndArray() {
-			break
-		}
-		if dec.err != nil {
-			return nil
-		}
-	}
-
-	return a
-}
-
-func (dec *decoder) decodeDeclStmts() []*ast.DeclStmt {
-	if !dec.assertNewArray() {
-		return nil
-	}
-
-	a := []*ast.DeclStmt{}
-
-	if dec.isEmptyArray() {
-		return a
-	}
-	if dec.err != nil {
-		return nil
-	}
-
-	for {
-		elt := dec.decodeDeclStmt()
 		if dec.err != nil {
 			return nil
 		}

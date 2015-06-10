@@ -254,7 +254,8 @@ func (dec *decoder) decode{{ .Name }}() *ast.{{ .Name }} {
 }
 
 func (dec *decoder) decode{{ .Name }}Attrs() *ast.{{ .Name }} {
-	expr := ast.{{ .Name }}{ExprName: token.{{ .Name }}Name}
+	expr := ast.{{ .Name }}{}
+	expr.ExprName = token.{{ .Name }}Name
 	for {
 		key, err := dec.scan.nextKey()
 		if err != nil {
@@ -336,7 +337,8 @@ func (dec *decoder) decode{{ .Name }}() *ast.{{ .Name }} {
 }
 
 func (dec *decoder) decode{{ .Name }}Attrs() *ast.{{ .Name }} {
-	stmt := ast.{{ .Name }}{StmtName: token.{{ .Name }}Name}
+	stmt := ast.{{ .Name }}{}
+	stmt.StmtName = token.{{ .Name }}Name
 	for {
 		key, err := dec.scan.nextKey()
 		if err != nil {
@@ -629,24 +631,36 @@ func extractTag(tag *ast.BasicLit) string {
 	return m[1]
 }
 
-func extractCompositions(field *ast.Field, name string) []Field {
+func extractCompositions(field *ast.Field, name string) ([]Field, int) {
 	// XXX: unsafe
 	var fields []Field
+	kind := Other
 	for _, field := range field.Type.(*ast.Ident).Obj.Decl.(*ast.TypeSpec).Type.(*ast.StructType).Fields.List {
 		fieldTmpl := Field{}
 		if len(field.Names) == 0 {
-			fields = append(fields, extractCompositions(field, name)...)
+			var newFields []Field
+			newFields, kind = extractCompositions(field, name)
+			fields = append(fields, newFields...)
 			continue
 		}
 		fieldTmpl.Name = field.Names[0].String()
 		fieldTmpl.JSONName = extractTag(field.Tag)
+
+		switch fieldTmpl.JSONName {
+		case "expression_name":
+			kind = Expression
+		case "statement_name":
+			kind = Statement
+		}
+
 		if fieldTmpl.Type, fieldTmpl.Array, fieldTmpl.BasicType = extractType(field); fieldTmpl.Type == "" {
 			warnf("invalid type for %s.%s", name, fieldTmpl.Name)
 			continue
 		}
+
 		fields = append(fields, fieldTmpl)
 	}
-	return fields
+	return fields, kind
 }
 
 func warn(a ...interface{}) {
@@ -706,7 +720,9 @@ func main() {
 				fieldTmpl := Field{}
 				// XXX: handle compositions
 				if len(field.Names) == 0 {
-					dec.Fields = append(dec.Fields, extractCompositions(field, dec.Name)...)
+					var newFields []Field
+					newFields, kind = extractCompositions(field, dec.Name)
+					dec.Fields = append(dec.Fields, newFields...)
 					continue
 				}
 				fieldTmpl.Name = field.Names[0].String()
