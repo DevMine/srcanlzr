@@ -192,7 +192,7 @@ func (dec *decoder) decodeStmt() ast.Stmt {
 			stmt = dec.decode{{ $stmt.Name }}Attrs()
 	{{ end }}
 	default:
-		dec.err = fmt.Errorf("unknown expression '%s'", stmtName)
+		dec.err = fmt.Errorf("unknown statement '%s'", stmtName)
 		return nil
 	}
 	if dec.err != nil {
@@ -629,6 +629,26 @@ func extractTag(tag *ast.BasicLit) string {
 	return m[1]
 }
 
+func extractCompositions(field *ast.Field, name string) []Field {
+	// XXX: unsafe
+	var fields []Field
+	for _, field := range field.Type.(*ast.Ident).Obj.Decl.(*ast.TypeSpec).Type.(*ast.StructType).Fields.List {
+		fieldTmpl := Field{}
+		if len(field.Names) == 0 {
+			fields = append(fields, extractCompositions(field, name)...)
+			continue
+		}
+		fieldTmpl.Name = field.Names[0].String()
+		fieldTmpl.JSONName = extractTag(field.Tag)
+		if fieldTmpl.Type, fieldTmpl.Array, fieldTmpl.BasicType = extractType(field); fieldTmpl.Type == "" {
+			warnf("invalid type for %s.%s", name, fieldTmpl.Name)
+			continue
+		}
+		fields = append(fields, fieldTmpl)
+	}
+	return fields
+}
+
 func warn(a ...interface{}) {
 	fmt.Fprintln(os.Stderr, a...)
 }
@@ -686,6 +706,7 @@ func main() {
 				fieldTmpl := Field{}
 				// XXX: handle compositions
 				if len(field.Names) == 0 {
+					dec.Fields = append(dec.Fields, extractCompositions(field, dec.Name)...)
 					continue
 				}
 				fieldTmpl.Name = field.Names[0].String()
