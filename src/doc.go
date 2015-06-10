@@ -14,6 +14,9 @@
 	that can be analyzed by the anlzr package as well as an API for
 	encoding/decoding it to/from JSON.
 
+	A presentation video is available on the DevMine website:
+
+	   http://devmine.ch/news/2015/06/08/srcanlzr-presentation/
 
 	Usage
 
@@ -27,18 +30,171 @@
 
 	Language parsers
 
-	TODO
+	Language parsers must output the same structure as defined by the
+	src.Project type. They have to first parse a project in order to get the
+	specific AST for that project. Then, they have to make that AST match with
+	our generic AST defined in the package:
+
+	   http://godoc.org/github.com/DevMine/srcanlzr/src/ast
+
+	To get more detail about how to write a language parser for srcanlzr, refer
+	to that tutorial:
+
+	   http://devmine.ch/news/2015/05/31/how-to-write-a-parser/
 
 
 	VCS support tools
 
-	TODO
+	Language parsers must not provide any information related to
+	Version Control Systems (VCS). VCS metadata is the job of
+	repotool:
+
+	   http://devmine.ch/news/2015/06/01/repotool-presentation/
+	   http://devmine.ch/doc/repotool/
 
 
 	Example
 
-	TODO
+	For the following Go source file (greet/main.go):
 
+		package main
+
+		import (
+		        "fmt"
+		)
+
+		func greet(name string) {
+		        fmt.Printf("Hello, %s!\n", name)
+		}
+
+		func main() {
+		        name := "World"
+		        greet(name)
+		}
+
+	The language parser must produce the following JSON output:
+
+		{
+		   "name": "greet",
+		   "loc": 5,
+		   "languages": [
+		      {
+				"language": "go",
+		         "paradigms": [
+		            "compiled",
+		            "concurrent",
+		            "imperative",
+		            "structured"
+		         ]
+		      }
+		   ],
+		   "packages": [
+		      {
+		         "loc": 5,
+		         "name": "greet",
+		         "path": "/home/revan/go/src/foo/greet",
+		         "source_files": [
+		            {
+		               "functions": [
+		                  {
+		                     "body": [
+		                        {
+		                           "expression": {
+		                              "arguments": [
+		                                 {
+		                                    "expression_name": "BASIC_LIT",
+		                                    "kind": "STRING",
+		                                    "value": "Hello, %s!\\n"
+		                                 },
+		                                 {
+		                                    "expression_name": "IDENT",
+		                                    "name": "name"
+		                                 }
+		                              ],
+		                              "expression_name": "CALL",
+		                              "function": {
+		                                 "function_name": "Printf",
+		                                 "namespace": "fmt"
+		                              },
+		                              "line": 0
+		                           },
+		                           "statement_name": "EXPR"
+		                        }
+		                     ],
+		                     "loc": 0,
+		                     "name": "greet",
+		                     "type": {
+		                        "parameters": [
+		                           {
+		                              "name": "name",
+		                              "type": "string"
+		                           }
+		                        ]
+		                     },
+		                     "visibility": ""
+		                  },
+		                  {
+		                     "body": [
+		                        {
+		                           "left_hand_side": [
+		                              {
+		                                 "expression_name": "IDENT",
+		                                 "name": "name"
+		                              }
+		                           ],
+		                           "line": 1,
+		                           "right_hand_side": [
+		                              {
+		                                 "expression_name": "BASIC_LIT",
+		                                 "kind": "STRING",
+		                                 "value": "World"
+		                              }
+		                           ],
+		                           "statement_name": "ASSIGN"
+		                        },
+		                        {
+		                           "expression": {
+		                              "arguments": [
+		                                 {
+		                                    "expression_name": "IDENT",
+		                                    "name": "name"
+		                                 }
+		                              ],
+		                              "expression_name": "CALL",
+		                              "function": {
+		                                 "function_name": "greet",
+		                                 "namespace": ""
+		                              },
+		                              "line": 0
+		                           },
+		                           "statement_name": "EXPR"
+		                        }
+		                     ],
+		                     "loc": 0,
+		                     "name": "main",
+		                     "type": null,
+		                     "visibility": ""
+		                  }
+		               ],
+		               "imports": [
+		                  "fmt"
+		               ],
+		               "language": {
+		                  "language": "go",
+		                  "paradigms": [
+		                     "compiled",
+		                     "concurrent",
+		                     "imperative",
+		                     "structured"
+		                  ]
+		               },
+		               "loc": 5,
+		               "path": "/home/revan/go/src/foo/greet/main.go"
+		            }
+		         ]
+		      }
+		   ]
+		}
 
 	Lines of Code counting
 
@@ -111,13 +267,9 @@
 	   bool
 	   object
 	   array
+	All objects used (even inside an array) must absolutely be a pointer. This
+	is required by the decoder generator.
 
-	And the only official supported encoding is UTF-8.
-
-	Further improvements
-
-	The code became quite repetitive. Since most of the logic has been
-	encapsulated into helper methods, it would be really nice to generate the
-	decoding methods using "go generate".
+	The only officially supported encoding is UTF-8.
 */
 package src
