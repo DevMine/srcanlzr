@@ -31,9 +31,8 @@ type AssignStmt struct {
 
 type Attr struct {
 	Var
-	Visibility string `json:"visibility"`
-	Constant   bool   `json:"constant"`
-	Static     bool   `json:"static"`
+	Constant bool `json:"constant"`
+	Static   bool `json:"static"`
 }
 
 type AttrRef struct {
