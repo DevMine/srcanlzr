@@ -81,6 +81,9 @@ func (scan *scanner) nextKey() (string, error) {
 
 	var key string
 	origPos := scan.pos
+	if origPos > len(scan.buf)-1 {
+		origPos = 0
+	}
 	for {
 		c, err := scan.read()
 		if err == io.EOF {
@@ -95,7 +98,7 @@ func (scan *scanner) nextKey() (string, error) {
 			break
 		}
 
-		if scan.pos >= len(scan.buf)-1 {
+		if scan.pos == 0 || scan.pos > len(scan.buf)-1 {
 			key += string(scan.buf[origPos:])
 			origPos = 0
 		}
@@ -138,7 +141,7 @@ func (scan *scanner) nextValue() ([]byte, scanToken, error) {
 	}
 
 	switch {
-	case isDigit(c):
+	case isDigit(c) || c == '-' || c == '+':
 		scan.back()
 		return scan.readNumber()
 	case c == 't' || c == 'f':
@@ -251,7 +254,7 @@ func (scan *scanner) readNumber() ([]byte, scanToken, error) {
 		}
 		if c == '.' {
 			// "." cannot be at the first place in a floating point number
-			if !isDigit(buf[0]) {
+			if numLen == 0 {
 				return nil, scanIllegalToken, errors.New("expected digit, found '.'")
 			}
 			// floating point number can only contain one "."
@@ -259,10 +262,12 @@ func (scan *scanner) readNumber() ([]byte, scanToken, error) {
 				return nil, scanIllegalToken, errors.New("unexpected character '.'")
 			}
 			tok = scanFloat64Lit
-		} else {
-			if !isDigit(c) {
-				return nil, scanIllegalToken, fmt.Errorf("expected digit, found '%c'", c)
+		} else if c == '-' || c == '+' {
+			if numLen != 0 {
+				return nil, scanIllegalToken, fmt.Errorf("symbol '%c' can only be at the first position of a number", c)
 			}
+		} else if !isDigit(c) {
+			return nil, scanIllegalToken, fmt.Errorf("expected digit, found '%c'", c)
 		}
 		// bufsize is already bigger that the maximum possible size for a number,
 		// therefore, if the numLen is bigger than the busize, we return an
