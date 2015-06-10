@@ -6,5 +6,5 @@ go:
     - 1.4
     - tip
 
-install: make deps
-script: go test -v ./...
+install: make deps && make build && make install
+script: make test
