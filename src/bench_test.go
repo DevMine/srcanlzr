@@ -11,7 +11,7 @@ import (
 
 func BenchmarkDecode(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		f, err := os.Open("./testdata/go.json")
+		f, err := os.Open("./testdata/simple.json")
 		if err != nil {
 			b.Fatal(err)
 		}
