@@ -58,7 +58,7 @@ var (
 
 func main() {
 	flag.Usage = func() {
-		fmt.Printf("usage: %s [PROJECT PATH]\n\n", os.Args[0])
+		fmt.Printf("usage: %s [JSON PATH]\n\n", os.Args[0])
 		flag.PrintDefaults()
 		os.Exit(0)
 	}
