@@ -354,6 +354,9 @@ func (dec *decoder) decodeSrcFile() *SrcFile {
 
 // decoderStrings decodes a list of strings.
 func (dec *decoder) decodeStrings() []string {
+	if dec.isNull() {
+		return nil
+	}
 	if !dec.assertNewArray() {
 		return nil
 	}
