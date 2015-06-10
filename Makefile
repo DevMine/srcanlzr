@@ -17,16 +17,16 @@ test:
 bench:
 	go test -bench=. -benchmem ${PKG}/...
 
-deps:
-	go get -u golang.org/x/tools/imports
-	go get -u github.com/DevMine/repotool/model
-
 package: clean deps build
 	test -d ${DIR} || mkdir ${DIR}
 	cp ${EXEC} ${DIR}/
 	cp README.md ${DIR}/
 	tar czvf ${DIR}.tar.gz ${DIR}
 	rm -rf ${DIR}
+
+deps:
+	go get -u golang.org/x/tools/imports
+	go get -u -f github.com/DevMine/repotool/model
 
 dev-deps:
 	 go get -u github.com/golang/lint/golint
